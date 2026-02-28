@@ -60,32 +60,15 @@ export async function POST(request: NextRequest) {
         .toBuffer();
       mimeType = 'image/jpeg';
     } else {
-      // PNG with aggressive compression
-      // For medium/low quality, use palette mode for significantly smaller files
-      const usePalette = qualityPreset === 'medium' || qualityPreset === 'low';
-
-      if (usePalette) {
-        // Quantize to 256 colors for much smaller file size
-        outputBuffer = await sharpInstance
-          .png({
-            compressionLevel: 9, // Maximum compression
-            adaptiveFiltering: true,
-            palette: true, // Enable palette mode (reduces to 256 colors)
-            quality: qualityPreset === 'medium' ? 90 : 70, // Palette quality
-            effort: 10, // Maximum effort for compression
-            colors: qualityPreset === 'medium' ? 256 : 128, // Number of colors
-          })
-          .toBuffer();
-      } else {
-        // High quality: full color PNG with good compression
-        outputBuffer = await sharpInstance
-          .png({
-            compressionLevel: 6, // Balanced compression
-            adaptiveFiltering: true,
-            effort: 8, // High effort for compression
-          })
-          .toBuffer();
-      }
+      // Lossless PNG — only compressionLevel + adaptiveFiltering.
+      // Do NOT pass effort/quality/colours — they enable palette mode
+      // which quantises to ≤256 colours and destroys shadow gradients.
+      outputBuffer = await sharpInstance
+        .png({
+          compressionLevel: qualitySettings.pngCompression,
+          adaptiveFiltering: true,
+        })
+        .toBuffer();
       mimeType = 'image/png';
     }
 

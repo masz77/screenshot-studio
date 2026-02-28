@@ -11,6 +11,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useImageStore } from "@/lib/store";
+import confetti from 'canvas-confetti';
+import { toast } from 'sonner';
 import {
   exportSlideshowVideo,
   exportAnimationVideo,
@@ -62,14 +64,14 @@ function ExportProgressView({ progress, format }: { progress: number; format: st
         .film-loader {
           width: 80px;
           height: 70px;
-          border: 5px solid var(--brand);
+          border: 5px solid var(--primary);
           padding: 0 8px;
           box-sizing: border-box;
           background:
-            linear-gradient(var(--brand) 0 0) 0 0/8px 20px,
-            linear-gradient(var(--brand) 0 0) 100% 0/8px 20px,
-            radial-gradient(farthest-side, var(--brand) 90%, #0000) 0 5px/8px 8px content-box,
-            var(--surface-3);
+            linear-gradient(var(--primary) 0 0) 0 0/8px 20px,
+            linear-gradient(var(--primary) 0 0) 100% 0/8px 20px,
+            radial-gradient(farthest-side, var(--primary) 90%, #0000) 0 5px/8px 8px content-box,
+            var(--accent);
           background-repeat: no-repeat;
           animation: filmLoad 2s infinite linear;
         }
@@ -82,13 +84,13 @@ function ExportProgressView({ progress, format }: { progress: number; format: st
       <div className="film-loader" />
 
       {/* Percentage */}
-      <span className="text-2xl font-bold text-brand tabular-nums">{roundedProgress}%</span>
+      <span className="text-2xl font-bold text-primary tabular-nums">{roundedProgress}%</span>
 
       {/* Progress bar */}
       <div className="w-full">
-        <div className="h-1.5 bg-surface-3 rounded-full overflow-hidden">
+        <div className="h-1.5 bg-accent rounded-full overflow-hidden">
           <div
-            className="h-full bg-brand rounded-full transition-all duration-500 ease-out"
+            className="h-full bg-primary rounded-full transition-all duration-200 ease-out"
             style={{ width: `${progress}%` }}
           />
         </div>
@@ -100,7 +102,7 @@ function ExportProgressView({ progress, format }: { progress: number; format: st
       </p>
 
       {/* Format tag */}
-      <div className="px-3 py-1 rounded-full bg-surface-3 border border-border/50">
+      <div className="px-3 py-1 rounded-full bg-accent border border-border/50">
         <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-medium">
           Exporting as {format.toUpperCase()}
         </span>
@@ -160,6 +162,22 @@ export function ExportSlideshowDialog({
       if (result.format !== format) {
         console.info(`Exported as ${result.format} (${format} not supported)`);
       }
+
+      // Confetti on successful video export
+      confetti({
+        particleCount: 120,
+        spread: 80,
+        origin: { y: 0.6 },
+      });
+
+      toast.success('Video exported successfully!', {
+        description: `Saved as ${result.format.toUpperCase()}`,
+      });
+    } catch (error) {
+      console.error('Video export failed:', error);
+      toast.error('Video export failed', {
+        description: error instanceof Error ? error.message : 'Please try again.',
+      });
     } finally {
       onOpenChange(false);
     }
@@ -200,8 +218,8 @@ export function ExportSlideshowDialog({
                       className={`
                         relative p-3 rounded-lg border text-left transition-all
                         ${exportMode === "animation"
-                          ? "border-brand/50 bg-brand/10"
-                          : "border-border bg-surface-2 hover:border-border/80"
+                          ? "border-primary/50 bg-primary/10"
+                          : "border-border bg-card hover:border-border/80"
                         }
                       `}
                     >
@@ -215,8 +233,8 @@ export function ExportSlideshowDialog({
                       className={`
                         relative p-3 rounded-lg border text-left transition-all
                         ${exportMode === "slideshow"
-                          ? "border-brand/50 bg-brand/10"
-                          : "border-border bg-surface-2 hover:border-border/80"
+                          ? "border-primary/50 bg-primary/10"
+                          : "border-border bg-card hover:border-border/80"
                         }
                       `}
                     >
@@ -243,8 +261,8 @@ export function ExportSlideshowDialog({
                         className={`
                           relative p-3 rounded-lg border text-left transition-all
                           ${format === opt.value
-                            ? "border-brand/50 bg-brand/10"
-                            : "border-border bg-surface-2 hover:border-border/80"
+                            ? "border-primary/50 bg-primary/10"
+                            : "border-border bg-card hover:border-border/80"
                           }
                           ${isDisabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
                         `}
@@ -271,8 +289,8 @@ export function ExportSlideshowDialog({
                       className={`
                         flex-1 py-2 px-3 rounded-lg border text-center transition-all
                         ${quality === opt.value
-                          ? "border-brand/50 bg-brand/10"
-                          : "border-border bg-surface-2 hover:border-border/80"
+                          ? "border-primary/50 bg-primary/10"
+                          : "border-border bg-card hover:border-border/80"
                         }
                       `}
                     >
@@ -308,7 +326,7 @@ export function ExportSlideshowDialog({
 
               {/* Animation Duration Info */}
               {exportMode === "animation" && (
-                <div className="p-3 rounded-lg bg-surface-2 border border-border">
+                <div className="p-3 rounded-lg bg-card border border-border">
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-foreground/70">Animation Duration</span>
                     <span className="text-sm font-medium text-foreground/90">
@@ -324,7 +342,7 @@ export function ExportSlideshowDialog({
               {/* Export Button */}
               <Button
                 onClick={handleExport}
-                className="w-full bg-brand hover:bg-brand-hover text-brand-foreground font-medium"
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium"
                 size="lg"
               >
                 Export as {format.toUpperCase()}

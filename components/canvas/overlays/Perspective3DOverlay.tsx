@@ -132,29 +132,16 @@ export function Perspective3DOverlay({
     b = parseInt(hex.slice(4, 6), 16) || 0;
   }
 
-  // Build multi-layer shadow for realistic depth effect
-  // Heavy on right and bottom, light on top and left
+  // Build shadow filter using direct values from store
   const buildShadowFilter = () => {
-    const baseBlur = shadow.enabled ? (shadow.softness || 25) : 20;
-    const baseOffset = shadow.enabled ? (shadow.elevation || 15) : 12;
+    const x = shadow.enabled ? (shadow.offsetX ?? 0) : 0;
+    const y = shadow.enabled ? (shadow.offsetY ?? 0) : 0;
+    const blur = shadow.enabled ? ((shadow.softness || 15) + (shadow.spread || 0)) : 15;
+    const opacity = shadow.enabled ? Math.min(1, shadow.intensity) : 0.5;
 
-    // Always use dark shadow colors for visibility, but allow custom colors to tint
-    const useCustomColor = shadow.enabled && (r > 0 || g > 0 || b > 0) && !(r === 0 && g === 0 && b === 0);
-
-    // For dark shadows, use black with high opacity
-    // If custom color, blend it with black for better visibility
-    const shadowR = useCustomColor ? Math.floor(r * 0.3) : 0;
-    const shadowG = useCustomColor ? Math.floor(g * 0.3) : 0;
-    const shadowB = useCustomColor ? Math.floor(b * 0.3) : 0;
-
-    // Create layered shadows for depth - using dark colors
     const shadows = [
-      // Primary shadow - heavy on bottom-right (darkest)
-      `drop-shadow(${baseOffset}px ${baseOffset * 1.2}px ${baseBlur}px rgba(${shadowR}, ${shadowG}, ${shadowB}, 0.5))`,
-      // Secondary shadow - medium spread
-      `drop-shadow(${baseOffset * 0.5}px ${baseOffset * 0.8}px ${baseBlur * 1.5}px rgba(${shadowR}, ${shadowG}, ${shadowB}, 0.35))`,
-      // Ambient shadow - soft, larger spread
-      `drop-shadow(${baseOffset * 0.2}px ${baseOffset * 0.4}px ${baseBlur * 2.5}px rgba(0, 0, 0, 0.25))`,
+      `drop-shadow(${x}px ${y}px ${blur}px rgba(${r}, ${g}, ${b}, ${opacity}))`,
+      `drop-shadow(0px 0px ${blur * 0.5}px rgba(${r}, ${g}, ${b}, ${opacity * 0.2}))`,
     ];
 
     return shadows.join(' ');

@@ -123,8 +123,8 @@ export function Hero({
       {/* Content */}
       <div className="relative z-10 max-w-5xl mx-auto text-center px-6 py-24 sm:py-32">
         {/* Badge/Pill */}
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 mb-8">
-          <span className="w-2 h-2 rounded-full bg-brand animate-pulse" />
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-foreground/10 backdrop-blur-md border border-foreground/20 mb-8">
+          <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
           <span className="text-sm text-foreground/90">
             Create stunning visuals in seconds
           </span>
@@ -138,7 +138,7 @@ export function Hero({
           {subtitle && (
             <>
               <br />
-              <span className="bg-gradient-to-r from-brand via-[#ff810a] to-[#73bfc4] bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-primary via-chart-3 to-chart-2 bg-clip-text text-transparent">
                 {subtitle}
               </span>
             </>
@@ -155,7 +155,7 @@ export function Hero({
           <Link href={ctaHref} onClick={() => trackCTAClick('hero', ctaLabel)}>
             <Button
               size="lg"
-              className="cursor-pointer text-base sm:text-lg px-10 py-6 min-h-[56px] font-medium bg-brand text-brand-foreground hover:bg-brand-hover rounded-full shadow-lg shadow-brand/25 hover:shadow-brand/40 transition-all duration-300"
+              className="cursor-pointer text-base sm:text-lg px-10 py-6 min-h-[56px] font-medium bg-primary text-primary-foreground hover:bg-primary/90 rounded-full shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all duration-300"
             >
               {ctaLabel}
             </Button>
@@ -165,10 +165,10 @@ export function Hero({
               trackCTAClick('hero', 'Watch demo');
               setIsVideoOpen(true);
             }}
-            className="cursor-pointer text-foreground/70 hover:text-foreground transition-colors text-sm flex items-center gap-3 group px-6 py-3 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10"
+            className="cursor-pointer text-foreground/70 hover:text-foreground transition-colors text-sm flex items-center gap-3 group px-6 py-3 rounded-full bg-foreground/5 backdrop-blur-sm border border-foreground/10 hover:bg-foreground/10"
             aria-label="Watch demo video"
           >
-            <span className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-brand/20 group-hover:text-brand transition-all duration-300">
+            <span className="w-10 h-10 rounded-full bg-foreground/10 flex items-center justify-center group-hover:bg-primary/20 group-hover:text-primary transition-all duration-300">
               <svg
                 className="w-4 h-4 ml-0.5"
                 fill="currentColor"
@@ -178,7 +178,7 @@ export function Hero({
                 <path d="M6.5 5.5v9l7-4.5-7-4.5z" />
               </svg>
             </span>
-            <span className="group-hover:text-brand transition-colors">
+            <span className="group-hover:text-primary transition-colors">
               Watch demo
             </span>
           </button>
@@ -203,7 +203,7 @@ export function Hero({
         <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-6 text-sm text-foreground/50">
           <div className="flex items-center gap-2">
             <svg
-              className="w-4 h-4 text-brand"
+              className="w-4 h-4 text-primary"
               fill="currentColor"
               viewBox="0 0 20 20"
             >
@@ -218,7 +218,7 @@ export function Hero({
           <div className="hidden sm:block w-1 h-1 rounded-full bg-foreground/30" />
           <div className="flex items-center gap-2">
             <svg
-              className="w-4 h-4 text-brand"
+              className="w-4 h-4 text-primary"
               fill="currentColor"
               viewBox="0 0 20 20"
             >
@@ -233,7 +233,7 @@ export function Hero({
           <div className="hidden sm:block w-1 h-1 rounded-full bg-foreground/30" />
           <div className="flex items-center gap-2">
             <svg
-              className="w-4 h-4 text-brand"
+              className="w-4 h-4 text-primary"
               fill="currentColor"
               viewBox="0 0 20 20"
             >

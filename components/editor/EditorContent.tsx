@@ -12,10 +12,9 @@ export function EditorContent({ children, className }: EditorContentProps) {
   return (
     <main
       className={cn(
-        "flex-1 flex flex-col overflow-y-auto overflow-x-hidden",
+        "flex-1 flex flex-col w-full h-full",
         className
       )}
-      style={{ backgroundColor: 'transparent' }}
     >
       {children}
     </main>

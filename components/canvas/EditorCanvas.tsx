@@ -16,6 +16,7 @@ import { useState, useEffect, useCallback } from "react";
 import React from "react";
 import { cn } from "@/lib/utils";
 import { ExportSlideshowDialog } from "@/lib/export-slideshow-dialog";
+import { aspectRatios } from "@/lib/constants/aspect-ratios";
 
 const ClientCanvas = dynamic(() => import("@/components/canvas/ClientCanvas"), {
   ssr: false,
@@ -41,6 +42,7 @@ export function EditorCanvas() {
     showTimeline,
     timeline,
     animationClips,
+    selectedAspectRatio,
   } = useImageStore();
 
   // Check both stores - imageStore is the source of truth (tracked by undo/redo)
@@ -111,11 +113,23 @@ export function EditorCanvas() {
 
   // Show upload state if no image in either store
   if (!hasImage) {
+    const currentRatio = aspectRatios.find((ar) => ar.id === selectedAspectRatio);
+    const ratioValue = currentRatio ? currentRatio.width / currentRatio.height : 16 / 9;
+
     return (
       <div className="flex-1 flex flex-col h-full w-full">
-        {/* Canvas area with background */}
-        <div className="flex-1 flex items-center justify-center p-4 md:p-8 overflow-hidden">
-          <div className="relative w-full max-w-3xl aspect-video md:aspect-auto md:h-[70vh] rounded-lg overflow-hidden">
+        <div className="flex-1 flex items-center justify-center p-4 md:p-8">
+          <div
+            key={selectedAspectRatio}
+            className="relative rounded-lg overflow-hidden transition-all duration-300"
+            style={{
+              aspectRatio: `${ratioValue}`,
+              width: ratioValue >= 1 ? '100%' : 'auto',
+              height: ratioValue < 1 ? '100%' : 'auto',
+              maxWidth: '48rem',
+              maxHeight: '70vh',
+            }}
+          >
             <CleanUploadState />
           </div>
         </div>
@@ -128,7 +142,7 @@ export function EditorCanvas() {
       <div className="flex flex-col h-full w-full relative">
         {/* Secondary toolbar for slides and image management */}
         {(slides.length > 0 || uploadedImageUrl) && (
-          <div className="flex items-center justify-between gap-2 p-2 border-b border-border/30 bg-[#1e1e1e] shrink-0">
+          <div className="flex items-center justify-between gap-2 p-2 border-b border-border/30 bg-card shrink-0">
             {/* Left side - Undo/Redo controls */}
             <div className="flex items-center gap-1">
               <button
@@ -136,10 +150,10 @@ export function EditorCanvas() {
                 disabled={!canUndo}
                 className={cn(
                   'flex items-center justify-center w-9 h-9 rounded-lg',
-                  'bg-surface-3/60 border border-border/30',
-                  'text-text-secondary transition-all duration-150',
+                  'bg-accent/60 border border-border/30',
+                  'text-muted-foreground transition-all duration-150',
                   canUndo
-                    ? 'hover:bg-surface-4 hover:text-foreground active:scale-95'
+                    ? 'hover:bg-accent hover:text-foreground active:scale-95'
                     : 'opacity-40 cursor-not-allowed'
                 )}
                 title="Undo (Cmd+Z)"
@@ -152,10 +166,10 @@ export function EditorCanvas() {
                 disabled={!canRedo}
                 className={cn(
                   'flex items-center justify-center w-9 h-9 rounded-lg',
-                  'bg-surface-3/60 border border-border/30',
-                  'text-text-secondary transition-all duration-150',
+                  'bg-accent/60 border border-border/30',
+                  'text-muted-foreground transition-all duration-150',
                   canRedo
-                    ? 'hover:bg-surface-4 hover:text-foreground active:scale-95'
+                    ? 'hover:bg-accent hover:text-foreground active:scale-95'
                     : 'opacity-40 cursor-not-allowed'
                 )}
                 title="Redo (Cmd+Shift+Z)"
@@ -222,7 +236,7 @@ export function EditorCanvas() {
 
         {/* Bottom filmstrip — only shown when timeline is NOT visible */}
         {slides.length > 1 && !showTimeline && (
-          <div className="border-t border-border/30 bg-surface-2 p-2 shrink-0 overflow-x-auto">
+          <div className="border-t border-border/30 bg-card p-2 shrink-0 overflow-x-auto">
             <div className="flex gap-2 overflow-x-auto">
               {slides.map((slide) => (
                 <div
@@ -249,7 +263,7 @@ export function EditorCanvas() {
                       e.stopPropagation();
                       removeSlide(slide.id);
                     }}
-                    className="absolute top-1 right-1 z-10 rounded bg-white/70 text-black hover:text-white cursor-pointer hover:bg-red-600 transition h-5 w-5 flex items-center justify-center text-xs"
+                    className="absolute top-1 right-1 z-10 rounded bg-background/70 text-foreground hover:text-destructive-foreground cursor-pointer hover:bg-destructive transition h-5 w-5 flex items-center justify-center text-xs"
                     title="Delete slide"
                   >
                     ✕

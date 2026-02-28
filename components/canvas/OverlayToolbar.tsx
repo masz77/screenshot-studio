@@ -78,7 +78,7 @@ export function OverlayToolbar({
       ref={toolbarRef}
       className={cn(
         'absolute z-50 flex items-center gap-1 p-1.5',
-        'bg-surface-2/95 backdrop-blur-sm rounded-xl',
+        'bg-card/95 backdrop-blur-sm rounded-xl',
         'border border-border/40 shadow-lg',
         'animate-in fade-in-0 zoom-in-95 duration-150'
       )}
@@ -97,8 +97,8 @@ export function OverlayToolbar({
         }}
         className={cn(
           'flex items-center justify-center w-8 h-8 rounded-lg',
-          'text-text-secondary hover:text-foreground',
-          'hover:bg-surface-3 transition-colors duration-150'
+          'text-muted-foreground hover:text-foreground',
+          'hover:bg-accent transition-colors duration-150'
         )}
         title="Rotate -45°"
       >
@@ -111,8 +111,8 @@ export function OverlayToolbar({
         }}
         className={cn(
           'flex items-center justify-center w-8 h-8 rounded-lg',
-          'text-text-secondary hover:text-foreground',
-          'hover:bg-surface-3 transition-colors duration-150'
+          'text-muted-foreground hover:text-foreground',
+          'hover:bg-accent transition-colors duration-150'
         )}
         title="Rotate +45°"
       >
@@ -129,8 +129,8 @@ export function OverlayToolbar({
         }}
         className={cn(
           'flex items-center justify-center w-8 h-8 rounded-lg',
-          'text-text-secondary hover:text-foreground',
-          'hover:bg-surface-3 transition-colors duration-150'
+          'text-muted-foreground hover:text-foreground',
+          'hover:bg-accent transition-colors duration-150'
         )}
         title="Decrease size"
       >
@@ -143,8 +143,8 @@ export function OverlayToolbar({
         }}
         className={cn(
           'flex items-center justify-center w-8 h-8 rounded-lg',
-          'text-text-secondary hover:text-foreground',
-          'hover:bg-surface-3 transition-colors duration-150'
+          'text-muted-foreground hover:text-foreground',
+          'hover:bg-accent transition-colors duration-150'
         )}
         title="Increase size"
       >
@@ -161,8 +161,8 @@ export function OverlayToolbar({
         }}
         className={cn(
           'flex items-center justify-center w-8 h-8 rounded-lg',
-          'text-text-secondary hover:text-foreground',
-          'hover:bg-surface-3 transition-colors duration-150'
+          'text-muted-foreground hover:text-foreground',
+          'hover:bg-accent transition-colors duration-150'
         )}
         title="Duplicate"
       >
@@ -179,7 +179,7 @@ export function OverlayToolbar({
         }}
         className={cn(
           'flex items-center justify-center w-8 h-8 rounded-lg',
-          'text-text-secondary hover:text-red-500',
+          'text-muted-foreground hover:text-red-500',
           'hover:bg-red-500/10 transition-colors duration-150'
         )}
         title="Delete"

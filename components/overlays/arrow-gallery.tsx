@@ -45,7 +45,7 @@ export function ArrowGallery() {
           <button
             key={index}
             onClick={() => handleAddArrow(arrowUrl)}
-            className="w-full aspect-square flex items-center justify-center bg-white dark:bg-muted rounded-md p-1 border border-border hover:border-primary transition-colors group"
+            className="w-full aspect-square flex items-center justify-center bg-background dark:bg-muted rounded-md p-1 border border-border hover:border-primary transition-colors group"
             title={`Arrow ${index + 1}`}
           >
             <img

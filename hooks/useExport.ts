@@ -30,75 +30,75 @@ const DEFAULT_SETTINGS: ExportSettings = {
   scale: 3,
 };
 
+/**
+ * Smooth progress animator — animates from current value toward a target
+ * using requestAnimationFrame for 60fps smoothness.
+ */
+function createProgressAnimator(setProgress: (v: number) => void) {
+  let current = 0;
+  let target = 0;
+  let rafId: number | null = null;
+
+  const animate = () => {
+    const diff = target - current;
+    if (Math.abs(diff) < 0.5) {
+      current = target;
+      setProgress(Math.round(current));
+      rafId = null;
+      return;
+    }
+    // Ease toward target: faster when far, slower when close
+    current += diff * 0.15;
+    setProgress(Math.round(current));
+    rafId = requestAnimationFrame(animate);
+  };
+
+  return {
+    set(value: number) {
+      target = value;
+      if (rafId === null) {
+        rafId = requestAnimationFrame(animate);
+      }
+    },
+    snap(value: number) {
+      target = value;
+      current = value;
+      setProgress(value);
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+    },
+    reset() {
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+      current = 0;
+      target = 0;
+      setProgress(0);
+    },
+  };
+}
+
 export function useExport(selectedAspectRatio: string) {
   const [settings, setSettings] = useState<ExportSettings>(DEFAULT_SETTINGS);
   const [isExporting, setIsExporting] = useState(false);
   const [isCopying, setIsCopying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [copyProgress, setCopyProgress] = useState(0);
-  const progressIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const copyProgressIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const startSimulatedProgress = useCallback(() => {
-    setProgress(0);
-    let current = 0;
-    progressIntervalRef.current = setInterval(() => {
-      // Decelerate as we approach 90%
-      const remaining = 90 - current;
-      const increment = Math.max(0.5, remaining * 0.06);
-      current = Math.min(90, current + increment);
-      setProgress(Math.round(current));
-    }, 100);
-  }, []);
+  const progressAnimator = useRef(createProgressAnimator(setProgress));
+  const copyAnimator = useRef(createProgressAnimator(setCopyProgress));
 
-  const stopSimulatedProgress = useCallback((success: boolean) => {
-    if (progressIntervalRef.current) {
-      clearInterval(progressIntervalRef.current);
-      progressIntervalRef.current = null;
-    }
-    if (success) {
-      setProgress(100);
-      setTimeout(() => setProgress(0), 400);
-    } else {
-      setProgress(0);
-    }
-  }, []);
-
-  const startCopyProgress = useCallback(() => {
-    setCopyProgress(0);
-    let current = 0;
-    copyProgressIntervalRef.current = setInterval(() => {
-      const remaining = 90 - current;
-      const increment = Math.max(0.5, remaining * 0.06);
-      current = Math.min(90, current + increment);
-      setCopyProgress(Math.round(current));
-    }, 100);
-  }, []);
-
-  const stopCopyProgress = useCallback((success: boolean) => {
-    if (copyProgressIntervalRef.current) {
-      clearInterval(copyProgressIntervalRef.current);
-      copyProgressIntervalRef.current = null;
-    }
-    if (success) {
-      setCopyProgress(100);
-      setTimeout(() => setCopyProgress(0), 400);
-    } else {
-      setCopyProgress(0);
-    }
-  }, []);
-
-  // Cleanup intervals on unmount
+  // Cleanup on unmount
   useEffect(() => {
     return () => {
-      if (progressIntervalRef.current) {
-        clearInterval(progressIntervalRef.current);
-      }
-      if (copyProgressIntervalRef.current) {
-        clearInterval(copyProgressIntervalRef.current);
-      }
+      progressAnimator.current.reset();
+      copyAnimator.current.reset();
     };
   }, []);
+
   const { backgroundConfig, backgroundBorderRadius, backgroundBlur, backgroundNoise, textOverlays, imageOverlays, perspective3D } = useImageStore();
   const backgroundOpacity = backgroundConfig?.opacity !== undefined ? backgroundConfig.opacity : 1;
   const { screenshot } = useEditorStore();
@@ -155,18 +155,15 @@ export function useExport(selectedAspectRatio: string) {
   }, [settings, savePreferences]);
 
   const exportImage = useCallback(async (): Promise<void> => {
+    const anim = progressAnimator.current;
     setIsExporting(true);
-    startSimulatedProgress();
+    anim.snap(0);
     const startTime = Date.now();
 
-    // Track export start
     trackExportStart(settings.format, settings.qualityPreset, settings.scale);
 
     try {
-      // Get HTML canvas container
       const canvasContainer = getCanvasContainer();
-
-      // Get actual pixel dimensions from aspect ratio preset
       const preset = getAspectRatioPreset(selectedAspectRatio);
       if (!preset) {
         throw new Error('Invalid aspect ratio selected');
@@ -180,6 +177,7 @@ export function useExport(selectedAspectRatio: string) {
         exportHeight: preset.height,
       };
 
+      // exportElement reports progress 0-95 via callback
       const result = await exportElement(
         'image-render-card',
         exportOptions,
@@ -193,18 +191,19 @@ export function useExport(selectedAspectRatio: string) {
         screenshot.radius,
         backgroundBlur,
         backgroundNoise,
-        backgroundOpacity
+        backgroundOpacity,
+        (percent) => anim.set(percent)
       );
 
       if (!result.dataURL || result.dataURL === 'data:,') {
         throw new Error('Invalid image data generated');
       }
 
-      // Determine file extension
+      // Save to storage (95 → 97%)
+      anim.set(96);
       const fileExtension = settings.format === 'jpeg' ? 'jpg' : 'png';
       const fileName = `screenshot-studio-${Date.now()}.${fileExtension}`;
 
-      // Save blob to IndexedDB for high-quality storage
       try {
         await saveExportedImage(
           result.blob,
@@ -215,10 +214,11 @@ export function useExport(selectedAspectRatio: string) {
         );
       } catch (error) {
         console.warn('Failed to save export to IndexedDB:', error);
-        // Continue with download even if storage fails
       }
 
-      // Track export complete
+      // Download (97 → 100%)
+      anim.set(98);
+
       const durationMs = Date.now() - startTime;
       const fileSizeKb = Math.round(result.blob.size / 1024);
       trackExportComplete(
@@ -229,44 +229,36 @@ export function useExport(selectedAspectRatio: string) {
         durationMs
       );
 
-      // Download the file
       const link = document.createElement('a');
       link.download = fileName;
       link.href = result.dataURL;
-
       document.body.appendChild(link);
       link.click();
+      setTimeout(() => document.body.removeChild(link), 100);
 
-      // Small delay before removing to ensure download starts
-      setTimeout(() => {
-        document.body.removeChild(link);
-      }, 100);
+      // Done
+      anim.snap(100);
 
-      // Complete the progress animation
-      stopSimulatedProgress(true);
-
-      // Trigger confetti celebration
       confetti({
         particleCount: 100,
         spread: 70,
         origin: { y: 0.6 }
       });
 
-      // Show success toast
       toast.success('Image downloaded successfully!', {
         description: `Saved as ${fileName}`,
       });
+
+      setTimeout(() => anim.reset(), 600);
     } catch (error) {
-      stopSimulatedProgress(false);
+      anim.reset();
       console.error('Export failed:', error);
       const errorMessage = error instanceof Error
         ? error.message
         : 'Failed to export image. Please try again.';
 
-      // Track export error
       trackExportError(settings.format, errorMessage);
 
-      // Show error toast
       toast.error('Export failed', {
         description: errorMessage,
       });
@@ -275,30 +267,29 @@ export function useExport(selectedAspectRatio: string) {
     } finally {
       setIsExporting(false);
     }
-  }, [selectedAspectRatio, settings, backgroundConfig, backgroundBorderRadius, backgroundBlur, backgroundNoise, backgroundOpacity, textOverlays, imageOverlays, perspective3D, screenshot.src, screenshot.radius, startSimulatedProgress, stopSimulatedProgress]);
+  }, [selectedAspectRatio, settings, backgroundConfig, backgroundBorderRadius, backgroundBlur, backgroundNoise, backgroundOpacity, textOverlays, imageOverlays, perspective3D, screenshot.src, screenshot.radius]);
 
   const copyImage = useCallback(async (): Promise<void> => {
+    const anim = copyAnimator.current;
     setIsCopying(true);
-    startCopyProgress();
+    anim.snap(0);
 
     try {
-      // Get HTML canvas container
       const canvasContainer = getCanvasContainer();
-
-      // Get actual pixel dimensions from aspect ratio preset
       const preset = getAspectRatioPreset(selectedAspectRatio);
       if (!preset) {
         throw new Error('Invalid aspect ratio selected');
       }
 
       const exportOptions: ExportOptions = {
-        format: 'png', // Always use PNG for clipboard to preserve transparency
-        qualityPreset: 'medium', // Use medium quality for easier sharing
+        format: 'png',
+        qualityPreset: 'medium',
         scale: 2,
         exportWidth: preset.width,
         exportHeight: preset.height,
       };
 
+      // exportElement reports progress 0-95 via callback
       const result = await exportElement(
         'image-render-card',
         exportOptions,
@@ -312,15 +303,16 @@ export function useExport(selectedAspectRatio: string) {
         screenshot.radius,
         backgroundBlur,
         backgroundNoise,
-        backgroundOpacity
+        backgroundOpacity,
+        (percent) => anim.set(percent)
       );
 
       if (!result.dataURL || result.dataURL === 'data:,') {
         throw new Error('Invalid image data generated');
       }
 
-      // Copy to clipboard using Clipboard API
-      // Ensure we have a PNG blob for clipboard
+      // Prepare clipboard blob (95 → 97%)
+      anim.set(96);
       const blob = result.blob.type === 'image/png'
         ? result.blob
         : await new Promise<Blob>((resolve, reject) => {
@@ -347,7 +339,8 @@ export function useExport(selectedAspectRatio: string) {
           img.src = result.dataURL;
         });
 
-      // Write to clipboard
+      // Stage 4: Write to clipboard (85 → 100%)
+      anim.set(92);
       if (navigator.clipboard && navigator.clipboard.write) {
         await navigator.clipboard.write([
           new ClipboardItem({
@@ -355,37 +348,34 @@ export function useExport(selectedAspectRatio: string) {
           })
         ]);
 
-        // Track copy success
         trackCopyToClipboard(true);
 
-        // Complete the progress animation
-        stopCopyProgress(true);
+        // Done
+        anim.snap(100);
 
-        // Trigger confetti celebration
         confetti({
           particleCount: 100,
           spread: 70,
           origin: { y: 0.6 }
         });
 
-        // Show success toast
         toast.success('Image copied to clipboard!', {
           description: 'You can now paste it anywhere',
         });
+
+        setTimeout(() => anim.reset(), 600);
       } else {
         throw new Error('Clipboard API not supported');
       }
     } catch (error) {
-      stopCopyProgress(false);
+      anim.reset();
       console.error('Copy failed:', error);
       const errorMessage = error instanceof Error
         ? error.message
         : 'Failed to copy image to clipboard. Please try again.';
 
-      // Track copy failure
       trackCopyToClipboard(false);
 
-      // Show error toast
       toast.error('Copy failed', {
         description: errorMessage,
       });
@@ -394,7 +384,7 @@ export function useExport(selectedAspectRatio: string) {
     } finally {
       setIsCopying(false);
     }
-  }, [selectedAspectRatio, backgroundConfig, backgroundBorderRadius, backgroundBlur, backgroundNoise, backgroundOpacity, textOverlays, imageOverlays, perspective3D, screenshot.src, screenshot.radius, startCopyProgress, stopCopyProgress]);
+  }, [selectedAspectRatio, backgroundConfig, backgroundBorderRadius, backgroundBlur, backgroundNoise, backgroundOpacity, textOverlays, imageOverlays, perspective3D, screenshot.src, screenshot.radius]);
 
   return {
     settings,

@@ -65,9 +65,9 @@ export function TransformsSection() {
               key={preset.name}
               onClick={() => applyPreset(preset, index)}
               className={cn(
-                'flex-shrink-0 flex items-center justify-center bg-surface-2/60 w-16 h-16 rounded-xl overflow-hidden transition-all cursor-pointer',
-                'hover:bg-surface-3/60',
-                isSelected && 'ring-2 ring-surface-5'
+                'flex-shrink-0 flex items-center justify-center bg-card/60 w-16 h-16 rounded-xl overflow-hidden transition-all cursor-pointer',
+                'hover:bg-accent/60',
+                isSelected && 'ring-2 ring-border'
               )}
               title={preset.name}
             >

@@ -19,7 +19,7 @@ export function FormatSelector({ format, onFormatChange }: FormatSelectorProps) 
   return (
     <div className="space-y-3">
       <label className="text-sm font-medium text-foreground">Format</label>
-      <div className="grid grid-cols-2 gap-2 p-1 bg-surface-1 dark:bg-surface-2/50 rounded-xl">
+      <div className="grid grid-cols-2 gap-2 p-1 bg-muted dark:bg-card/50 rounded-xl">
         {FORMATS.map((f) => {
           const isSelected = f.value === format;
           return (
@@ -30,8 +30,8 @@ export function FormatSelector({ format, onFormatChange }: FormatSelectorProps) 
                 'relative px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200',
                 'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50',
                 isSelected
-                  ? 'bg-white dark:bg-surface-4 text-foreground shadow-sm'
-                  : 'text-text-secondary hover:text-foreground hover:bg-white/50 dark:hover:bg-surface-3/50'
+                  ? 'bg-background dark:bg-accent text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-background/50 dark:hover:bg-accent/50'
               )}
             >
               {f.label}
@@ -39,7 +39,7 @@ export function FormatSelector({ format, onFormatChange }: FormatSelectorProps) 
           );
         })}
       </div>
-      <p className="text-xs text-text-tertiary">
+      <p className="text-xs text-muted-foreground">
         {FORMATS.find((f) => f.value === format)?.description}
       </p>
     </div>

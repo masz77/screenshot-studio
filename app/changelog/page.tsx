@@ -244,7 +244,7 @@ export default function ChangelogPage() {
                 {changelog.map((entry) => (
                   <article key={entry.version} className="relative">
                     {/* Timeline dot */}
-                    <div className="absolute left-0 top-2 w-[15px] h-[15px] rounded-full bg-brand border-2 border-background hidden md:block" />
+                    <div className="absolute left-0 top-2 w-[15px] h-[15px] rounded-full bg-primary border-2 border-background hidden md:block" />
 
                     <div className="md:pl-10">
                       {/* Header */}
@@ -294,7 +294,7 @@ export default function ChangelogPage() {
             </p>
             <Link
               href="/home"
-              className="inline-flex items-center gap-2 bg-brand text-black font-semibold px-6 py-3 rounded-full hover:opacity-90 transition-opacity"
+              className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-semibold px-6 py-3 rounded-full hover:opacity-90 transition-opacity"
             >
               Open Editor
             </Link>

@@ -47,7 +47,7 @@ export function EditorHeader() {
 
   return (
     <>
-      <header className="h-14 bg-surface-2 border-b border-border/40 flex items-center justify-between px-4 shrink-0">
+      <header className="h-14 bg-card border-b border-border/40 flex items-center justify-between px-4 shrink-0">
         {/* Left - Logo */}
         <Link href="/" className="flex items-center gap-2.5 hover:opacity-80 transition-opacity">
           <Image
@@ -91,7 +91,7 @@ export function EditorHeader() {
                 <span>{currentAspectRatio ? `${currentAspectRatio.width}:${currentAspectRatio.height}` : 'auto'}</span>
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="p-0 w-[420px] max-h-[600px]" align="center">
+            <PopoverContent className="p-0 w-[420px]" align="center" sideOffset={8} collisionPadding={16}>
               <AspectRatioPicker onSelect={() => setAspectRatioOpen(false)} />
             </PopoverContent>
           </Popover>
@@ -100,7 +100,7 @@ export function EditorHeader() {
             onClick={toggleTimeline}
             disabled={!hasImage}
             variant="outline"
-            className={`h-9 justify-center gap-2 rounded-lg font-medium px-4 ${showTimeline ? 'bg-brand/15 border-brand/40 text-brand' : ''}`}
+            className={`h-9 justify-center gap-2 rounded-lg font-medium px-4 ${showTimeline ? 'bg-primary/15 border-primary/40 text-primary' : ''}`}
           >
             <VideoReplayIcon size={16} />
             <span>Animate</span>

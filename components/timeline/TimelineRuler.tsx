@@ -40,7 +40,7 @@ export function TimelineRuler({ width }: TimelineRulerProps) {
 
   return (
     <div
-      className="relative h-6 bg-surface-2 border-b border-border/30 select-none"
+      className="relative h-6 bg-card border-b border-border/30 select-none"
       style={{ width }}
     >
       {ticks.map(({ time, isMajor }) => {

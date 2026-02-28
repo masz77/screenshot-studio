@@ -29,11 +29,11 @@ export function Testimonial({
   return (
     <section className="relative py-32 sm:py-40 px-6 overflow-hidden">
       {/* Background with gradient mesh effect */}
-      <div className="absolute inset-0 bg-[#0a0a0a]" />
+      <div className="absolute inset-0 bg-background" />
 
       {/* Decorative gradient orbs */}
-      <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-brand/10 rounded-full blur-[150px] pointer-events-none" />
-      <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-purple-500/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[150px] pointer-events-none" />
+      <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-chart-4/10 rounded-full blur-[120px] pointer-events-none" />
 
       {/* Grid pattern overlay */}
       <div
@@ -52,13 +52,13 @@ export function Testimonial({
           viewport={{ once: true }}
           className="flex justify-center mb-12"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-foreground/5 border border-foreground/10">
             <div className="flex gap-0.5">
               {[...Array(5)].map((_, i) => (
-                <StarIcon key={i} className="w-4 h-4 text-brand fill-brand" />
+                <StarIcon key={i} className="w-4 h-4 text-primary fill-primary" />
               ))}
             </div>
-            <span className="text-sm text-white/60">Loved by creators</span>
+            <span className="text-sm text-muted-foreground">Loved by creators</span>
           </div>
         </motion.div>
 
@@ -74,7 +74,7 @@ export function Testimonial({
             {/* Large decorative quote mark */}
             <div className="relative mb-8">
               <svg
-                className="w-16 h-16 sm:w-20 sm:h-20 text-brand"
+                className="w-16 h-16 sm:w-20 sm:h-20 text-primary"
                 viewBox="0 0 24 24"
                 fill="currentColor"
               >
@@ -84,7 +84,7 @@ export function Testimonial({
 
             {/* Quote Text */}
             <blockquote
-              className={`text-3xl sm:text-4xl md:text-5xl lg:text-[56px] font-normal leading-[1.15] tracking-tight text-white mb-10 ${instrumentSerif.className}`}
+              className={`text-3xl sm:text-4xl md:text-5xl lg:text-[56px] font-normal leading-[1.15] tracking-tight text-foreground mb-10 ${instrumentSerif.className}`}
             >
               {quote}
             </blockquote>
@@ -92,7 +92,7 @@ export function Testimonial({
             {/* Author Info */}
             <div className="flex items-center gap-5">
               <div className="relative">
-                <div className="w-14 h-14 rounded-full overflow-hidden ring-2 ring-brand/30 ring-offset-2 ring-offset-[#0a0a0a]">
+                <div className="w-14 h-14 rounded-full overflow-hidden ring-2 ring-primary/30 ring-offset-2 ring-offset-background">
                   <img
                     src={imageSrc}
                     alt={author}
@@ -100,12 +100,12 @@ export function Testimonial({
                   />
                 </div>
                 {/* Online indicator */}
-                <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-brand rounded-full border-2 border-[#0a0a0a]" />
+                <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-primary rounded-full border-2 border-background" />
               </div>
               <div>
-                <p className="text-lg font-semibold text-white">{author}</p>
-                <p className="text-white/50">
-                  {title} <span className="text-brand">{company}</span>
+                <p className="text-lg font-semibold text-foreground">{author}</p>
+                <p className="text-muted-foreground">
+                  {title} <span className="text-primary">{company}</span>
                 </p>
               </div>
             </div>
@@ -121,10 +121,10 @@ export function Testimonial({
           >
             <div className="relative">
               {/* Decorative frame */}
-              <div className="absolute -inset-4 rounded-[32px] bg-gradient-to-br from-brand/20 via-purple-500/10 to-transparent blur-xl" />
+              <div className="absolute -inset-4 rounded-[32px] bg-gradient-to-br from-primary/20 via-chart-4/10 to-transparent blur-xl" />
 
               {/* Main image container */}
-              <div className="relative aspect-[3/4] rounded-[24px] overflow-hidden bg-surface-3 border border-white/10">
+              <div className="relative aspect-[3/4] rounded-[24px] overflow-hidden bg-accent border border-foreground/10">
                 <img
                   src={imageSrc}
                   alt={imageAlt}
@@ -140,15 +140,15 @@ export function Testimonial({
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: 0.5 }}
-                  className="absolute bottom-4 left-4 right-4 p-4 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20"
+                  className="absolute bottom-4 left-4 right-4 p-4 rounded-2xl bg-foreground/10 backdrop-blur-xl border border-foreground/20"
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-xs text-white/50 uppercase tracking-wider">Images created</p>
-                      <p className="text-2xl font-bold text-white">2,847</p>
+                      <p className="text-xs text-muted-foreground uppercase tracking-wider">Images created</p>
+                      <p className="text-2xl font-bold text-foreground">2,847</p>
                     </div>
-                    <div className="w-12 h-12 rounded-xl bg-brand/20 flex items-center justify-center">
-                      <svg className="w-6 h-6 text-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center">
+                      <svg className="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                       </svg>
                     </div>
@@ -162,7 +162,7 @@ export function Testimonial({
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.6, type: "spring" }}
-                className="absolute -top-3 -right-3 px-4 py-2 rounded-full bg-brand text-brand-foreground text-sm font-semibold shadow-lg shadow-brand/25"
+                className="absolute -top-3 -right-3 px-4 py-2 rounded-full bg-primary text-primary-foreground text-sm font-semibold shadow-lg shadow-primary/25"
               >
                 Pro User
               </motion.div>

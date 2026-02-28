@@ -32,7 +32,7 @@ export function ImageExportProgressView({ progress, format }: { progress: number
           inset: auto 42.5% 0;
           aspect-ratio: 1;
           border-radius: 50%;
-          background: var(--brand);
+          background: var(--primary);
           animation:
             bounce-y 0.5s cubic-bezier(0, 900, 1, 900) infinite,
             bounce-x 2s linear infinite alternate;
@@ -49,13 +49,13 @@ export function ImageExportProgressView({ progress, format }: { progress: number
       <div className="bounce-loader" />
 
       {/* Percentage */}
-      <span className="text-2xl font-bold text-brand tabular-nums">{progress}%</span>
+      <span className="text-2xl font-bold text-primary tabular-nums">{progress}%</span>
 
       {/* Progress bar */}
       <div className="w-full">
-        <div className="h-1.5 bg-surface-3 rounded-full overflow-hidden">
+        <div className="h-1.5 bg-accent rounded-full overflow-hidden">
           <div
-            className="h-full bg-brand rounded-full transition-all duration-500 ease-out"
+            className="h-full bg-primary rounded-full transition-all duration-200 ease-out"
             style={{ width: `${progress}%` }}
           />
         </div>
@@ -67,7 +67,7 @@ export function ImageExportProgressView({ progress, format }: { progress: number
       </p>
 
       {/* Format tag */}
-      <div className="px-3 py-1 rounded-full bg-surface-3 border border-border/50">
+      <div className="px-3 py-1 rounded-full bg-accent border border-border/50">
         <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-medium">
           Exporting as {formatLabel}
         </span>

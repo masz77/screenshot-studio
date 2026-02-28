@@ -31,17 +31,17 @@ export function FinalCTA({
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="bg-brand rounded-3xl px-8 sm:px-12 md:px-16 py-12 sm:py-16"
+          className="bg-primary rounded-3xl px-8 sm:px-12 md:px-16 py-12 sm:py-16"
         >
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-8">
             {/* Text Content */}
             <div className="max-w-xl">
               <h2
-                className={`text-2xl sm:text-3xl md:text-4xl font-normal text-brand-foreground mb-3 ${instrumentSerif.className}`}
+                className={`text-2xl sm:text-3xl md:text-4xl font-normal text-primary-foreground mb-3 ${instrumentSerif.className}`}
               >
                 {title}
               </h2>
-              <p className="text-brand-foreground/80 text-lg">
+              <p className="text-primary-foreground/80 text-lg">
                 {description}
               </p>
             </div>
@@ -51,7 +51,7 @@ export function FinalCTA({
               <Link href={ctaHref} onClick={() => trackCTAClick('final_cta', ctaLabel)}>
                 <Button
                   size="lg"
-                  className="text-base sm:text-lg px-8 py-6 min-h-[56px] font-medium bg-brand-foreground text-brand hover:bg-brand-foreground/90 rounded-full"
+                  className="text-base sm:text-lg px-8 py-6 min-h-[56px] font-medium bg-primary-foreground text-primary hover:bg-primary-foreground/90 rounded-full"
                 >
                   {ctaLabel}
                 </Button>

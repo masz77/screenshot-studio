@@ -355,6 +355,11 @@ async function capture3DTransformWithModernScreenshot(
       if (node instanceof HTMLElement && node.dataset.resizeHandle === 'true') return false;
       return true;
     },
+    onCloneNode: (cloned: Node) => {
+      if (cloned instanceof HTMLElement && cloned.dataset.htmlCanvas === 'true') {
+        cloned.style.overflow = 'visible';
+      }
+    },
   });
 
   return canvas;
@@ -396,7 +401,10 @@ async function exportHTMLCanvas(
     await new Promise(resolve => setTimeout(resolve, 150));
   }
 
-  // Use modern-screenshot for better CSS fidelity
+  // Use modern-screenshot for better CSS fidelity.
+  // onCloneNode overrides overflow:hidden → visible on the canvas
+  // container so that CSS drop-shadow filters render fully instead
+  // of being hard-clipped at the canvas boundary.
   const canvas = await domToCanvas(container, {
     scale: exportScale,
     backgroundColor: null,
@@ -405,6 +413,11 @@ async function exportHTMLCanvas(
     filter: (node: Node) => {
       if (node instanceof HTMLElement && node.dataset.resizeHandle === 'true') return false;
       return true;
+    },
+    onCloneNode: (cloned: Node) => {
+      if (cloned instanceof HTMLElement && cloned.dataset.htmlCanvas === 'true') {
+        cloned.style.overflow = 'visible';
+      }
     },
   });
 
@@ -469,9 +482,13 @@ export async function exportElement(
   screenshotRadius?: number,
   backgroundBlur: number = 0,
   backgroundNoise: number = 0,
-  backgroundOpacity: number = 1
+  backgroundOpacity: number = 1,
+  onProgress?: (percent: number) => void
 ): Promise<ExportResult> {
-  // Wait a bit to ensure DOM is ready
+  const report = onProgress ?? (() => {});
+
+  // Stage 1: DOM preparation (0 → 10%)
+  report(5);
   await new Promise(resolve => setTimeout(resolve, 200));
 
   const element = document.getElementById(elementId);
@@ -479,14 +496,14 @@ export async function exportElement(
     throw new Error('Image render card not found. Please ensure an image is uploaded.');
   }
 
-  // Find the canvas container within the element
   const container = element.querySelector('[data-html-canvas="true"]') as HTMLElement;
   if (!container) {
     throw new Error('HTML canvas container not found');
   }
 
+  report(10);
+
   try {
-    // Check if 3D transforms are active
     const has3DTransform = perspective3D && imageSrc && (
       perspective3D.rotateX !== 0 ||
       perspective3D.rotateY !== 0 ||
@@ -498,8 +515,10 @@ export async function exportElement(
 
     let finalCanvas: HTMLCanvasElement;
 
+    // Stage 2: Canvas capture (10 → 55%)
+    report(15);
+
     if (has3DTransform) {
-      // Use modern-screenshot for 3D transforms
       try {
         finalCanvas = await capture3DTransformWithModernScreenshot(
           container,
@@ -509,7 +528,8 @@ export async function exportElement(
           )
         );
 
-        // Resize to match export dimensions
+        report(50);
+
         if (finalCanvas.width !== options.exportWidth * options.scale ||
             finalCanvas.height !== options.exportHeight * options.scale) {
           const resizedCanvas = document.createElement('canvas');
@@ -538,7 +558,6 @@ export async function exportElement(
         );
       }
     } else {
-      // Use html2canvas for standard exports
       finalCanvas = await exportHTMLCanvas(
         container,
         options.exportWidth,
@@ -548,17 +567,23 @@ export async function exportElement(
       );
     }
 
-    // Process with Sharp for format conversion and quality optimization
+    report(55);
+
+    // Stage 3: Sharp processing (55 → 90%)
+    report(60);
     const sharpResult = await processWithSharp(
       finalCanvas,
       options.format,
       options.qualityPreset
     );
 
+    report(90);
+
     if (!sharpResult.dataURL || sharpResult.dataURL === 'data:,') {
       throw new Error('Failed to generate image data URL');
     }
 
+    report(95);
     return { dataURL: sharpResult.dataURL, blob: sharpResult.blob };
   } catch (error) {
     console.error('Export failed:', error);

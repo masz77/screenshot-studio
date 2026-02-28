@@ -41,7 +41,7 @@ export function EditSection() {
         <div className="flex-1 space-y-3">
           {/* Round Control */}
           <div className="flex items-center gap-3">
-            <span className="text-sm text-text-secondary w-12 shrink-0">Round</span>
+            <span className="text-sm text-muted-foreground w-12 shrink-0">Round</span>
             <div className="flex-1">
               <Slider
                 value={[borderRadius]}
@@ -52,12 +52,12 @@ export function EditSection() {
                 className="w-full"
               />
             </div>
-            <span className="text-sm text-text-tertiary w-8 text-right tabular-nums">{borderRadius}</span>
+            <span className="text-sm text-muted-foreground w-8 text-right tabular-nums">{borderRadius}</span>
           </div>
 
           {/* Scale Control */}
           <div className="flex items-center gap-3">
-            <span className="text-sm text-text-secondary w-12 shrink-0">Scale</span>
+            <span className="text-sm text-muted-foreground w-12 shrink-0">Scale</span>
             <div className="flex-1">
               <Slider
                 value={[imageScale / 100]}
@@ -68,7 +68,7 @@ export function EditSection() {
                 className="w-full"
               />
             </div>
-            <span className="text-sm text-text-tertiary w-8 text-right tabular-nums">{(imageScale / 100).toFixed(1)}</span>
+            <span className="text-sm text-muted-foreground w-8 text-right tabular-nums">{(imageScale / 100).toFixed(1)}</span>
           </div>
         </div>
 

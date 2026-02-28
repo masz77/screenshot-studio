@@ -60,7 +60,7 @@ export function OverlayShadowsGallery() {
         >
           <button
             onClick={handleRemoveShadows}
-            className="flex items-center justify-center w-16 h-9 text-xs dark:text-gray-500 cursor-pointer hover:scale-105 transition-all duration-200"
+            className="flex items-center justify-center w-16 h-9 text-xs text-muted-foreground cursor-pointer hover:scale-105 transition-all duration-200"
           >
             None
           </button>
@@ -68,7 +68,7 @@ export function OverlayShadowsGallery() {
             <button
               key={index}
               onClick={() => handleAddShadow(shadowUrl)}
-              className="block w-16 h-9 shrink-0 cursor-pointer transition-all duration-200 hover:scale-105 rounded-sm bg-gray-300"
+              className="block w-16 h-9 shrink-0 cursor-pointer transition-all duration-200 hover:scale-105 rounded-sm bg-muted"
               title={`Overlay Shadow ${OVERLAY_SHADOW_IDS[index]}`}
             >
               <img

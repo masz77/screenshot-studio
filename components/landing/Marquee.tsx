@@ -20,19 +20,19 @@ export function Marquee({
   const repeatedContent = (
     <>
       <span className="whitespace-nowrap">{text}</span>
-      <span className="mx-8 sm:mx-12 md:mx-16 text-brand" aria-hidden="true">
+      <span className="mx-8 sm:mx-12 md:mx-16 text-primary" aria-hidden="true">
         •
       </span>
       <span className="whitespace-nowrap">{text}</span>
-      <span className="mx-8 sm:mx-12 md:mx-16 text-brand" aria-hidden="true">
+      <span className="mx-8 sm:mx-12 md:mx-16 text-primary" aria-hidden="true">
         •
       </span>
       <span className="whitespace-nowrap">{text}</span>
-      <span className="mx-8 sm:mx-12 md:mx-16 text-brand" aria-hidden="true">
+      <span className="mx-8 sm:mx-12 md:mx-16 text-primary" aria-hidden="true">
         •
       </span>
       <span className="whitespace-nowrap">{text}</span>
-      <span className="mx-8 sm:mx-12 md:mx-16 text-brand" aria-hidden="true">
+      <span className="mx-8 sm:mx-12 md:mx-16 text-primary" aria-hidden="true">
         •
       </span>
     </>

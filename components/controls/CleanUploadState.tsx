@@ -14,10 +14,26 @@ import { useEditorStore, useImageStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { gradientColors, type GradientKey } from '@/lib/constants/gradient-colors';
-import { solidColors, type SolidColorKey } from '@/lib/constants/solid-colors';
-import { getR2ImageUrl } from '@/lib/r2';
-import { backgroundPaths } from '@/lib/r2-backgrounds';
+import { getBackgroundCSS } from '@/lib/constants/backgrounds';
+
+const TRANSITION_DURATION = 400; // ms
+
+function extractImageUrl(style: React.CSSProperties): string | null {
+  const bg = style.backgroundImage;
+  if (!bg || typeof bg !== 'string') return null;
+  const match = bg.match(/url\(([^)]+)\)/);
+  if (!match) return null;
+  return match[1].replace(/['"]/g, '');
+}
+
+function preloadImage(url: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const img = new window.Image();
+    img.onload = () => resolve(url);
+    img.onerror = () => reject(new Error(`Failed to load: ${url}`));
+    img.src = url;
+  });
+}
 
 export function CleanUploadState() {
   const [isDragActive, setIsDragActive] = React.useState(false);
@@ -29,27 +45,71 @@ export function CleanUploadState() {
   const { addImages, setImage, backgroundConfig } = useImageStore();
   const containerRef = React.useRef<HTMLDivElement>(null);
 
-  const getBackgroundStyle = (): React.CSSProperties => {
-    const { type, value } = backgroundConfig;
+  // Crossfade state
+  const backgroundStyle = React.useMemo(
+    () => getBackgroundCSS(backgroundConfig),
+    [backgroundConfig]
+  );
+  const [activeLayer, setActiveLayer] = React.useState<'a' | 'b'>('a');
+  const [layerAStyle, setLayerAStyle] = React.useState<React.CSSProperties>(backgroundStyle);
+  const [layerBStyle, setLayerBStyle] = React.useState<React.CSSProperties>(backgroundStyle);
+  const [showTransition, setShowTransition] = React.useState(false);
+  const prevConfigRef = React.useRef(backgroundConfig);
+  const isFirstRender = React.useRef(true);
+  const timeoutRef = React.useRef<ReturnType<typeof setTimeout>>(undefined);
 
-    if (type === 'gradient' && value && gradientColors[value as GradientKey]) {
-      return { background: gradientColors[value as GradientKey] };
+  React.useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      setLayerAStyle(backgroundStyle);
+      setLayerBStyle(backgroundStyle);
+      return;
     }
 
-    if (type === 'solid' && value && solidColors[value as SolidColorKey]) {
-      return { backgroundColor: solidColors[value as SolidColorKey] };
+    const prev = prevConfigRef.current;
+    const changed =
+      prev.type !== backgroundConfig.type ||
+      prev.value !== backgroundConfig.value;
+
+    if (!changed) {
+      if (activeLayer === 'a') setLayerAStyle(backgroundStyle);
+      else setLayerBStyle(backgroundStyle);
+      return;
     }
 
-    if (type === 'image' && value) {
-      const isR2Path = backgroundPaths.includes(value);
-      const imageUrl = isR2Path
-        ? getR2ImageUrl({ src: value })
-        : value;
-      return { backgroundImage: `url(${imageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' };
+    prevConfigRef.current = backgroundConfig;
+    let cancelled = false;
+
+    const applyNewBackground = (style: React.CSSProperties) => {
+      if (cancelled) return;
+      if (activeLayer === 'a') {
+        setLayerBStyle(style);
+        setShowTransition(true);
+        requestAnimationFrame(() => { if (!cancelled) setActiveLayer('b'); });
+      } else {
+        setLayerAStyle(style);
+        setShowTransition(true);
+        requestAnimationFrame(() => { if (!cancelled) setActiveLayer('a'); });
+      }
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      timeoutRef.current = setTimeout(() => setShowTransition(false), TRANSITION_DURATION + 50);
+    };
+
+    if (backgroundConfig.type === 'image') {
+      const url = extractImageUrl(backgroundStyle);
+      if (url) {
+        preloadImage(url)
+          .then((loadedUrl) => {
+            applyNewBackground({ ...backgroundStyle, backgroundImage: `url(${loadedUrl})` });
+          })
+          .catch(() => applyNewBackground(backgroundStyle));
+        return () => { cancelled = true; if (timeoutRef.current) clearTimeout(timeoutRef.current); };
+      }
     }
 
-    return { background: gradientColors.vibrant_orange_pink };
-  };
+    applyNewBackground(backgroundStyle);
+    return () => { cancelled = true; if (timeoutRef.current) clearTimeout(timeoutRef.current); };
+  }, [backgroundConfig, backgroundStyle, activeLayer]);
 
   const validateFile = React.useCallback((file: File): string | null => {
     if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
@@ -199,71 +259,91 @@ export function CleanUploadState() {
       {...getRootProps()}
       tabIndex={0}
       onPaste={handlePaste}
-      className="relative w-full h-full flex items-center justify-center outline-none"
-      style={getBackgroundStyle()}
+      className="relative w-full h-full flex items-center justify-center outline-none overflow-hidden"
     >
+      {/* Background Layer A */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          ...layerAStyle,
+          transition: showTransition ? `opacity ${TRANSITION_DURATION}ms ease-in-out` : undefined,
+          opacity: activeLayer === 'a' ? (layerAStyle.opacity ?? 1) : 0,
+          zIndex: 0,
+        }}
+      />
+      {/* Background Layer B */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          ...layerBStyle,
+          transition: showTransition ? `opacity ${TRANSITION_DURATION}ms ease-in-out` : undefined,
+          opacity: activeLayer === 'b' ? (layerBStyle.opacity ?? 1) : 0,
+          zIndex: 0,
+        }}
+      />
       <input {...getInputProps()} />
 
-      {/* Upload Card with Shadow */}
+      {/* Upload Card */}
       <div
         className={cn(
-          'relative rounded-2xl p-10 md:p-12',
+          'relative z-10 rounded-lg p-6 md:p-8',
           'flex flex-col items-center justify-center text-center',
-          'bg-surface-3/95 backdrop-blur-md',
-          'border border-border/50',
+          'bg-popover/90 backdrop-blur-xl',
+          'border border-border/30',
           'cursor-pointer transition-all duration-300 ease-out',
-          'hover:scale-[1.01] hover:border-border',
-          'min-w-[320px] md:min-w-[400px]',
-          active && 'scale-[1.02] border-foreground/30',
-          // Shadow with depth
-          'shadow-[0_8px_32px_rgba(0,0,0,0.6),0_16px_64px_rgba(0,0,0,0.5)]'
+          'hover:scale-[1.01] hover:border-border/50',
+          'w-[85%] max-w-[400px]',
+          active && 'scale-[1.02] border-primary/40',
+          'shadow-2xl'
         )}
         onClick={open}
       >
         {/* Icon */}
-        <div className="mb-6 p-6 rounded-2xl bg-surface-4/60 border border-border/50">
-          <Image01Icon size={56} className="text-text-secondary" />
+        <div className="mb-4 p-4 rounded-lg bg-muted/40 border border-border/30">
+          <Image01Icon size={40} className="text-muted-foreground" />
         </div>
 
         {/* Title */}
-        <h2 className="text-xl font-semibold text-foreground mb-2">
+        <h2 className="text-lg font-semibold text-foreground mb-1.5">
           {active ? 'Drop the image here...' : 'Add Your Image'}
         </h2>
 
         {/* Subtitle */}
         {!active && (
-          <p className="text-sm text-text-tertiary mb-6">
+          <p className="text-sm text-muted-foreground mb-4">
             Drag & drop, click to browse, or paste
           </p>
         )}
 
         {/* Paste Hint */}
         {!active && (
-          <div className="flex flex-col gap-5 items-center">
-            <div className="hidden sm:flex items-center gap-2 text-sm text-text-secondary">
-              <kbd className="bg-surface-2/80 border border-border/60 px-2.5 py-1.5 rounded-lg font-medium text-foreground/80 text-xs">
+          <div className="flex flex-col gap-3 items-center">
+            <div className="hidden sm:flex items-center gap-2 text-sm text-muted-foreground">
+              <kbd className="bg-muted/60 border border-border/40 px-2 py-1 rounded-lg font-medium text-foreground/80 text-xs">
                 <span className="flex items-center gap-1">
-                  <CommandIcon size={14} />V
+                  <CommandIcon size={12} />V
                 </span>
               </kbd>
               <span>to Paste</span>
             </div>
 
-            <span className="sm:hidden text-sm font-medium text-text-secondary">
+            <span className="sm:hidden text-sm font-medium text-muted-foreground">
               Tap to browse
             </span>
 
-            <div className="flex items-center gap-3 w-full max-w-[180px]">
-              <div className="flex-1 h-px bg-border/50" />
-              <span className="text-xs text-text-muted">or</span>
-              <div className="flex-1 h-px bg-border/50" />
+            <div className="flex items-center gap-3 w-full max-w-[160px]">
+              <div className="flex-1 h-px bg-border/30" />
+              <span className="text-xs text-muted-foreground/70">or</span>
+              <div className="flex-1 h-px bg-border/30" />
             </div>
 
             {/* Screenshot URL Input - shown directly */}
-            <div className="hidden lg:block w-full max-w-[280px]" onClick={(e) => e.stopPropagation()}>
-              <div className="flex gap-2">
+            <div className="hidden lg:block w-full max-w-[260px]" onClick={(e) => e.stopPropagation()}>
+              <div className="flex gap-1.5">
                 <div className="relative flex-1">
-                  <Globe02Icon size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-tertiary" />
+                  <Globe02Icon size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground/60" />
                   <Input
                     type="url"
                     placeholder="Enter URL to capture..."
@@ -271,22 +351,23 @@ export function CleanUploadState() {
                     onChange={(e) => setScreenshotUrl(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleCaptureScreenshot()}
                     disabled={isCapturing}
-                    className="pl-9 h-10 bg-surface-2/60 border-border/60 text-foreground placeholder:text-text-muted text-sm"
+                    className="pl-8 h-8 bg-muted/30 border-border/30 text-foreground placeholder:text-muted-foreground/50 text-xs"
                   />
                 </div>
                 <Button
                   onClick={handleCaptureScreenshot}
                   disabled={isCapturing || !screenshotUrl.trim()}
-                  className="h-10 bg-foreground text-background hover:bg-foreground/90 px-4 transition-all duration-200"
+                  size="sm"
+                  className="h-8 bg-foreground text-background hover:bg-foreground/90 px-3 transition-all duration-200"
                 >
-                  {isCapturing ? <Loading03Icon size={16} className="animate-spin" /> : <Camera01Icon size={16} />}
+                  {isCapturing ? <Loading03Icon size={14} className="animate-spin" /> : <Camera01Icon size={14} />}
                 </Button>
               </div>
             </div>
           </div>
         )}
 
-        {error && <div className="mt-4 text-sm text-destructive">{error}</div>}
+        {error && <div className="mt-3 text-sm text-destructive">{error}</div>}
       </div>
     </div>
   );

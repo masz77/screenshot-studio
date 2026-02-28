@@ -145,7 +145,7 @@ export default function AnimationMakerPage() {
             </p>
             <Link
               href="/home"
-              className="inline-flex items-center gap-2 bg-brand text-black font-semibold px-8 py-4 rounded-full hover:opacity-90 transition-opacity"
+              className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-semibold px-8 py-4 rounded-full hover:opacity-90 transition-opacity"
             >
               Create Animation Free
               <ArrowRight className="w-5 h-5" />
@@ -169,7 +169,7 @@ export default function AnimationMakerPage() {
                   className="flex gap-4 p-6 bg-background rounded-xl border"
                 >
                   <div className="flex-shrink-0">
-                    <feature.icon className="w-8 h-8 text-brand" />
+                    <feature.icon className="w-8 h-8 text-primary" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-lg mb-2">
@@ -199,7 +199,7 @@ export default function AnimationMakerPage() {
               {animations.map((animation) => (
                 <div
                   key={animation.name}
-                  className="p-6 border rounded-xl hover:border-brand transition-colors"
+                  className="p-6 border rounded-xl hover:border-primary transition-colors"
                 >
                   <h3 className="font-semibold mb-2">{animation.name}</h3>
                   <p className="text-sm text-muted-foreground">
@@ -266,7 +266,7 @@ export default function AnimationMakerPage() {
             </h2>
             <div className="space-y-8">
               <div className="flex gap-6 items-start">
-                <div className="flex-shrink-0 w-10 h-10 rounded-full bg-brand text-black flex items-center justify-center font-bold">
+                <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
                   1
                 </div>
                 <div>
@@ -280,7 +280,7 @@ export default function AnimationMakerPage() {
                 </div>
               </div>
               <div className="flex gap-6 items-start">
-                <div className="flex-shrink-0 w-10 h-10 rounded-full bg-brand text-black flex items-center justify-center font-bold">
+                <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
                   2
                 </div>
                 <div>
@@ -294,7 +294,7 @@ export default function AnimationMakerPage() {
                 </div>
               </div>
               <div className="flex gap-6 items-start">
-                <div className="flex-shrink-0 w-10 h-10 rounded-full bg-brand text-black flex items-center justify-center font-bold">
+                <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
                   3
                 </div>
                 <div>
@@ -323,7 +323,7 @@ export default function AnimationMakerPage() {
             </p>
             <Link
               href="/home"
-              className="inline-flex items-center gap-2 bg-brand text-black font-semibold px-8 py-4 rounded-full hover:opacity-90 transition-opacity"
+              className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-semibold px-8 py-4 rounded-full hover:opacity-90 transition-opacity"
             >
               Try Animation Maker Free
               <ArrowRight className="w-5 h-5" />

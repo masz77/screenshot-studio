@@ -303,14 +303,14 @@ export function Perspective3DControls() {
               key={preset.name}
               onClick={() => applyPreset(preset, index)}
               className={cn(
-                'flex items-center justify-center bg-[rgb(192,192,192)] w-full aspect-square rounded-sm overflow-hidden transition-all cursor-pointer',
+                'flex items-center justify-center bg-secondary w-full aspect-square rounded-sm overflow-hidden transition-all cursor-pointer',
                 'hover:opacity-80 active:scale-95',
-                isSelected && 'border-2 border-gray-800 dark:border-gray-300'
+                isSelected && 'border-2 border-foreground'
               )}
               style={getPerspectiveStyle(preset)}
             >
               <div
-                className="w-16 h-16 bg-white shadow-[0_4px_12px_rgba(0,0,0,0.25)]"
+                className="w-16 h-16 bg-background shadow-[0_4px_12px_rgba(0,0,0,0.25)]"
                 style={getTransformStyle(preset)}
               />
             </button>

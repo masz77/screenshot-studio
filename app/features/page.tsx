@@ -109,10 +109,10 @@ export default function FeaturesPage() {
                 <Link
                   key={feature.title}
                   href={feature.href}
-                  className="group p-8 bg-muted/30 rounded-2xl border hover:border-brand transition-all"
+                  className="group p-8 bg-muted/30 rounded-2xl border hover:border-primary transition-all"
                 >
-                  <feature.icon className="w-12 h-12 text-brand mb-6" />
-                  <h2 className="text-2xl font-bold mb-3 group-hover:text-brand transition-colors">
+                  <feature.icon className="w-12 h-12 text-primary mb-6" />
+                  <h2 className="text-2xl font-bold mb-3 group-hover:text-primary transition-colors">
                     {feature.title}
                   </h2>
                   <p className="text-muted-foreground mb-4">
@@ -128,7 +128,7 @@ export default function FeaturesPage() {
                       </span>
                     ))}
                   </div>
-                  <span className="inline-flex items-center gap-1 text-brand font-medium">
+                  <span className="inline-flex items-center gap-1 text-primary font-medium">
                     Learn more
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </span>
@@ -149,7 +149,7 @@ export default function FeaturesPage() {
             </p>
             <Link
               href="/home"
-              className="inline-flex items-center gap-2 bg-brand text-black font-semibold px-8 py-4 rounded-full hover:opacity-90 transition-opacity"
+              className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-semibold px-8 py-4 rounded-full hover:opacity-90 transition-opacity"
             >
               Open Editor
               <ArrowRight className="w-5 h-5" />

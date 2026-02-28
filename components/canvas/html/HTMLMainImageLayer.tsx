@@ -81,14 +81,20 @@ function buildImageFilter(imageFilters?: ImageFilters): string | undefined {
 }
 
 /**
- * Builds CSS box-shadow string from shadow config.
+ * Builds a CSS `filter: drop-shadow()` string.
+ *
+ * ShadowConfig fields (synced from imageShadow):
+ * - softness → blur radius (from imageShadow.blur)
+ * - offsetX/Y → shadow offset (direct from imageShadow)
+ * - intensity → opacity (from imageShadow.opacity)
+ * - color → shadow color (direct from imageShadow)
  */
-function buildBoxShadow(shadow: ShadowConfig): string {
-  if (!shadow.enabled) return 'none';
+function buildDropShadowFilter(shadow: ShadowConfig): string | undefined {
+  if (!shadow.enabled) return undefined;
 
-  const { elevation, softness, color, intensity, offsetX, offsetY } = shadow;
+  const { softness, spread, color, intensity, offsetX, offsetY } = shadow;
 
-  // Parse shadow color
+  // Parse shadow color — use it directly
   let r = 0, g = 0, b = 0;
   const colorMatch = color.match(/rgba?\(([^)]+)\)/);
 
@@ -104,27 +110,17 @@ function buildBoxShadow(shadow: ShadowConfig): string {
     b = parseInt(hex.slice(4, 6), 16) || 0;
   }
 
-  // Darken color for shadow
-  const shadowR = Math.floor(r * 0.3);
-  const shadowG = Math.floor(g * 0.3);
-  const shadowB = Math.floor(b * 0.3);
+  const x = offsetX ?? 0;
+  const y = offsetY ?? 0;
+  // Blur from the blur slider; spread adds extra diffusion
+  const blur = softness + (spread || 0);
+  const opacity = Math.min(1, Math.max(0, intensity));
 
-  // Calculate offsets
-  const diag = elevation * 0.707;
-  const x = offsetX ?? diag;
-  const y = offsetY ?? diag;
-
-  // Use same blur and intensity as Konva shadow
-  const effectiveBlur = Math.max(softness, 12);
-  const effectiveIntensity = Math.min(1, Math.max(0.4, intensity * 1.5));
-
-  // Create multi-layer shadow
-  const shadows = [
-    `rgba(${shadowR}, ${shadowG}, ${shadowB}, ${effectiveIntensity}) ${x}px ${y}px ${effectiveBlur}px`,
-    `rgba(${shadowR}, ${shadowG}, ${shadowB}, ${effectiveIntensity * 0.5}) ${x * 1.5}px ${y * 1.5}px ${effectiveBlur * 2}px`,
-  ];
-
-  return shadows.join(', ');
+  // Two-layer shadow: key shadow + soft ambient fill
+  return [
+    `drop-shadow(${x}px ${y}px ${blur}px rgba(${r}, ${g}, ${b}, ${opacity}))`,
+    `drop-shadow(0px 0px ${blur * 0.5}px rgba(${r}, ${g}, ${b}, ${opacity * 0.2}))`,
+  ].join(' ');
 }
 
 /**
@@ -161,7 +157,7 @@ export function HTMLMainImageLayer({
   const resizeStartRef = useRef<{ mouseX: number; mouseY: number; scale: number; handle: string } | null>(null);
 
   const imageFilter = useMemo(() => buildImageFilter(imageFilters), [imageFilters]);
-  const boxShadow = useMemo(() => buildBoxShadow(shadow), [shadow]);
+  const shadowFilter = useMemo(() => buildDropShadowFilter(shadow), [shadow]);
 
   const isDark = frame.type.includes('dark');
   const isArcFrame = frame.type === 'arc-light' || frame.type === 'arc-dark';
@@ -393,7 +389,6 @@ export function HTMLMainImageLayer({
         ...baseStyle,
         border: `${arcBorderWidth}px solid ${arcBorderColor}`,
         borderRadius: `${screenshot.radius}px`,
-        boxShadow: boxShadow,
       };
     }
 
@@ -402,7 +397,6 @@ export function HTMLMainImageLayer({
         ...baseStyle,
         backgroundColor: isDark ? 'rgb(40, 40, 43)' : '#e8e8e8',
         borderRadius: `${screenshot.radius}px`,
-        boxShadow: boxShadow,
       };
     }
 
@@ -411,7 +405,6 @@ export function HTMLMainImageLayer({
         ...baseStyle,
         backgroundColor: isDark ? '#2d2d2d' : '#f3f3f3',
         borderRadius: `${screenshot.radius}px`,
-        boxShadow: boxShadow,
       };
     }
 
@@ -421,15 +414,13 @@ export function HTMLMainImageLayer({
         backgroundColor: 'white',
         borderRadius: '8px',
         padding: '8px 8px 24px 8px',
-        boxShadow: boxShadow,
       };
     }
 
-    // No frame - apply shadow directly to image container
+    // No frame
     return {
       ...baseStyle,
       borderRadius: `${screenshot.radius}px`,
-      boxShadow: showFrame ? 'none' : boxShadow,
     };
   };
 
@@ -490,7 +481,6 @@ export function HTMLMainImageLayer({
       width: '100%',
       height: '100%',
       borderRadius: `${screenshot.radius}px`,
-      boxShadow: boxShadow,
     };
   };
 
@@ -511,6 +501,7 @@ export function HTMLMainImageLayer({
         zIndex: 10,
         outline: isMainImageSelected ? '2px solid rgba(59, 130, 246, 0.5)' : 'none',
         outlineOffset: '2px',
+        filter: shadowFilter,
       }}
     >
       {/* Frame container */}

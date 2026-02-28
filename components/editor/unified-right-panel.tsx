@@ -42,13 +42,13 @@ export function UnifiedRightPanel() {
   const activeIndex = tabs.findIndex((t) => t.id === activeTab);
 
   return (
-    <div className="w-full h-full bg-surface-2 flex flex-col overflow-hidden md:w-[460px] border-l border-border/40">
+    <div className="w-full h-full bg-card flex flex-col overflow-hidden md:w-[460px] border-l border-border/40">
       {/* Tab Navigation */}
       <div className="px-3 py-3 border-b border-border/30 shrink-0">
-        <div className="relative flex p-1 bg-surface-1/80 dark:bg-surface-1/50 rounded-xl border border-border/20">
+        <div className="relative flex p-1 bg-muted/80 dark:bg-muted/50 rounded-xl border border-border/20">
           {/* Sliding background indicator */}
           <div
-            className="absolute top-1 bottom-1 bg-white dark:bg-surface-4 rounded-lg shadow-sm transition-all duration-250 ease-out"
+            className="absolute top-1 bottom-1 bg-background dark:bg-accent rounded-lg shadow-sm transition-all duration-250 ease-out"
             style={{
               left: `calc(${activeIndex * (100 / tabs.length)}% + 4px)`,
               width: `calc(${100 / tabs.length}% - 8px)`,
@@ -65,7 +65,7 @@ export function UnifiedRightPanel() {
                 'relative z-10 flex-1 flex flex-col items-center gap-1 py-2.5 px-2 rounded-lg transition-colors duration-150',
                 activeTab === tab.id
                   ? 'text-foreground'
-                  : 'text-text-tertiary hover:text-text-secondary'
+                  : 'text-muted-foreground hover:text-foreground'
               )}
             >
               {tab.icon}

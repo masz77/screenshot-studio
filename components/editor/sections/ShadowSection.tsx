@@ -25,41 +25,85 @@ export function ShadowSection() {
     const g = parseInt(hex.slice(3, 5), 16);
     const b = parseInt(hex.slice(5, 7), 16);
     const alphaMatch = imageShadow.color.match(/rgba\([^)]+,\s*([\d.]+)\)/);
-    const currentAlpha = alphaMatch ? alphaMatch[1] : '0.5';
+    const currentAlpha = alphaMatch ? alphaMatch[1] : '0.6';
     setImageShadow({ color: `rgba(${r}, ${g}, ${b}, ${currentAlpha})`, enabled: true });
   };
 
-  const shadowBlur = imageShadow.blur;
-
   return (
     <SectionWrapper title="Shadow" defaultOpen={true}>
-      {/* Shadow Blur/Size */}
+      {/* Blur */}
       <div className="flex items-center gap-4">
-        <span className="text-sm text-text-secondary w-14 shrink-0">Size</span>
+        <span className="text-sm text-muted-foreground w-14 shrink-0">Blur</span>
         <Slider
-          value={[shadowBlur]}
-          onValueChange={(value) => {
-            const blur = value[0];
-            // Set shadow with offsets for natural bottom-right shadow effect
-            setImageShadow({
-              enabled: blur > 0,
-              blur,
-              offsetX: Math.round(blur * 0.3), // Offset to the right
-              offsetY: Math.round(blur * 0.5), // Offset to the bottom (heavier)
-              spread: Math.round(blur * 0.2),
-            });
-          }}
+          value={[imageShadow.blur]}
+          onValueChange={(value) => setImageShadow({ blur: value[0], enabled: value[0] > 0 || imageShadow.offsetX !== 0 || imageShadow.offsetY !== 0 })}
           min={0}
           max={100}
           step={1}
           className="flex-1"
         />
-        <span className="text-sm text-text-tertiary w-10 text-right tabular-nums">{shadowBlur}</span>
+        <span className="text-sm text-muted-foreground w-10 text-right tabular-nums">{imageShadow.blur}</span>
       </div>
 
-      {/* Shadow Color */}
+      {/* Offset X */}
       <div className="flex items-center gap-4">
-        <span className="text-sm text-text-secondary w-14 shrink-0">Color</span>
+        <span className="text-sm text-muted-foreground w-14 shrink-0">X</span>
+        <Slider
+          value={[imageShadow.offsetX]}
+          onValueChange={(value) => setImageShadow({ offsetX: value[0] })}
+          min={-50}
+          max={50}
+          step={1}
+          className="flex-1"
+        />
+        <span className="text-sm text-muted-foreground w-10 text-right tabular-nums">{imageShadow.offsetX}</span>
+      </div>
+
+      {/* Offset Y */}
+      <div className="flex items-center gap-4">
+        <span className="text-sm text-muted-foreground w-14 shrink-0">Y</span>
+        <Slider
+          value={[imageShadow.offsetY]}
+          onValueChange={(value) => setImageShadow({ offsetY: value[0] })}
+          min={-50}
+          max={50}
+          step={1}
+          className="flex-1"
+        />
+        <span className="text-sm text-muted-foreground w-10 text-right tabular-nums">{imageShadow.offsetY}</span>
+      </div>
+
+      {/* Spread */}
+      <div className="flex items-center gap-4">
+        <span className="text-sm text-muted-foreground w-14 shrink-0">Spread</span>
+        <Slider
+          value={[imageShadow.spread]}
+          onValueChange={(value) => setImageShadow({ spread: value[0] })}
+          min={0}
+          max={50}
+          step={1}
+          className="flex-1"
+        />
+        <span className="text-sm text-muted-foreground w-10 text-right tabular-nums">{imageShadow.spread}</span>
+      </div>
+
+      {/* Opacity */}
+      <div className="flex items-center gap-4">
+        <span className="text-sm text-muted-foreground w-14 shrink-0">Opacity</span>
+        <Slider
+          value={[Math.round((imageShadow.opacity ?? 0.5) * 100)]}
+          onValueChange={(value) => setImageShadow({ opacity: value[0] / 100 })}
+          min={0}
+          max={100}
+          step={1}
+          className="flex-1"
+        />
+        <span className="text-sm text-muted-foreground w-10 text-right tabular-nums">{Math.round((imageShadow.opacity ?? 0.5) * 100)}%</span>
+      </div>
+
+      {/* Color */}
+      <div className="flex items-center gap-4">
+        <span className="text-sm text-muted-foreground w-14 shrink-0">Color</span>
         <div className="flex items-center gap-3">
           <input
             type="color"
@@ -67,7 +111,7 @@ export function ShadowSection() {
             onChange={(e) => handleColorChange(e.target.value)}
             className="w-9 h-9 rounded-lg border border-border/60 cursor-pointer bg-transparent"
           />
-          <span className="text-sm text-text-tertiary font-mono">{getColorHex()}</span>
+          <span className="text-sm text-muted-foreground font-mono">{getColorHex()}</span>
         </div>
       </div>
     </SectionWrapper>

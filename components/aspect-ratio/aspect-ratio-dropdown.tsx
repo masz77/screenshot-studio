@@ -85,7 +85,7 @@ export const AspectRatioDropdown = () => {
           </div>
         </div>
       </div>
-      <PopoverContent className="p-0 w-[420px] max-h-[600px]" align="start">
+      <PopoverContent className="p-0 w-[380px]" align="start">
         <AspectRatioPicker onSelect={() => setOpen(false)} />
       </PopoverContent>
     </Popover>

@@ -53,11 +53,11 @@ export function TimelineControls() {
   };
 
   return (
-    <div className="flex items-center gap-4 px-4 py-2 bg-[#1e1e1e] border-b border-white/10">
+    <div className="flex items-center gap-4 px-4 py-2 bg-card border-b border-border/40">
       {/* Playback controls */}
       <div className="flex items-center gap-1">
         <button
-          className="h-7 w-7 flex items-center justify-center rounded hover:bg-white/10 text-white/60 hover:text-white transition-colors"
+          className="h-7 w-7 flex items-center justify-center rounded hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
           onClick={handleSkipToStart}
         >
           <PreviousIcon size={14} />
@@ -67,8 +67,8 @@ export function TimelineControls() {
           className={cn(
             'h-9 w-9 flex items-center justify-center rounded-full transition-all',
             isPlaying
-              ? 'bg-red-500 text-white hover:bg-red-600'
-              : 'bg-white/10 text-white hover:bg-white/20'
+              ? 'bg-destructive text-destructive-foreground hover:bg-destructive/90'
+              : 'bg-accent text-foreground hover:bg-accent/80'
           )}
           onClick={togglePlayback}
         >
@@ -76,7 +76,7 @@ export function TimelineControls() {
         </button>
 
         <button
-          className="h-7 w-7 flex items-center justify-center rounded hover:bg-white/10 text-white/60 hover:text-white transition-colors"
+          className="h-7 w-7 flex items-center justify-center rounded hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
           onClick={handleSkipToEnd}
         >
           <NextIcon size={14} />
@@ -84,19 +84,19 @@ export function TimelineControls() {
       </div>
 
       {/* Time display */}
-      <div className="flex items-center gap-1.5 min-w-[100px] px-3 py-1.5 bg-black/30 rounded">
-        <span className="text-xs font-mono text-white/90">
+      <div className="flex items-center gap-1.5 min-w-[100px] px-3 py-1.5 bg-background/30 rounded">
+        <span className="text-xs font-mono text-foreground/90">
           {formatTime(playhead)}
         </span>
-        <span className="text-xs text-white/30">/</span>
-        <span className="text-xs font-mono text-white/50">
+        <span className="text-xs text-muted-foreground/50">/</span>
+        <span className="text-xs font-mono text-muted-foreground">
           {formatTime(duration)}
         </span>
       </div>
 
       {/* Duration control */}
       <div className="flex items-center gap-3 flex-1 max-w-[250px]">
-        <span className="text-[10px] text-white/40 uppercase tracking-wider font-medium">
+        <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">
           Duration
         </span>
         <Slider
@@ -105,9 +105,9 @@ export function TimelineControls() {
           max={30}
           step={1}
           onValueChange={([val]) => setTimelineDuration(val * 1000)}
-          className="flex-1 [&_[role=slider]]:bg-white [&_[role=slider]]:border-0 [&_.relative]:bg-white/20 [&_[data-orientation=horizontal]>.bg-primary]:bg-brand"
+          className="flex-1 [&_[role=slider]]:bg-foreground [&_[role=slider]]:border-0 [&_.relative]:bg-foreground/20 [&_[data-orientation=horizontal]>.bg-primary]:bg-primary"
         />
-        <span className="text-xs font-mono text-white/60 min-w-[28px] text-right">
+        <span className="text-xs font-mono text-muted-foreground min-w-[28px] text-right">
           {Math.floor(duration / 1000)}s
         </span>
       </div>
@@ -117,8 +117,8 @@ export function TimelineControls() {
         className={cn(
           'h-7 w-7 flex items-center justify-center rounded transition-colors',
           isLooping
-            ? 'bg-brand/20 text-brand'
-            : 'hover:bg-white/10 text-white/40 hover:text-white/60'
+            ? 'bg-primary/20 text-primary'
+            : 'hover:bg-accent text-muted-foreground hover:text-foreground'
         )}
         onClick={handleToggleLoop}
         title={isLooping ? 'Loop enabled' : 'Loop disabled'}

@@ -31,7 +31,7 @@ export function CachedImage({
     return (
       <div
         className={cn(
-          'bg-surface-2 flex items-center justify-center text-text-tertiary text-xs',
+          'bg-card flex items-center justify-center text-muted-foreground text-xs',
           className
         )}
       >

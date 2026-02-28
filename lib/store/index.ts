@@ -110,6 +110,7 @@ export interface ImageShadow {
   offsetY: number;
   spread: number;
   color: string;
+  opacity: number;
 }
 
 // Helper function to parse gradient string and extract colors
@@ -181,6 +182,7 @@ export interface EditorState {
     elevation: number;
     side: "bottom" | "right" | "bottom-right";
     softness: number;
+    spread: number;
     color: string;
     intensity: number;
     offsetX: number;
@@ -263,11 +265,12 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     enabled: true,
     elevation: 12,
     side: "bottom-right",
-    softness: 30,
+    softness: 15,
+    spread: 3,
     color: "rgba(0, 0, 0, 1)",
     intensity: 0.5,
-    offsetX: 8,
-    offsetY: 12,
+    offsetX: 5,
+    offsetY: 8,
   },
 
   pattern: {
@@ -440,17 +443,20 @@ export function useEditorStoreSync() {
     if (
       editorStore.shadow.enabled !== shadow.enabled ||
       editorStore.shadow.softness !== shadow.blur ||
+      editorStore.shadow.spread !== (shadow.spread || 0) ||
       editorStore.shadow.color !== shadow.color ||
       editorStore.shadow.offsetX !== offsetX ||
-      editorStore.shadow.offsetY !== offsetY
+      editorStore.shadow.offsetY !== offsetY ||
+      editorStore.shadow.intensity !== (shadow.opacity ?? 0.5)
     ) {
       editorStore.setShadow({
         enabled: shadow.enabled,
         softness: shadow.blur,
+        spread: shadow.spread || 0,
         color: shadow.color,
         elevation,
         side,
-        intensity: 1,
+        intensity: shadow.opacity ?? 0.5,
         offsetX,
         offsetY,
       });
@@ -636,7 +642,7 @@ export const useImageStore = create<ImageState>()(
     selectedAspectRatio: "16_9",
     backgroundConfig: {
       type: "image",
-      value: "backgrounds/mac/mac-asset-8.jpg",
+      value: "backgrounds/raycast/red_distortion_4.webp",
       opacity: 1,
     },
     backgroundBlur: 0,
@@ -656,11 +662,12 @@ export const useImageStore = create<ImageState>()(
     },
     imageShadow: {
       enabled: true,
-      blur: 30,
-      offsetX: 10,
-      offsetY: 15,
-      spread: 5,
+      blur: 15,
+      offsetX: 5,
+      offsetY: 8,
+      spread: 3,
       color: "rgba(0, 0, 0, 0.6)",
+      opacity: 0.5,
     },
     perspective3D: {
       perspective: 200, // em units, converted to px
@@ -717,7 +724,7 @@ export const useImageStore = create<ImageState>()(
         // Reset background
         backgroundConfig: {
           type: "image",
-          value: "backgrounds/mac/mac-asset-8.jpg",
+          value: "backgrounds/raycast/red_distortion_4.webp",
           opacity: 1,
         },
         backgroundBlur: 0,
@@ -726,11 +733,12 @@ export const useImageStore = create<ImageState>()(
         // Reset shadow
         imageShadow: {
           enabled: true,
-          blur: 30,
-          offsetX: 10,
-          offsetY: 15,
-          spread: 5,
+          blur: 15,
+          offsetX: 5,
+          offsetY: 8,
+          spread: 3,
           color: "rgba(0, 0, 0, 0.6)",
+          opacity: 0.5,
         },
         // Reset border/frame
         imageBorder: {
@@ -812,7 +820,7 @@ export const useImageStore = create<ImageState>()(
         // Reset background
         backgroundConfig: {
           type: "image",
-          value: "backgrounds/mac/mac-asset-8.jpg",
+          value: "backgrounds/raycast/red_distortion_4.webp",
           opacity: 1,
         },
         backgroundBlur: 0,
@@ -821,11 +829,12 @@ export const useImageStore = create<ImageState>()(
         // Reset shadow
         imageShadow: {
           enabled: true,
-          blur: 30,
-          offsetX: 10,
-          offsetY: 15,
-          spread: 5,
+          blur: 15,
+          offsetX: 5,
+          offsetY: 8,
+          spread: 3,
           color: "rgba(0, 0, 0, 0.6)",
+          opacity: 0.5,
         },
         // Reset border/frame
         imageBorder: {
@@ -917,7 +926,7 @@ export const useImageStore = create<ImageState>()(
         // If current value is a gradient or solid color key, or not a valid image, set default to asset-26
         const newValue =
           isGradientKey || isSolidColorKey || !isValidImage
-            ? "backgrounds/mac/mac-asset-8.jpg"
+            ? "backgrounds/raycast/red_distortion_4.webp"
             : currentValue;
 
         set({

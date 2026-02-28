@@ -113,28 +113,15 @@ export async function POST(request: NextRequest) {
         .toBuffer();
       mimeType = 'image/jpeg';
     } else {
-      const usePalette = qualityPreset === 'medium' || qualityPreset === 'low';
-
-      if (usePalette) {
-        outputBuffer = await sharpInstance
-          .png({
-            compressionLevel: 9,
-            adaptiveFiltering: true,
-            palette: true,
-            quality: qualityPreset === 'medium' ? 90 : 70,
-            effort: 10,
-            colors: qualityPreset === 'medium' ? 256 : 128,
-          })
-          .toBuffer();
-      } else {
-        outputBuffer = await sharpInstance
-          .png({
-            compressionLevel: 6,
-            adaptiveFiltering: true,
-            effort: 8,
-          })
-          .toBuffer();
-      }
+      // Lossless PNG — only compressionLevel + adaptiveFiltering.
+      // Do NOT pass effort/quality/colours — they enable palette mode
+      // which quantises to ≤256 colours and destroys shadow gradients.
+      outputBuffer = await sharpInstance
+        .png({
+          compressionLevel: qualitySettings.pngCompression,
+          adaptiveFiltering: true,
+        })
+        .toBuffer();
       mimeType = 'image/png';
     }
 

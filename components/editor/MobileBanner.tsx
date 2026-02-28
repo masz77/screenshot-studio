@@ -30,11 +30,11 @@ export function MobileBanner() {
   }
 
   return (
-    <div className="w-full bg-gradient-to-r from-blue-600/90 to-purple-600/90 backdrop-blur-sm border-b border-blue-500/20 px-4 py-3 z-50 relative">
+    <div className="w-full bg-gradient-to-r from-primary/90 to-chart-4/90 backdrop-blur-sm border-b border-primary/20 px-4 py-3 z-50 relative">
       <div className="flex items-center justify-between gap-3 max-w-7xl mx-auto">
         <div className="flex items-center gap-3 flex-1 min-w-0">
-          <ComputerIcon className="h-5 w-5 text-white shrink-0" />
-          <p className="text-sm text-white font-medium">
+          <ComputerIcon className="h-5 w-5 text-primary-foreground shrink-0" />
+          <p className="text-sm text-primary-foreground font-medium">
             For the best experience, please use Screenshot Studio on a desktop device.
           </p>
         </div>
@@ -42,7 +42,7 @@ export function MobileBanner() {
           variant="ghost"
           size="icon"
           onClick={handleDismiss}
-          className="h-8 w-8 text-white hover:bg-white/20 shrink-0"
+          className="h-8 w-8 text-primary-foreground hover:bg-primary-foreground/20 shrink-0"
           aria-label="Dismiss banner"
         >
           <Cancel01Icon className="h-4 w-4" />

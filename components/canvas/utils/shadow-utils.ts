@@ -11,10 +11,32 @@ export interface ShadowConfig {
   elevation: number;
   side: 'bottom' | 'right' | 'bottom-right';
   softness: number;
+  spread: number;
   color: string;
   intensity: number;
   offsetX?: number;
   offsetY?: number;
+}
+
+/**
+ * Calculate minimum padding around the image for the blur-div shadow.
+ * Blur-divs fade with Gaussian falloff so we only need room for the
+ * shadow offset plus a fraction of the blur (the outer fringe is
+ * already nearly invisible and clips gracefully).
+ */
+export function calculateShadowPadding(shadow: ShadowConfig): number {
+  if (!shadow.enabled) return 0;
+
+  const { elevation, softness, offsetX, offsetY } = shadow;
+
+  const diag = elevation * 0.707;
+  const x = offsetX ?? diag;
+  const y = offsetY ?? diag;
+  const effectiveBlur = Math.max(softness, 12);
+
+  // Need room for offset + ~35 % of the blur spread
+  const maxOffset = Math.max(Math.abs(x), Math.abs(y));
+  return Math.ceil(maxOffset * 1.5 + effectiveBlur * 0.35);
 }
 
 export function getShadowProps(shadow: ShadowConfig): ShadowProps | Record<string, never> {

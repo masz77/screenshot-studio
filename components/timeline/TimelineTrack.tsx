@@ -68,7 +68,7 @@ export function TimelineTrack({
   return (
     <div className="flex">
       {/* Track label */}
-      <div className="w-28 shrink-0 flex items-center gap-1 px-2 py-1 bg-surface-2 border-b border-r border-border/30">
+      <div className="w-28 shrink-0 flex items-center gap-1 px-2 py-1 bg-card border-b border-r border-border/30">
         <span className="text-[10px] font-medium text-foreground/70 truncate flex-1">
           {track.name}
         </span>
@@ -109,7 +109,7 @@ export function TimelineTrack({
       {/* Track timeline area */}
       <div
         className={cn(
-          'relative h-8 bg-surface-1/50 border-b border-border/30 border-l-2',
+          'relative h-8 bg-muted/50 border-b border-border/30 border-l-2',
           trackColor,
           !track.isVisible && 'opacity-40'
         )}

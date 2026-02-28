@@ -54,11 +54,11 @@ export function SettingsSection() {
       <SectionWrapper title="Filters" defaultOpen={true}>
         <div className="space-y-4">
           {/* Foreground/Background Toggle - Segmented Control */}
-          <div className="relative flex p-0.5 bg-surface-1 dark:bg-surface-1/80 rounded-lg border border-border/30">
+          <div className="relative flex p-0.5 bg-muted dark:bg-muted/80 rounded-lg border border-border/30">
             {/* Sliding background indicator */}
             <div
               className={cn(
-                'absolute top-0.5 bottom-0.5 w-[calc(50%-4px)] bg-white dark:bg-surface-4 rounded-md shadow-sm transition-all duration-200 ease-out',
+                'absolute top-0.5 bottom-0.5 w-[calc(50%-4px)] bg-background dark:bg-accent rounded-md shadow-sm transition-all duration-200 ease-out',
                 filterTarget === 'foreground' ? 'left-0.5' : 'left-[calc(50%+2px)]'
               )}
             />
@@ -68,7 +68,7 @@ export function SettingsSection() {
                 'relative z-10 flex-1 py-2 text-xs font-medium rounded-md transition-colors duration-150',
                 filterTarget === 'foreground'
                   ? 'text-foreground'
-                  : 'text-text-tertiary hover:text-text-secondary'
+                  : 'text-muted-foreground hover:text-muted-foreground'
               )}
             >
               Image
@@ -79,7 +79,7 @@ export function SettingsSection() {
                 'relative z-10 flex-1 py-2 text-xs font-medium rounded-md transition-colors duration-150',
                 filterTarget === 'background'
                   ? 'text-foreground'
-                  : 'text-text-tertiary hover:text-text-secondary'
+                  : 'text-muted-foreground hover:text-muted-foreground'
               )}
             >
               Background
@@ -91,7 +91,7 @@ export function SettingsSection() {
             <div className="space-y-3">
               {foregroundFilters.map((filter) => (
                 <div key={filter.key} className="flex items-center gap-4">
-                  <span className="text-sm text-text-secondary w-20 shrink-0">{filter.label}</span>
+                  <span className="text-sm text-muted-foreground w-20 shrink-0">{filter.label}</span>
                   <Slider
                     value={[imageFilters[filter.key]]}
                     onValueChange={(value) => setImageFilter(filter.key, value[0])}
@@ -100,7 +100,7 @@ export function SettingsSection() {
                     step={1}
                     className="flex-1"
                   />
-                  <span className="text-sm text-text-tertiary w-10 text-right tabular-nums">
+                  <span className="text-sm text-muted-foreground w-10 text-right tabular-nums">
                     {imageFilters[filter.key]}{filter.key === 'hueRotate' ? '°' : filter.key === 'blur' ? 'px' : ''}
                   </span>
                 </div>
@@ -112,7 +112,7 @@ export function SettingsSection() {
                   variant="outline"
                   size="sm"
                   onClick={resetImageFilters}
-                  className="w-full h-8 text-xs text-text-tertiary hover:text-foreground"
+                  className="w-full h-8 text-xs text-muted-foreground hover:text-foreground"
                 >
                   <RotateClockwiseIcon size={14} className="mr-2" />
                   Reset All Filters
@@ -125,7 +125,7 @@ export function SettingsSection() {
           {filterTarget === 'background' && (
             <div className="space-y-3">
               <div className="flex items-center gap-4">
-                <span className="text-sm text-text-secondary w-20 shrink-0">Blur</span>
+                <span className="text-sm text-muted-foreground w-20 shrink-0">Blur</span>
                 <Slider
                   value={[backgroundBlur]}
                   onValueChange={(value) => setBackgroundBlur(value[0])}
@@ -134,10 +134,10 @@ export function SettingsSection() {
                   step={1}
                   className="flex-1"
                 />
-                <span className="text-sm text-text-tertiary w-10 text-right tabular-nums">{backgroundBlur}px</span>
+                <span className="text-sm text-muted-foreground w-10 text-right tabular-nums">{backgroundBlur}px</span>
               </div>
               <div className="flex items-center gap-4">
-                <span className="text-sm text-text-secondary w-20 shrink-0">Noise</span>
+                <span className="text-sm text-muted-foreground w-20 shrink-0">Noise</span>
                 <Slider
                   value={[backgroundNoise]}
                   onValueChange={(value) => setBackgroundNoise(value[0])}
@@ -146,7 +146,7 @@ export function SettingsSection() {
                   step={1}
                   className="flex-1"
                 />
-                <span className="text-sm text-text-tertiary w-10 text-right tabular-nums">{backgroundNoise}%</span>
+                <span className="text-sm text-muted-foreground w-10 text-right tabular-nums">{backgroundNoise}%</span>
               </div>
 
               {/* Reset Background Filters Button */}
@@ -155,7 +155,7 @@ export function SettingsSection() {
                   variant="outline"
                   size="sm"
                   onClick={resetBackgroundFilters}
-                  className="w-full h-8 text-xs text-text-tertiary hover:text-foreground"
+                  className="w-full h-8 text-xs text-muted-foreground hover:text-foreground"
                 >
                   <RotateClockwiseIcon size={14} className="mr-2" />
                   Reset Background Filters
@@ -169,7 +169,7 @@ export function SettingsSection() {
       {/* Canvas Section */}
       <SectionWrapper title="Canvas" defaultOpen={true}>
         <div className="flex items-center gap-4">
-          <span className="text-sm text-text-secondary w-20 shrink-0">Radius</span>
+          <span className="text-sm text-muted-foreground w-20 shrink-0">Radius</span>
           <Slider
             value={[backgroundBorderRadius]}
             onValueChange={(value) => setBackgroundBorderRadius(value[0])}
@@ -178,7 +178,7 @@ export function SettingsSection() {
             step={1}
             className="flex-1"
           />
-          <span className="text-sm text-text-tertiary w-10 text-right tabular-nums">{backgroundBorderRadius}px</span>
+          <span className="text-sm text-muted-foreground w-10 text-right tabular-nums">{backgroundBorderRadius}px</span>
         </div>
       </SectionWrapper>
     </>

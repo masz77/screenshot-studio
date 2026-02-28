@@ -142,16 +142,16 @@ export function Features({ features, title, eyebrow = "FEATURES" }: FeaturesProp
                   onClick={() => handleFeatureClick(index)}
                   className={`cursor-pointer w-full text-left p-4 sm:p-5 rounded-2xl transition-all duration-300 group ${
                     isActive
-                      ? "bg-surface-3 border border-brand/30"
-                      : "hover:bg-surface-2 border border-transparent"
+                      ? "bg-accent border border-primary/30"
+                      : "hover:bg-card border border-transparent"
                   }`}
                 >
                   <div className="flex items-start gap-4">
                     <div
                       className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors ${
                         isActive
-                          ? "bg-brand/20 text-brand"
-                          : "bg-surface-3 text-muted-foreground group-hover:text-foreground"
+                          ? "bg-primary/20 text-primary"
+                          : "bg-accent text-muted-foreground group-hover:text-foreground"
                       }`}
                     >
                       <IconComponent className="w-5 h-5" />
@@ -222,10 +222,10 @@ export function Features({ features, title, eyebrow = "FEATURES" }: FeaturesProp
                     ? iconMap[feature.icon] || Image01Icon
                     : Image01Icon;
                   return (
-                    <div className="w-full h-full bg-surface-2 flex items-center justify-center p-8">
+                    <div className="w-full h-full bg-card flex items-center justify-center p-8">
                       <div className="text-center">
-                        <div className="w-20 h-20 rounded-2xl bg-brand/10 flex items-center justify-center mx-auto mb-6">
-                          <IconComponent className="w-10 h-10 text-brand" />
+                        <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-6">
+                          <IconComponent className="w-10 h-10 text-primary" />
                         </div>
                         <h4 className={`text-2xl sm:text-3xl font-normal mb-3 ${instrumentSerif.className}`}>
                           {feature?.title}

@@ -24,7 +24,7 @@ export function SectionWrapper({
   return (
     <div className={cn('mb-1', className)}>
       <div
-        className="w-full flex items-center justify-between gap-2 py-3 px-2 hover:bg-surface-2/30 rounded-lg transition-colors group"
+        className="w-full flex items-center justify-between gap-2 py-3 px-2 hover:bg-card/30 rounded-lg transition-colors group"
       >
         <button
           onClick={() => setIsOpen(!isOpen)}
@@ -33,11 +33,11 @@ export function SectionWrapper({
           <ArrowDown01Icon
             size={16}
             className={cn(
-              'text-text-tertiary transition-transform duration-200',
+              'text-muted-foreground transition-transform duration-200',
               !isOpen && '-rotate-90'
             )}
           />
-          <span className="text-xs font-semibold uppercase tracking-wider text-text-tertiary group-hover:text-text-secondary">
+          <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground group-hover:text-foreground">
             {title}
           </span>
         </button>

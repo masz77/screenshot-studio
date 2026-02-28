@@ -20,11 +20,13 @@ export interface ExportApiResponse {
 export interface QualitySettings {
   jpeg: number;
   pngCompression: number;
+  // NOTE: Do NOT add `effort` — sharp treats it as a palette-mode flag
+  // which quantises to ≤256 colours and destroys shadow gradients.
 }
 
 export const QUALITY_PRESETS: Record<QualityPreset, QualitySettings> = {
-  high: { jpeg: 92, pngCompression: 3 },
-  medium: { jpeg: 80, pngCompression: 6 },
+  high: { jpeg: 92, pngCompression: 6 },
+  medium: { jpeg: 80, pngCompression: 9 },
   low: { jpeg: 60, pngCompression: 9 },
 };
 
@@ -39,14 +41,14 @@ export const QUALITY_PRESET_LABELS: Record<QualityPreset, { label: string; descr
   medium: {
     label: 'Medium',
     description: {
-      png: 'Balanced quality and size',
+      png: 'Balanced size, lossless',
       jpeg: '80% quality, moderate compression',
     },
   },
   low: {
     label: 'Low',
     description: {
-      png: 'Smaller file, some quality loss',
+      png: 'Smallest file, lossless',
       jpeg: '60% quality, maximum compression',
     },
   },

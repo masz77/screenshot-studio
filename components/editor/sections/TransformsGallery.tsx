@@ -184,7 +184,7 @@ export function TransformsGallery() {
                   onClick={() => applyPreset(preset, globalIndex)}
                   className={cn(
                     'relative flex flex-col items-center gap-1.5 p-1.5 rounded-lg transition-all',
-                    'bg-surface-1/60 hover:bg-surface-2/80',
+                    'bg-muted/60 hover:bg-card/80',
                     'border-2',
                     isSelected
                       ? 'border-primary shadow-lg shadow-primary/20'
@@ -219,7 +219,7 @@ export function TransformsGallery() {
                         </div>
                       ) : (
                         <div
-                          className="w-3/4 h-3/4 bg-primary/80 rounded"
+                          className="w-3/4 h-3/4 bg-muted-foreground/40 rounded"
                           style={getTransformStyle(preset)}
                         />
                       )}

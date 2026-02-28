@@ -160,12 +160,12 @@ export function ValueProposition({
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 + 0.2 }}
-                className="group bg-surface-2 rounded-2xl p-6 hover:bg-surface-3 transition-all duration-300 border border-transparent hover:border-border/50"
+                className="group bg-card rounded-2xl p-6 hover:bg-accent transition-all duration-300 border border-transparent hover:border-border/50"
               >
                 {/* Visual Preview */}
                 <Visual />
 
-                <h3 className="text-xl font-semibold mb-3 text-foreground group-hover:text-brand transition-colors">
+                <h3 className="text-xl font-semibold mb-3 text-foreground group-hover:text-primary transition-colors">
                   {card.title}
                 </h3>
                 <p className="text-muted-foreground leading-relaxed text-sm">

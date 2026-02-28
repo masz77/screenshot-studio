@@ -47,7 +47,7 @@ export function ScaleSlider({
               className={`text-xs transition-colors ${
                 s === scale
                   ? 'text-primary font-medium'
-                  : 'text-text-tertiary hover:text-text-secondary'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               {s}x
@@ -56,7 +56,7 @@ export function ScaleSlider({
         </div>
       </div>
 
-      <p className="text-xs text-text-tertiary">
+      <p className="text-xs text-muted-foreground">
         Higher scale = better quality, larger file size
       </p>
     </div>

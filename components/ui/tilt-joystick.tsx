@@ -89,7 +89,7 @@ export function TiltJoystick({
           'px-3 py-1.5 text-xs font-medium rounded-md transition-all cursor-pointer select-none',
           hasTilt
             ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-            : 'bg-[#c8c8c8] dark:bg-[#3a3a3a] text-foreground/80 hover:bg-[#b8b8b8] dark:hover:bg-[#444444]'
+            : 'bg-border dark:bg-secondary text-foreground/80 hover:bg-muted-foreground/40 dark:hover:bg-accent'
         )}
       >
         Tilt
@@ -99,7 +99,7 @@ export function TiltJoystick({
       <div
         ref={baseRef}
         onDoubleClick={handleReset}
-        className="relative flex justify-center items-center rounded-full bg-[#d4d4d4] dark:bg-[#d0d0d0]"
+        className="relative flex justify-center items-center rounded-full bg-border dark:bg-muted-foreground"
         style={{
           height: size,
           width: size,
@@ -108,7 +108,7 @@ export function TiltJoystick({
       >
         {/* Inner dark area */}
         <div
-          className="absolute rounded-full bg-[#2d2d2d] dark:bg-[#252525]"
+          className="absolute rounded-full bg-foreground dark:bg-background"
           style={{
             width: size - borderWidth * 2,
             height: size - borderWidth * 2,
@@ -121,7 +121,7 @@ export function TiltJoystick({
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
           onPointerCancel={handlePointerUp}
-          className="relative z-10 rounded-full bg-[#555555] dark:bg-[#4a4a4a]"
+          className="relative z-10 rounded-full bg-muted-foreground dark:bg-accent"
           style={{
             cursor: isDragging ? 'grabbing' : 'grab',
             height: knobSize,

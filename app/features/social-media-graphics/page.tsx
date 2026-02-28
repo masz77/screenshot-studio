@@ -142,7 +142,7 @@ export default function SocialMediaGraphicsPage() {
             </p>
             <Link
               href="/home"
-              className="inline-flex items-center gap-2 bg-brand text-black font-semibold px-8 py-4 rounded-full hover:opacity-90 transition-opacity"
+              className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-semibold px-8 py-4 rounded-full hover:opacity-90 transition-opacity"
             >
               Create Graphics Free
               <ArrowRight className="w-5 h-5" />
@@ -167,11 +167,11 @@ export default function SocialMediaGraphicsPage() {
               {platforms.map((platform) => (
                 <div
                   key={platform.name}
-                  className="p-6 bg-background border rounded-xl hover:border-brand transition-colors"
+                  className="p-6 bg-background border rounded-xl hover:border-primary transition-colors"
                 >
-                  <platform.icon className="w-10 h-10 text-brand mb-4" />
+                  <platform.icon className="w-10 h-10 text-primary mb-4" />
                   <h3 className="font-semibold text-lg mb-1">{platform.name}</h3>
-                  <p className="text-sm text-brand mb-2">{platform.dimensions}</p>
+                  <p className="text-sm text-primary mb-2">{platform.dimensions}</p>
                   <p className="text-sm text-muted-foreground">
                     {platform.description}
                   </p>
@@ -190,7 +190,7 @@ export default function SocialMediaGraphicsPage() {
             <div className="grid md:grid-cols-2 gap-8">
               {benefits.map((benefit) => (
                 <div key={benefit.title} className="flex gap-4">
-                  <div className="flex-shrink-0 w-2 h-2 mt-3 rounded-full bg-brand" />
+                  <div className="flex-shrink-0 w-2 h-2 mt-3 rounded-full bg-primary" />
                   <div>
                     <h3 className="font-semibold text-lg mb-2">
                       {benefit.title}
@@ -243,7 +243,7 @@ export default function SocialMediaGraphicsPage() {
             </p>
             <Link
               href="/home"
-              className="inline-flex items-center gap-2 bg-brand text-black font-semibold px-8 py-4 rounded-full hover:opacity-90 transition-opacity"
+              className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-semibold px-8 py-4 rounded-full hover:opacity-90 transition-opacity"
             >
               Try Free Now
               <ArrowRight className="w-5 h-5" />

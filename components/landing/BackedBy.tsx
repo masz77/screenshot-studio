@@ -104,7 +104,7 @@ export function BackedBy() {
                   <h3 className="text-xl sm:text-2xl font-semibold text-foreground">
                     Your Company Here
                   </h3>
-                  <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-brand/10 text-brand border border-brand/20">
+                  <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-primary/10 text-primary border border-primary/20">
                     Free Sponsor
                   </span>
                 </div>

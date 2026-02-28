@@ -21,8 +21,8 @@ const Toaster = ({ ...props }: ToasterProps) => {
           toast: `
             group toast
             flex items-start gap-3.5 p-4 pr-5
-            bg-[#0a0a0a]/95 backdrop-blur-xl
-            border border-white/[0.08]
+            bg-popover/95 backdrop-blur-xl
+            border border-border
             rounded-2xl
             shadow-[0_8px_32px_rgba(0,0,0,0.5),0_0_0_1px_rgba(255,255,255,0.03)_inset]
             w-[380px] max-w-[calc(100vw-32px)]
@@ -32,23 +32,23 @@ const Toaster = ({ ...props }: ToasterProps) => {
             data-[type=info]:border-blue-500/20
           `,
           title: `
-            text-[15px] font-medium text-white/95 leading-snug tracking-[-0.01em]
+            text-[15px] font-medium text-popover-foreground/95 leading-snug tracking-[-0.01em]
           `,
           description: `
-            text-[13px] text-white/50 leading-relaxed mt-1
+            text-[13px] text-muted-foreground leading-relaxed mt-1
           `,
           actionButton: `
             text-xs font-medium px-3 py-1.5 rounded-lg
-            bg-white/10 text-white/80
-            hover:bg-white/15 hover:text-white
+            bg-foreground/10 text-foreground/80
+            hover:bg-foreground/15 hover:text-foreground
             transition-all duration-200
           `,
           cancelButton: `
-            text-xs font-medium text-white/40 hover:text-white/60 transition-colors
+            text-xs font-medium text-muted-foreground hover:text-foreground/60 transition-colors
           `,
           closeButton: `
             absolute top-3 right-3 p-1 rounded-md
-            text-white/30 hover:text-white/60 hover:bg-white/5
+            text-muted-foreground hover:text-foreground/60 hover:bg-foreground/5
             transition-all duration-200
           `,
           icon: `
@@ -58,7 +58,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
             data-[type=error]:[&>svg]:text-red-400
             data-[type=warning]:[&>svg]:text-amber-400
             data-[type=info]:[&>svg]:text-blue-400
-            [&>svg]:text-white/60
+            [&>svg]:text-muted-foreground
           `,
         },
       }}
@@ -84,8 +84,8 @@ const Toaster = ({ ...props }: ToasterProps) => {
           </div>
         ),
         loading: (
-          <div className="flex items-center justify-center size-7 rounded-full bg-white/10 ring-1 ring-white/10">
-            <Loading03Icon className="size-4 text-white/70 animate-spin" />
+          <div className="flex items-center justify-center size-7 rounded-full bg-foreground/10 ring-1 ring-foreground/10">
+            <Loading03Icon className="size-4 text-muted-foreground animate-spin" />
           </div>
         ),
       }}

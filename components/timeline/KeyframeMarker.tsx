@@ -81,7 +81,7 @@ export function KeyframeMarker({
         'transition-all duration-100',
         'focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-1',
         markerColor,
-        isSelected && 'ring-2 ring-white shadow-lg scale-110',
+        isSelected && 'ring-2 ring-foreground shadow-lg scale-110',
         isDragging && 'cursor-grabbing scale-125'
       )}
       style={{ left: position }}

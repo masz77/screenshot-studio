@@ -89,7 +89,7 @@ export function AnimationPresetGallery() {
     <div className="space-y-5">
       {/* Header with clear button */}
       {hasAnimation && (
-        <div className="flex items-center justify-between p-3 bg-brand/10 border border-brand/20 rounded-lg">
+        <div className="flex items-center justify-between p-3 bg-primary/10 border border-primary/20 rounded-lg">
           <div>
             <span className="text-xs font-medium text-foreground/80">
               {animationClips.length} animation{animationClips.length > 1 ? 's' : ''} added
@@ -125,10 +125,10 @@ export function AnimationPresetGallery() {
                   onClick={() => handlePresetClick(preset)}
                   className={cn(
                     'relative flex flex-col items-center gap-1.5 p-1.5 rounded-lg transition-all group',
-                    'bg-surface-1/60 hover:bg-surface-2/80',
+                    'bg-muted/60 hover:bg-card/80',
                     'border-2',
                     isApplied
-                      ? 'border-brand/50'
+                      ? 'border-primary/50'
                       : 'border-transparent hover:border-border/50'
                   )}
                 >
@@ -154,25 +154,25 @@ export function AnimationPresetGallery() {
                           />
                         </div>
                       ) : (
-                        <div className="w-3/4 h-3/4 bg-primary/80 rounded" />
+                        <div className="w-3/4 h-3/4 bg-muted-foreground/40 rounded" />
                       )}
                     </div>
 
                     {/* Hover add indicator */}
-                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <div className="bg-white/20 rounded-full p-2">
-                        <Add01Icon size={16} className="text-white" />
+                    <div className="absolute inset-0 bg-foreground/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <div className="bg-foreground/20 rounded-full p-2">
+                        <Add01Icon size={16} className="text-primary-foreground" />
                       </div>
                     </div>
 
                     {/* Duration badge */}
-                    <div className="absolute bottom-1 right-1 px-1 py-0.5 bg-black/60 rounded text-[8px] text-white/80">
+                    <div className="absolute bottom-1 right-1 px-1 py-0.5 bg-foreground/60 rounded text-[8px] text-background/80">
                       {(preset.duration / 1000).toFixed(1)}s
                     </div>
 
                     {/* Applied indicator */}
                     {isApplied && (
-                      <div className="absolute top-1 left-1 px-1 py-0.5 bg-brand rounded text-[7px] text-brand-foreground font-medium">
+                      <div className="absolute top-1 left-1 px-1 py-0.5 bg-primary rounded text-[7px] text-primary-foreground font-medium">
                         Added
                       </div>
                     )}
@@ -199,7 +199,7 @@ export function AnimationPresetGallery() {
       )}
 
       {/* Instructions */}
-      <div className="p-3 rounded-lg bg-surface-1/50 border border-border/30 space-y-1">
+      <div className="p-3 rounded-lg bg-muted/50 border border-border/30 space-y-1">
         <p className="text-xs text-foreground/60">
           Click any preset to add it to the timeline.
           You can add multiple animations and arrange them.

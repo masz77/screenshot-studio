@@ -203,8 +203,8 @@ export function BackgroundSection() {
               className={cn(
                 'aspect-[16/9] flex items-center justify-center text-[10px] rounded-lg border-2 transition-all',
                 !currentShadow
-                  ? 'border-primary text-foreground bg-surface-2/50'
-                  : 'border-dashed border-border/50 text-text-tertiary hover:border-border hover:bg-surface-2/30'
+                  ? 'border-primary text-foreground bg-card/50'
+                  : 'border-dashed border-border/50 text-muted-foreground hover:border-border hover:bg-card/30'
               )}
             >
               None
@@ -214,7 +214,7 @@ export function BackgroundSection() {
                 key={index}
                 onClick={() => handleAddShadow(shadowUrl)}
                 className={cn(
-                  'aspect-[16/9] rounded-lg overflow-hidden border-2 transition-all bg-neutral-300 dark:bg-neutral-700',
+                  'aspect-[16/9] rounded-lg overflow-hidden border-2 transition-all bg-secondary dark:bg-secondary',
                   currentShadow?.src === shadowUrl
                     ? 'border-primary ring-1 ring-primary/30 scale-105'
                     : 'border-border/40 hover:border-primary/60 hover:scale-105'
@@ -239,7 +239,7 @@ export function BackgroundSection() {
             <button
               key={index}
               onClick={() => handleAddArrow(arrowUrl)}
-              className="aspect-square flex items-center justify-center rounded-lg border border-border/40 bg-white dark:bg-surface-3 hover:border-primary/60 hover:scale-105 transition-all p-2"
+              className="aspect-square flex items-center justify-center rounded-lg border border-border/40 bg-background dark:bg-accent hover:border-primary/60 hover:scale-105 transition-all p-2"
             >
               <img
                 src={arrowUrl}
@@ -261,12 +261,12 @@ export function BackgroundSection() {
               'flex flex-col items-center justify-center gap-1.5 py-3 rounded-lg border cursor-pointer transition-all',
               customBgType === 'image'
                 ? 'border-primary bg-primary/5'
-                : 'border-border/50 bg-surface-2 hover:bg-surface-3'
+                : 'border-border/50 bg-card hover:bg-accent'
             )}
           >
             <input {...getBgInputProps()} />
-            <Image01Icon size={20} className="text-text-secondary" />
-            <span className="text-xs text-text-secondary">Image</span>
+            <Image01Icon size={20} className="text-muted-foreground" />
+            <span className="text-xs text-muted-foreground">Image</span>
           </div>
 
           {/* Color Picker */}
@@ -295,7 +295,7 @@ export function BackgroundSection() {
               'flex flex-col items-center justify-center gap-1.5 py-3 rounded-lg border transition-all',
               customBgType === 'transparent'
                 ? 'border-primary bg-primary/5'
-                : 'border-border/50 bg-surface-2 hover:bg-surface-3'
+                : 'border-border/50 bg-card hover:bg-accent'
             )}
           >
             {/* Checkerboard pattern for transparent */}
@@ -305,21 +305,21 @@ export function BackgroundSection() {
                 background: 'repeating-conic-gradient(#808080 0% 25%, #fff 0% 50%) 50% / 8px 8px',
               }}
             />
-            <span className="text-xs text-text-secondary">Transparent</span>
+            <span className="text-xs text-muted-foreground">Transparent</span>
           </button>
         </div>
         {bgUploadError && <p className="text-xs text-destructive mt-2">{bgUploadError}</p>}
 
         {/* Current Image Preview */}
         {backgroundConfig.type === 'image' && backgroundConfig.value?.startsWith('blob:') && (
-          <div className="relative rounded-lg overflow-hidden border border-border/40 aspect-video bg-surface-1/50 mt-3">
+          <div className="relative rounded-lg overflow-hidden border border-border/40 aspect-video bg-muted/50 mt-3">
             <img
               src={backgroundConfig.value}
               alt="Background"
               className="w-full h-full object-cover"
             />
             <button
-              className="absolute top-2 right-2 p-1 rounded-md bg-black/50 text-white hover:bg-destructive transition-colors"
+              className="absolute top-2 right-2 p-1 rounded-md bg-background/50 text-foreground hover:bg-destructive transition-colors"
               onClick={() => {
                 setBackgroundType('gradient');
                 setBackgroundValue('vibrant_orange_pink');
@@ -375,7 +375,7 @@ export function BackgroundSection() {
               e.stopPropagation();
               shuffleMagicGradient();
             }}
-            className="py-0.5 bg-surface-1 hover:bg-surface-2 cursor-pointer border border-border/20 rounded-md transition-colors flex text-[10px] text-text-tertiary space-x-1 px-2 items-center"
+            className="py-0.5 bg-muted hover:bg-card cursor-pointer border border-border/20 rounded-md transition-colors flex text-[10px] text-muted-foreground space-x-1 px-2 items-center"
           >
             <span>SHUFFLE</span>
             <ShuffleIcon size={12} />

@@ -68,28 +68,28 @@ export function MockupGallery() {
         <TabsList className="w-full grid grid-cols-4 rounded-none bg-transparent h-12 p-1.5 gap-1.5">
           <TabsTrigger 
             value="macbook" 
-            className="data-[state=active]:bg-background data-[state=active]:shadow-lg data-[state=active]:shadow-black/20 rounded-md border-0 data-[state=active]:border-0 transition-all duration-200 text-xs gap-1.5"
+            className="data-[state=active]:bg-background data-[state=active]:shadow-lg data-[state=active]:shadow-foreground/20 rounded-md border-0 data-[state=active]:border-0 transition-all duration-200 text-xs gap-1.5"
           >
             <LaptopIcon className="h-3.5 w-3.5" />
             <span>MacBook</span>
           </TabsTrigger>
           <TabsTrigger 
             value="imac" 
-            className="data-[state=active]:bg-background data-[state=active]:shadow-lg data-[state=active]:shadow-black/20 rounded-md border-0 data-[state=active]:border-0 transition-all duration-200 text-xs gap-1.5"
+            className="data-[state=active]:bg-background data-[state=active]:shadow-lg data-[state=active]:shadow-foreground/20 rounded-md border-0 data-[state=active]:border-0 transition-all duration-200 text-xs gap-1.5"
           >
             <ComputerIcon className="h-3.5 w-3.5" />
             <span>iMac</span>
           </TabsTrigger>
           <TabsTrigger 
             value="iwatch" 
-            className="data-[state=active]:bg-background data-[state=active]:shadow-lg data-[state=active]:shadow-black/20 rounded-md border-0 data-[state=active]:border-0 transition-all duration-200 text-xs gap-1.5"
+            className="data-[state=active]:bg-background data-[state=active]:shadow-lg data-[state=active]:shadow-foreground/20 rounded-md border-0 data-[state=active]:border-0 transition-all duration-200 text-xs gap-1.5"
           >
             <Watch02Icon className="h-3.5 w-3.5" />
             <span>Watch</span>
           </TabsTrigger>
           <TabsTrigger 
             value="iphone" 
-            className="data-[state=active]:bg-background data-[state=active]:shadow-lg data-[state=active]:shadow-black/20 rounded-md border-0 data-[state=active]:border-0 transition-all duration-200 text-xs gap-1.5"
+            className="data-[state=active]:bg-background data-[state=active]:shadow-lg data-[state=active]:shadow-foreground/20 rounded-md border-0 data-[state=active]:border-0 transition-all duration-200 text-xs gap-1.5"
           >
             <SmartPhone01Icon className="h-3.5 w-3.5" />
             <span>iPhone</span>
@@ -111,9 +111,9 @@ export function MockupGallery() {
                   className="object-cover"
                   sizes="(max-width: 768px) 50vw, 200px"
                 />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
-                <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/60 to-transparent">
-                  <p className="text-xs text-white font-medium truncate">{mockup.name}</p>
+                <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/10 transition-colors" />
+                <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-foreground/60 to-transparent">
+                  <p className="text-xs text-background font-medium truncate">{mockup.name}</p>
                 </div>
               </button>
             ))}
@@ -135,9 +135,9 @@ export function MockupGallery() {
                   className="object-cover"
                   sizes="(max-width: 768px) 50vw, 200px"
                 />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
-                <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/60 to-transparent">
-                  <p className="text-xs text-white font-medium truncate">{mockup.name}</p>
+                <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/10 transition-colors" />
+                <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-foreground/60 to-transparent">
+                  <p className="text-xs text-background font-medium truncate">{mockup.name}</p>
                 </div>
               </button>
             ))}
@@ -159,9 +159,9 @@ export function MockupGallery() {
                   className="object-cover"
                   sizes="(max-width: 768px) 50vw, 200px"
                 />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
-                <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/60 to-transparent">
-                  <p className="text-xs text-white font-medium truncate">{mockup.name}</p>
+                <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/10 transition-colors" />
+                <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-foreground/60 to-transparent">
+                  <p className="text-xs text-background font-medium truncate">{mockup.name}</p>
                 </div>
               </button>
             ))}
@@ -184,9 +184,9 @@ export function MockupGallery() {
                     className="object-cover"
                     sizes="(max-width: 768px) 50vw, 200px"
                   />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
-                  <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/60 to-transparent">
-                    <p className="text-xs text-white font-medium truncate">{mockup.name}</p>
+                  <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/10 transition-colors" />
+                  <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-foreground/60 to-transparent">
+                    <p className="text-xs text-background font-medium truncate">{mockup.name}</p>
                   </div>
                 </button>
               ))}

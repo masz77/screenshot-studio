@@ -59,10 +59,10 @@ export function FramesSection() {
           >
             <div
               className={cn(
-                'flex h-14 w-16 items-center justify-center rounded-lg border-2 bg-surface-1/50 transition-all p-1',
+                'flex h-14 w-16 items-center justify-center rounded-lg border-2 bg-muted/50 transition-all p-1',
                 isSelected(value)
-                  ? 'border-surface-5 bg-surface-2/50'
-                  : 'border-border/40 hover:border-surface-4 hover:bg-surface-2/30'
+                  ? 'border-border bg-card/50'
+                  : 'border-border/40 hover:border-border hover:bg-card/30'
               )}
             >
               <img
@@ -74,7 +74,7 @@ export function FramesSection() {
             </div>
             <span className={cn(
               'text-[10px] whitespace-nowrap',
-              isSelected(value) ? 'text-text-primary' : 'text-text-tertiary'
+              isSelected(value) ? 'text-foreground' : 'text-muted-foreground'
             )}>
               {label}
             </span>
@@ -85,7 +85,7 @@ export function FramesSection() {
       {isArcFrame && (
         <div className="space-y-3 pt-2">
           <div className="space-y-2">
-            <label className="text-[10px] text-text-tertiary block">Width</label>
+            <label className="text-[10px] text-muted-foreground block">Width</label>
             <Slider
               value={[imageBorder.width]}
               onValueChange={(value) => setImageBorder({ width: value[0], enabled: true })}
@@ -97,7 +97,7 @@ export function FramesSection() {
             />
           </div>
           <div className="space-y-2">
-            <label className="text-[10px] text-text-tertiary block">Opacity</label>
+            <label className="text-[10px] text-muted-foreground block">Opacity</label>
             <Slider
               value={[Math.round((imageBorder.opacity ?? (imageBorder.type === 'arc-light' ? 0.5 : 0.7)) * 100)]}
               onValueChange={(value) => setImageBorder({ opacity: value[0] / 100, enabled: true })}
@@ -118,7 +118,7 @@ export function FramesSection() {
             value={imageBorder.title || ''}
             onChange={(e) => setImageBorder({ title: e.target.value, enabled: true })}
             placeholder="Window title"
-            className="h-9 text-sm bg-surface-1/50 border-border/60 text-foreground placeholder:text-text-muted"
+            className="h-9 text-sm bg-muted/50 border-border/60 text-foreground placeholder:text-muted-foreground"
           />
         </div>
       )}

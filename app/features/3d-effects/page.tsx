@@ -139,7 +139,7 @@ export default function ThreeDEffectsPage() {
             </p>
             <Link
               href="/home"
-              className="inline-flex items-center gap-2 bg-brand text-black font-semibold px-8 py-4 rounded-full hover:opacity-90 transition-opacity"
+              className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-semibold px-8 py-4 rounded-full hover:opacity-90 transition-opacity"
             >
               Add 3D Effects Free
               <ArrowRight className="w-5 h-5" />
@@ -163,7 +163,7 @@ export default function ThreeDEffectsPage() {
                   className="flex gap-4 p-6 bg-background rounded-xl border"
                 >
                   <div className="flex-shrink-0">
-                    <effect.icon className="w-8 h-8 text-brand" />
+                    <effect.icon className="w-8 h-8 text-primary" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-lg mb-2">
@@ -222,7 +222,7 @@ export default function ThreeDEffectsPage() {
               {useCases.map((useCase) => (
                 <div
                   key={useCase.title}
-                  className="p-6 bg-background border rounded-xl hover:border-brand transition-colors"
+                  className="p-6 bg-background border rounded-xl hover:border-primary transition-colors"
                 >
                   <h3 className="font-semibold mb-2">{useCase.title}</h3>
                   <p className="text-sm text-muted-foreground">
@@ -242,7 +242,7 @@ export default function ThreeDEffectsPage() {
             </h2>
             <div className="space-y-6">
               <div className="flex gap-4">
-                <div className="flex-shrink-0 w-2 h-2 mt-3 rounded-full bg-brand" />
+                <div className="flex-shrink-0 w-2 h-2 mt-3 rounded-full bg-primary" />
                 <div>
                   <h3 className="font-semibold mb-1">Higher Engagement</h3>
                   <p className="text-muted-foreground">
@@ -252,7 +252,7 @@ export default function ThreeDEffectsPage() {
                 </div>
               </div>
               <div className="flex gap-4">
-                <div className="flex-shrink-0 w-2 h-2 mt-3 rounded-full bg-brand" />
+                <div className="flex-shrink-0 w-2 h-2 mt-3 rounded-full bg-primary" />
                 <div>
                   <h3 className="font-semibold mb-1">Professional Look</h3>
                   <p className="text-muted-foreground">
@@ -262,7 +262,7 @@ export default function ThreeDEffectsPage() {
                 </div>
               </div>
               <div className="flex gap-4">
-                <div className="flex-shrink-0 w-2 h-2 mt-3 rounded-full bg-brand" />
+                <div className="flex-shrink-0 w-2 h-2 mt-3 rounded-full bg-primary" />
                 <div>
                   <h3 className="font-semibold mb-1">Stand Out</h3>
                   <p className="text-muted-foreground">
@@ -286,7 +286,7 @@ export default function ThreeDEffectsPage() {
             </p>
             <Link
               href="/home"
-              className="inline-flex items-center gap-2 bg-brand text-black font-semibold px-8 py-4 rounded-full hover:opacity-90 transition-opacity"
+              className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-semibold px-8 py-4 rounded-full hover:opacity-90 transition-opacity"
             >
               Try 3D Effects Free
               <ArrowRight className="w-5 h-5" />
