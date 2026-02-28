@@ -26,6 +26,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'monthly',
       priority: 0.8,
     },
+    // Keyword landing page (high SEO priority)
+    {
+      url: `${baseUrl}/free-screenshot-editor`,
+      lastModified,
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    },
     // Individual feature pages (SEO landing pages)
     {
       url: `${baseUrl}/features/screenshot-beautifier`,

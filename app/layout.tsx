@@ -230,7 +230,7 @@ const fontVariables = [
 
 export const metadata: Metadata = {
   title: {
-    default: "Screenshot Studio - Free Online Image Editor | Create Stunning Graphics in Seconds",
+    default: "Screenshot Studio - Free Screenshot Editor Online | Beautify Images Instantly",
     template: "%s | Screenshot Studio",
   },
   // Add your Google Search Console verification code here
@@ -240,14 +240,17 @@ export const metadata: Metadata = {
     // yandex: "your-yandex-verification",
     // bing: "your-bing-verification",
   },
-  description: "Transform screenshots into professional social media graphics instantly. Free browser-based editor with 100+ backgrounds, animations, 3D effects, and video export. No signup needed.",
+  description: "Free screenshot editor online — transform plain screenshots into professional graphics in seconds. 100+ backgrounds, animations, 3D effects, and video export. No signup needed.",
   keywords: [
     // Primary keywords
-    "free image editor",
-    "online image editor",
+    "screenshot editor online free",
+    "free screenshot editor",
+    "online screenshot editor",
     "screenshot beautifier",
     "screenshot editor",
     "screenshot studio",
+    "free image editor",
+    "online image editor",
     // Feature keywords
     "social media graphics maker",
     "image background editor",
@@ -267,6 +270,7 @@ export const metadata: Metadata = {
     "add background to screenshot",
     "screenshot to video converter",
     "animated slideshow maker",
+    "free online screenshot beautifier",
   ],
   authors: [{ name: "Screenshot Studio", url: "https://screenshot-studio.com" }],
   creator: "Screenshot Studio",
@@ -280,8 +284,8 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: "/",
     siteName: "Screenshot Studio",
-    title: "Screenshot Studio - Free Screenshot Beautifier & Image Editor",
-    description: "Create stunning social media graphics in seconds. 100+ backgrounds, animations, 3D effects, video export. 100% free, no signup required.",
+    title: "Screenshot Studio - Free Screenshot Editor Online | Beautify Images Instantly",
+    description: "Free screenshot editor online — create stunning social media graphics in seconds. 100+ backgrounds, animations, 3D effects, video export. No signup required.",
     images: [
       {
         url: "https://screenshot-studio.com/og.png",
@@ -293,8 +297,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Screenshot Studio - Free Screenshot Beautifier",
-    description: "Transform screenshots into stunning graphics. Animations, 3D effects, video export. Free, no signup.",
+    title: "Screenshot Studio - Free Screenshot Editor Online",
+    description: "Free screenshot editor online — transform screenshots into stunning graphics. Animations, 3D effects, video export. No signup.",
     images: ["https://screenshot-studio.com/og.png"],
     creator: "@code_kartik",
     site: "@code_kartik",

@@ -1,4 +1,30 @@
+import { Metadata } from "next";
 import { LandingPage } from "@/components/landing/LandingPage";
+
+export const metadata: Metadata = {
+  title: "Screenshot Studio - Free Screenshot Editor Online | Create Stunning Graphics",
+  description:
+    "Free screenshot editor online — beautify screenshots with 100+ backgrounds, 3D effects, animations, and video export. No signup, no watermarks. Open and start editing instantly.",
+  keywords: [
+    "screenshot editor online free",
+    "free screenshot editor",
+    "online screenshot editor",
+    "screenshot beautifier",
+    "free image editor online",
+    "beautify screenshots",
+    "screenshot background editor",
+    "screenshot to social media",
+  ],
+  openGraph: {
+    title: "Screenshot Studio - Free Screenshot Editor Online",
+    description:
+      "Free screenshot editor online — beautify screenshots with 100+ backgrounds, 3D effects, animations, and video export. No signup required.",
+    url: "/",
+  },
+  alternates: {
+    canonical: "/",
+  },
+};
 
 // Features - benefit-focused, concise
 const features = [

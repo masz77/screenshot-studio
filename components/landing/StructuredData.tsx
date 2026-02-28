@@ -6,10 +6,12 @@ export function StructuredData() {
         "@type": "WebApplication",
         "@id": "https://screenshot-studio.com/#application",
         name: "Screenshot Studio",
+        alternateName: "Free Screenshot Editor Online",
         description:
-          "Free browser-based image editor for creating professional graphics. Transform screenshots into stunning visuals with backgrounds, animations, 3D effects, and video export.",
+          "Free screenshot editor online — transform plain screenshots into professional graphics with 100+ backgrounds, animations, 3D effects, and video export. No signup required.",
         url: "https://screenshot-studio.com",
         applicationCategory: "DesignApplication",
+        applicationSubCategory: "Screenshot Editor",
         operatingSystem: "Any (Web Browser)",
         browserRequirements: "Requires JavaScript. Works in Chrome, Firefox, Safari, Edge.",
         offers: {
@@ -50,9 +52,9 @@ export function StructuredData() {
         "@type": "WebSite",
         "@id": "https://screenshot-studio.com/#website",
         url: "https://screenshot-studio.com",
-        name: "Screenshot Studio - Free Online Image Editor",
+        name: "Screenshot Studio - Free Screenshot Editor Online",
         description:
-          "Turn screenshots into stunning social media graphics in seconds. Free, no signup required.",
+          "Free screenshot editor online — turn screenshots into stunning social media graphics in seconds. No signup required.",
         publisher: {
           "@id": "https://screenshot-studio.com/#organization",
         },
@@ -91,6 +93,22 @@ export function StructuredData() {
             acceptedAnswer: {
               "@type": "Answer",
               text: "Yes. Screenshot Studio includes a timeline editor with 20+ animation presets including zoom, pan, rotate, and 3D perspective effects. You can add keyframes, preview in real-time, and export as MP4, WebM, or GIF.",
+            },
+          },
+          {
+            "@type": "Question",
+            name: "Is there a free screenshot editor I can use online?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: "Yes, Screenshot Studio is a completely free screenshot editor online. It runs entirely in your browser — no downloads, no installation, no signup. Just open the editor and start beautifying your screenshots with backgrounds, shadows, 3D effects, and more.",
+            },
+          },
+          {
+            "@type": "Question",
+            name: "What makes Screenshot Studio different from other screenshot editors?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: "Screenshot Studio is purpose-built for making screenshots look professional. Unlike generic image editors, it offers one-click design presets, 100+ gradient backgrounds, 3D perspective transforms, animation timeline with 20+ presets, and video export — all free with no watermarks or account required.",
             },
           },
         ],

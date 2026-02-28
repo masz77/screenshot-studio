@@ -38,6 +38,39 @@ interface ChangelogEntry {
 
 const changelog: ChangelogEntry[] = [
   {
+    date: "February 28, 2026",
+    version: "2.2.0",
+    title: "Templates Sidebar, Tab Transitions & Export Fix",
+    description:
+      "Presets moved to a new Templates overlay, tab switching now has smooth transitions, and animation video export accuracy has been fixed.",
+    changes: [
+      {
+        type: "added",
+        text: "Templates overlay — presets gallery moved from the tab bar to a dedicated slide-in panel accessible via the \"Templates\" button above tabs",
+      },
+      {
+        type: "added",
+        text: "Smooth tab content transitions — switching between Settings, Edit, BG, 3D, and Animate tabs now fades with a subtle slide animation",
+      },
+      {
+        type: "improved",
+        text: "Right panel tab bar reduced from 6 to 5 tabs for a cleaner layout, with presets accessible from the Templates overlay",
+      },
+      {
+        type: "improved",
+        text: "Templates overlay opens/closes with a smooth slide-in animation and supports Escape key to dismiss",
+      },
+      {
+        type: "fixed",
+        text: "Animation video export now captures exact frame values — previously, a CSS transition on the 3D overlay caused exported frames to show smoothed/lagged intermediate values instead of the intended animation",
+      },
+      {
+        type: "fixed",
+        text: "Export frame timing improved with double-RAF technique ensuring React DOM commits are fully painted before each frame capture",
+      },
+    ],
+  },
+  {
     date: "February 23, 2026",
     version: "2.1.0",
     title: "Overlay Resize, Custom Presets & Arc Controls",

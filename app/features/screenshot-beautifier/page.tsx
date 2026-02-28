@@ -10,12 +10,15 @@ export const metadata: Metadata = {
     "Transform plain screenshots into stunning visuals with our free screenshot beautifier. Add backgrounds, shadows, rounded corners, and export in high resolution. No signup required.",
   keywords: [
     "screenshot beautifier",
+    "screenshot editor online free",
     "screenshot editor",
     "beautify screenshots",
+    "free screenshot editor",
     "screenshot mockup",
     "screenshot background",
     "screenshot shadows",
     "free screenshot tool",
+    "online screenshot beautifier",
   ],
   openGraph: {
     title: "Free Screenshot Beautifier - Make Screenshots Look Professional",

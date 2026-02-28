@@ -611,8 +611,8 @@ export interface ImageState {
   clearAnimationClips: () => void;
 
   // UI State
-  activeRightPanelTab: 'settings' | 'edit' | 'background' | 'transforms' | 'animate' | 'presets';
-  setActiveRightPanelTab: (tab: 'settings' | 'edit' | 'background' | 'transforms' | 'animate' | 'presets') => void;
+  activeRightPanelTab: 'settings' | 'edit' | 'background' | 'transforms' | 'animate';
+  setActiveRightPanelTab: (tab: 'settings' | 'edit' | 'background' | 'transforms' | 'animate') => void;
 }
 
 export const useImageStore = create<ImageState>()(
