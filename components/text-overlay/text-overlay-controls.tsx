@@ -1,20 +1,29 @@
 'use client';
 
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Slider } from '@/components/ui/slider';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { GlassInputWrapper } from '@/components/ui/glass-input-wrapper';
 import { useImageStore } from '@/lib/store';
-import { Delete02Icon, ViewIcon, ViewOffSlashIcon } from 'hugeicons-react';
-import { fontFamilies, getAvailableFontWeights, fontCategories, getFontsByCategory, getFontCSS } from '@/lib/constants/fonts';
+import { Delete02Icon, ViewIcon, ViewOffSlashIcon, Add01Icon } from 'hugeicons-react';
+import { fontFamilies, getAvailableFontWeights, getFontCSS } from '@/lib/constants/fonts';
+import { cn } from '@/lib/utils';
+
+const QUICK_COLORS = [
+  '#ffffff', '#000000', '#ef4444', '#f97316',
+  '#eab308', '#22c55e', '#3b82f6', '#8b5cf6',
+];
+
+const WEIGHT_LABELS: Record<string, string> = {
+  '100': 'Thin',
+  '200': 'Extra Light',
+  '300': 'Light',
+  'normal': 'Regular',
+  '400': 'Regular',
+  '500': 'Medium',
+  '600': 'Semibold',
+  'bold': 'Bold',
+  '700': 'Bold',
+  '800': 'Extra Bold',
+  '900': 'Black',
+};
 
 export const TextOverlayControls = () => {
   const {
@@ -26,593 +35,319 @@ export const TextOverlayControls = () => {
   } = useImageStore();
 
   const [newText, setNewText] = useState('');
-  const [selectedOverlayId, setSelectedOverlayId] = useState<string | null>(
-    null
-  );
+  const [selectedOverlayId, setSelectedOverlayId] = useState<string | null>(null);
 
-  const selectedOverlay = textOverlays.find(
-    (overlay) => overlay.id === selectedOverlayId
-  );
+  const selectedOverlay = textOverlays.find((o) => o.id === selectedOverlayId);
 
   const handleAddText = () => {
-    if (newText.trim()) {
-      const defaultFont = 'system';
-      const availableWeights = getAvailableFontWeights(defaultFont);
-      addTextOverlay({
-        text: newText.trim(),
-        position: { x: 50, y: 50 },
-        fontSize: 24,
-        fontWeight: availableWeights[0] || 'normal',
-        fontFamily: defaultFont,
-        color: '#ffffff',
-        opacity: 1,
-        isVisible: true,
-        orientation: 'horizontal',
-        textShadow: {
-          enabled: true,
-          color: 'rgba(0, 0, 0, 0.5)',
-          blur: 4,
-          offsetX: 2,
-          offsetY: 2,
-        },
-      });
-      setNewText('');
-    }
-  };
-
-  const handleUpdatePosition = (axis: 'x' | 'y', value: number[]) => {
-    if (selectedOverlay) {
-      updateTextOverlay(selectedOverlay.id, {
-        position: {
-          ...selectedOverlay.position,
-          [axis]: value[0],
-        },
-      });
-    }
-  };
-
-  const handleUpdateFontSize = (value: number[]) => {
-    if (selectedOverlay) {
-      updateTextOverlay(selectedOverlay.id, {
-        fontSize: value[0],
-      });
-    }
-  };
-
-  const handleUpdateOpacity = (value: number[]) => {
-    if (selectedOverlay) {
-      updateTextOverlay(selectedOverlay.id, {
-        opacity: value[0],
-      });
-    }
-  };
-
-  const handleUpdateText = (text: string) => {
-    if (selectedOverlay) {
-      updateTextOverlay(selectedOverlay.id, { text });
-    }
-  };
-
-  const handleUpdateColor = (color: string) => {
-    if (selectedOverlay) {
-      updateTextOverlay(selectedOverlay.id, { color });
-    }
-  };
-
-  const handleUpdateFontWeight = (weight: string) => {
-    if (selectedOverlay) {
-      updateTextOverlay(selectedOverlay.id, { fontWeight: weight });
-    }
-  };
-
-  const handleUpdateFontFamily = (fontFamily: string) => {
-    if (selectedOverlay) {
-      const availableWeights = getAvailableFontWeights(fontFamily);
-      const currentWeight = selectedOverlay.fontWeight;
-      // If the current weight is not available for the new font, default to the first available weight
-      const newWeight = availableWeights.includes(currentWeight)
-        ? currentWeight
-        : availableWeights[0] || 'normal';
-
-      updateTextOverlay(selectedOverlay.id, {
-        fontFamily,
-        fontWeight: newWeight,
-      });
-    }
-  };
-
-  const handleUpdateOrientation = (orientation: 'horizontal' | 'vertical') => {
-    if (selectedOverlay) {
-      updateTextOverlay(selectedOverlay.id, { orientation });
-    }
-  };
-
-  const handleUpdateTextShadow = (
-    updates: Partial<{
-      enabled: boolean;
-      color: string;
-      blur: number;
-      offsetX: number;
-      offsetY: number;
-    }>
-  ) => {
-    if (selectedOverlay) {
-      updateTextOverlay(selectedOverlay.id, {
-        textShadow: {
-          ...selectedOverlay.textShadow,
-          ...updates,
-        },
-      });
-    }
-  };
-
-  const handleToggleVisibility = (id: string) => {
-    const overlay = textOverlays.find((o) => o.id === id);
-    if (overlay) {
-      updateTextOverlay(id, { isVisible: !overlay.isVisible });
-    }
+    if (!newText.trim()) return;
+    const availableWeights = getAvailableFontWeights('system');
+    addTextOverlay({
+      text: newText.trim(),
+      position: { x: 50, y: 50 },
+      fontSize: 24,
+      fontWeight: availableWeights[0] || 'normal',
+      fontFamily: 'system',
+      color: '#ffffff',
+      opacity: 1,
+      isVisible: true,
+      orientation: 'horizontal',
+      textShadow: {
+        enabled: true,
+        color: 'rgba(0, 0, 0, 0.5)',
+        blur: 4,
+        offsetX: 2,
+        offsetY: 2,
+      },
+    });
+    setNewText('');
   };
 
   return (
-    <div className="space-y-5">
-      <div className="flex items-center justify-between">
-        <h3 className="font-semibold text-sm text-foreground">Text Overlays</h3>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={clearTextOverlays}
-          disabled={textOverlays.length === 0}
-          className="h-8 px-3 text-xs font-medium rounded-lg"
-        >
-          Clear All
-        </Button>
-      </div>
+    <div className="space-y-3">
 
-      <div className="space-y-3">
-        <Input
-          placeholder="Enter text..."
+      {/* ── Add text input ── */}
+      <div className="flex gap-1.5">
+        <input
+          placeholder="Add text..."
           value={newText}
           onChange={(e) => setNewText(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleAddText()}
-          className="h-11 rounded-xl border-border focus:border-primary focus:ring-2 focus:ring-ring"
+          className="flex-1 h-8 px-2.5 text-[12px] rounded-md border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
         />
+        <button
+          onClick={handleAddText}
+          disabled={!newText.trim()}
+          className="h-8 px-2.5 rounded-md bg-primary text-primary-foreground text-[11px] font-medium disabled:opacity-40 hover:bg-primary/90 transition-colors"
+        >
+          <Add01Icon size={14} />
+        </button>
       </div>
 
+      {/* ── Overlay list ── */}
       {textOverlays.length > 0 && (
-        <div className="space-y-4">
-          <p className="text-sm font-semibold text-foreground">
-            Manage Overlays
-          </p>
-          <div className="space-y-2 max-h-32 overflow-y-auto">
-            {textOverlays.map((overlay) => (
+        <div className="space-y-1">
+          {textOverlays.map((overlay) => {
+            const isSelected = selectedOverlayId === overlay.id;
+            return (
               <div
                 key={overlay.id}
-                className={`flex items-center gap-2 p-2 rounded-xl border cursor-pointer transition-colors ${
-                  selectedOverlayId === overlay.id
-                    ? 'bg-accent border-primary'
-                    : 'bg-background hover:bg-accent border-border'
-                }`}
-                onClick={() => setSelectedOverlayId(overlay.id)}
+                onClick={() => setSelectedOverlayId(isSelected ? null : overlay.id)}
+                className={cn(
+                  'flex items-center gap-1.5 px-2 py-1.5 rounded-md cursor-pointer transition-all text-[11px] group',
+                  isSelected
+                    ? 'bg-accent border border-primary/30'
+                    : 'hover:bg-muted/50 border border-transparent'
+                )}
               >
-                <Button
-                  variant="ghost"
-                  size="sm"
+                <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleToggleVisibility(overlay.id);
+                    updateTextOverlay(overlay.id, { isVisible: !overlay.isVisible });
                   }}
-                  className="h-6 w-6 p-0"
+                  className="p-0.5 text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  {overlay.isVisible ? (
-                    <ViewIcon className="h-3 w-3" />
-                  ) : (
-                    <ViewOffSlashIcon className="h-3 w-3" />
+                  {overlay.isVisible
+                    ? <ViewIcon size={12} />
+                    : <ViewOffSlashIcon size={12} />}
+                </button>
+                <span
+                  className={cn(
+                    'flex-1 truncate',
+                    overlay.isVisible ? 'text-foreground' : 'text-muted-foreground line-through'
                   )}
-                </Button>
-                <span className="flex-1 text-xs truncate">{overlay.text}</span>
-                <Button
-                  variant="ghost"
-                  size="sm"
+                >
+                  {overlay.text}
+                </span>
+                <button
                   onClick={(e) => {
                     e.stopPropagation();
                     removeTextOverlay(overlay.id);
-                    if (selectedOverlayId === overlay.id) {
-                      setSelectedOverlayId(null);
-                    }
+                    if (selectedOverlayId === overlay.id) setSelectedOverlayId(null);
                   }}
-                  className="h-6 w-6 p-0 text-destructive hover:text-destructive"
+                  className="opacity-0 group-hover:opacity-100 p-0.5 text-muted-foreground hover:text-destructive transition-all"
                 >
-                  <Delete02Icon className="h-3 w-3" />
-                </Button>
+                  <Delete02Icon size={12} />
+                </button>
               </div>
-            ))}
-          </div>
+            );
+          })}
+
+          {textOverlays.length > 1 && (
+            <button
+              onClick={clearTextOverlays}
+              className="text-[10px] text-muted-foreground hover:text-destructive transition-colors px-2"
+            >
+              Clear all
+            </button>
+          )}
         </div>
       )}
 
+      {/* ── Selected overlay controls ── */}
       {selectedOverlay && (
-        <div className="space-y-5 border-t pt-5">
-          <div className="space-y-5">
-            <p className="text-sm font-semibold text-foreground">
-              {`Edit: "${selectedOverlay.text}"`}
-            </p>
+        <div className="space-y-3 pt-1 border-t border-border/40">
 
-            <Input
-              placeholder="Edit text..."
-              value={selectedOverlay.text}
-              onChange={(e) => handleUpdateText(e.target.value)}
-              className="h-11 rounded-xl border-border focus:border-primary focus:ring-2 focus:ring-ring"
-            />
+          {/* Inline text edit */}
+          <input
+            value={selectedOverlay.text}
+            onChange={(e) => updateTextOverlay(selectedOverlay.id, { text: e.target.value })}
+            className="w-full h-8 px-2.5 text-[12px] rounded-md border border-border bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+          />
 
-            <div className="flex gap-2 items-center">
-              <Input
-                type="color"
-                value={selectedOverlay.color}
-                onChange={(e) => handleUpdateColor(e.target.value)}
-                className="w-12 h-12 rounded-xl border border-border cursor-pointer"
-              />
-              <Input
-                placeholder="#ffffff"
-                value={selectedOverlay.color}
-                onChange={(e) => handleUpdateColor(e.target.value)}
-                className="flex-1 h-11 rounded-xl border-border focus:border-primary focus:ring-2 focus:ring-ring font-mono text-sm"
-              />
-            </div>
-
-            <Select
-              value={selectedOverlay.fontFamily}
-              onValueChange={handleUpdateFontFamily}
-            >
-              <SelectTrigger className="w-full h-11 rounded-xl border-border focus:border-primary focus:ring-2 focus:ring-ring">
-                <SelectValue placeholder="Font family" />
-              </SelectTrigger>
-              <SelectContent className="max-h-80">
-                {/* Modern Sans-Serif */}
-                <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground bg-muted/50">
-                  {fontCategories['sans-serif']}
-                </div>
-                {getFontsByCategory('sans-serif').map((font) => (
-                  <SelectItem
-                    key={font.id}
-                    value={font.id}
-                    className="cursor-pointer"
-                  >
-                    <span style={{ fontFamily: getFontCSS(font.id) }}>
-                      {font.name}
-                    </span>
-                    {font.description && (
-                      <span className="ml-2 text-xs text-muted-foreground">
-                        {font.description}
-                      </span>
-                    )}
-                  </SelectItem>
-                ))}
-
-                {/* Display & Headlines */}
-                <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground bg-muted/50 mt-1">
-                  {fontCategories['display']}
-                </div>
-                {getFontsByCategory('display').map((font) => (
-                  <SelectItem
-                    key={font.id}
-                    value={font.id}
-                    className="cursor-pointer"
-                  >
-                    <span style={{ fontFamily: getFontCSS(font.id) }}>
-                      {font.name}
-                    </span>
-                    {font.description && (
-                      <span className="ml-2 text-xs text-muted-foreground">
-                        {font.description}
-                      </span>
-                    )}
-                  </SelectItem>
-                ))}
-
-                {/* Serif */}
-                <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground bg-muted/50 mt-1">
-                  {fontCategories['serif']}
-                </div>
-                {getFontsByCategory('serif').map((font) => (
-                  <SelectItem
-                    key={font.id}
-                    value={font.id}
-                    className="cursor-pointer"
-                  >
-                    <span style={{ fontFamily: getFontCSS(font.id) }}>
-                      {font.name}
-                    </span>
-                    {font.description && (
-                      <span className="ml-2 text-xs text-muted-foreground">
-                        {font.description}
-                      </span>
-                    )}
-                  </SelectItem>
-                ))}
-
-                {/* Handwriting */}
-                <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground bg-muted/50 mt-1">
-                  {fontCategories['handwriting']}
-                </div>
-                {getFontsByCategory('handwriting').map((font) => (
-                  <SelectItem
-                    key={font.id}
-                    value={font.id}
-                    className="cursor-pointer"
-                  >
-                    <span style={{ fontFamily: getFontCSS(font.id) }}>
-                      {font.name}
-                    </span>
-                    {font.description && (
-                      <span className="ml-2 text-xs text-muted-foreground">
-                        {font.description}
-                      </span>
-                    )}
-                  </SelectItem>
-                ))}
-
-                {/* Monospace */}
-                <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground bg-muted/50 mt-1">
-                  {fontCategories['monospace']}
-                </div>
-                {getFontsByCategory('monospace').map((font) => (
-                  <SelectItem
-                    key={font.id}
-                    value={font.id}
-                    className="cursor-pointer"
-                  >
-                    <span style={{ fontFamily: getFontCSS(font.id) }}>
-                      {font.name}
-                    </span>
-                    {font.description && (
-                      <span className="ml-2 text-xs text-muted-foreground">
-                        {font.description}
-                      </span>
-                    )}
-                  </SelectItem>
-                ))}
-
-                {/* System */}
-                <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground bg-muted/50 mt-1">
-                  {fontCategories['system']}
-                </div>
-                {getFontsByCategory('system').map((font) => (
-                  <SelectItem
-                    key={font.id}
-                    value={font.id}
-                    className="cursor-pointer"
-                  >
-                    <span style={{ fontFamily: getFontCSS(font.id) }}>
-                      {font.name}
-                    </span>
-                    {font.description && (
-                      <span className="ml-2 text-xs text-muted-foreground">
-                        {font.description}
-                      </span>
-                    )}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-            <Select
-              value={selectedOverlay.fontWeight}
-              onValueChange={handleUpdateFontWeight}
-            >
-              <SelectTrigger className="w-full h-11 rounded-xl border-border focus:border-primary focus:ring-2 focus:ring-ring">
-                <SelectValue placeholder="Font weight" />
-              </SelectTrigger>
-              <SelectContent>
-                {getAvailableFontWeights(selectedOverlay.fontFamily).map(
-                  (weight) => (
-                    <SelectItem key={weight} value={weight}>
-                      {weight === 'normal'
-                        ? 'Normal'
-                        : weight === 'bold'
-                          ? 'Bold'
-                          : weight === '100'
-                            ? 'Thin (100)'
-                            : weight === '300'
-                              ? 'Light (300)'
-                              : weight === '500'
-                                ? 'Medium (500)'
-                                : weight === '600'
-                                  ? 'Semi Bold (600)'
-                                  : weight === '700'
-                                    ? 'Bold (700)'
-                                    : weight === '800'
-                                      ? 'Extra Bold (800)'
-                                      : weight === '900'
-                                        ? 'Black (900)'
-                                        : weight}
-                    </SelectItem>
-                  )
+          {/* Color swatches */}
+          <div className="flex items-center gap-1">
+            {QUICK_COLORS.map((color) => (
+              <button
+                key={color}
+                onClick={() => updateTextOverlay(selectedOverlay.id, { color })}
+                className={cn(
+                  'w-[18px] h-[18px] rounded-full transition-all',
+                  selectedOverlay.color === color
+                    ? 'ring-1.5 ring-foreground ring-offset-1 ring-offset-background scale-110'
+                    : 'hover:scale-110'
                 )}
-              </SelectContent>
-            </Select>
+                style={{
+                  backgroundColor: color,
+                  border: color === '#ffffff' ? '1px solid hsl(var(--border))' : undefined,
+                }}
+              />
+            ))}
+            <div className="w-px h-4 bg-border/40 mx-0.5" />
+            <input
+              type="color"
+              value={selectedOverlay.color}
+              onChange={(e) => updateTextOverlay(selectedOverlay.id, { color: e.target.value })}
+              className="w-[18px] h-[18px] rounded-full cursor-pointer border border-border/50 appearance-none bg-transparent [&::-webkit-color-swatch-wrapper]:p-0 [&::-webkit-color-swatch]:rounded-full [&::-webkit-color-swatch]:border-0"
+            />
+          </div>
 
-            <p className="text-xs text-muted-foreground">
-              {getAvailableFontWeights(selectedOverlay.fontFamily).length}{' '}
-              weight
-              {getAvailableFontWeights(selectedOverlay.fontFamily).length !== 1
-                ? 's'
-                : ''}{' '}
-              available
-            </p>
-
-            <Select
-              value={selectedOverlay.orientation}
-              onValueChange={handleUpdateOrientation}
+          {/* Font family */}
+          <div className="space-y-1">
+            <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Font</span>
+            <select
+              value={selectedOverlay.fontFamily}
+              onChange={(e) => {
+                const fontFamily = e.target.value;
+                const weights = getAvailableFontWeights(fontFamily);
+                const newWeight = weights.includes(selectedOverlay.fontWeight)
+                  ? selectedOverlay.fontWeight
+                  : weights[0] || 'normal';
+                updateTextOverlay(selectedOverlay.id, { fontFamily, fontWeight: newWeight });
+              }}
+              className="w-full h-8 px-2 text-[12px] rounded-md border border-border bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer"
             >
-              <SelectTrigger className="w-full h-11 rounded-xl border-border focus:border-primary focus:ring-2 focus:ring-ring">
-                <SelectValue placeholder="Text orientation" />
-              </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="horizontal">Horizontal</SelectItem>
-                  <SelectItem value="vertical">Vertical</SelectItem>
-                </SelectContent>
-              </Select>
+              {fontFamilies.map((font) => (
+                <option key={font.id} value={font.id} style={{ fontFamily: getFontCSS(font.id) }}>
+                  {font.name}
+                </option>
+              ))}
+            </select>
+          </div>
 
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-muted border border-border">
-              <span className="text-sm font-medium text-foreground whitespace-nowrap">Font Size</span>
-              <div className="flex-1 flex items-center gap-3">
-                <Slider
-                  value={[selectedOverlay.fontSize]}
-                  onValueChange={handleUpdateFontSize}
-                  max={150}
-                  min={12}
-                  step={1}
-                />
-                <span className="text-sm text-foreground font-medium whitespace-nowrap">{selectedOverlay.fontSize}px</span>
-              </div>
+          {/* Weight + Size row */}
+          <div className="grid grid-cols-2 gap-2">
+            <div className="space-y-1">
+              <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Weight</span>
+              <select
+                value={selectedOverlay.fontWeight}
+                onChange={(e) => updateTextOverlay(selectedOverlay.id, { fontWeight: e.target.value })}
+                className="w-full h-8 px-2 text-[12px] rounded-md border border-border bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer"
+              >
+                {getAvailableFontWeights(selectedOverlay.fontFamily).map((w) => (
+                  <option key={w} value={w}>{WEIGHT_LABELS[w] ?? w}</option>
+                ))}
+              </select>
             </div>
-
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-muted border border-border">
-              <span className="text-sm font-medium text-foreground whitespace-nowrap">Opacity</span>
-              <div className="flex-1 flex items-center gap-3">
-                <Slider
-                  value={[selectedOverlay.opacity]}
-                  onValueChange={handleUpdateOpacity}
-                  max={1}
-                  min={0}
-                  step={0.01}
+            <div className="space-y-1">
+              <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Size</span>
+              <div className="flex items-center gap-1.5">
+                <input
+                  type="range"
+                  min="8"
+                  max="150"
+                  step="1"
+                  value={selectedOverlay.fontSize}
+                  onChange={(e) => updateTextOverlay(selectedOverlay.id, { fontSize: Number(e.target.value) })}
+                  className="flex-1 h-1 accent-primary"
                 />
-                <span className="text-sm text-foreground font-medium whitespace-nowrap">{Math.round(selectedOverlay.opacity * 100)}%</span>
-              </div>
-            </div>
-
-            {/* Text Shadow Controls */}
-            <div className="space-y-4 border-t pt-5">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-semibold text-foreground">
-                  Text Shadow
-                </p>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() =>
-                    handleUpdateTextShadow({
-                      enabled: !selectedOverlay.textShadow.enabled,
-                    })
-                  }
-                  className="h-6 px-2 text-xs"
-                >
-                  {selectedOverlay.textShadow.enabled ? 'Disable' : 'Enable'}
-                </Button>
-              </div>
-
-              {selectedOverlay.textShadow.enabled && (
-                <div className="space-y-4">
-                  {/* Shadow Color */}
-                  <div className="flex gap-2">
-                    <Input
-                      type="color"
-                      value={selectedOverlay.textShadow.color}
-                      onChange={(e) =>
-                        handleUpdateTextShadow({ color: e.target.value })
-                      }
-                      className="w-12 h-10 p-1 rounded-lg border border-border"
-                    />
-                    <GlassInputWrapper className="flex-1">
-                      <Input
-                        placeholder="rgba(0, 0, 0, 0.5)"
-                        value={selectedOverlay.textShadow.color}
-                        onChange={(e) =>
-                          handleUpdateTextShadow({ color: e.target.value })
-                        }
-                        className="border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
-                      />
-                    </GlassInputWrapper>
-                  </div>
-
-                  {/* Shadow Blur */}
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 border border-border/50">
-                    <span className="text-sm font-medium text-foreground whitespace-nowrap">Blur</span>
-                    <div className="flex-1 flex items-center gap-3">
-                      <Slider
-                        value={[selectedOverlay.textShadow.blur]}
-                        onValueChange={(value) =>
-                          handleUpdateTextShadow({ blur: value[0] })
-                        }
-                        max={20}
-                        min={0}
-                        step={1}
-                      />
-                      <span className="text-sm text-foreground font-medium whitespace-nowrap">{selectedOverlay.textShadow.blur}px</span>
-                    </div>
-                  </div>
-
-                  {/* Shadow Offset X */}
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 border border-border/50">
-                    <span className="text-sm font-medium text-foreground whitespace-nowrap">Offset X</span>
-                    <div className="flex-1 flex items-center gap-3">
-                      <Slider
-                        value={[selectedOverlay.textShadow.offsetX]}
-                        onValueChange={(value) =>
-                          handleUpdateTextShadow({ offsetX: value[0] })
-                        }
-                        max={20}
-                        min={-20}
-                        step={1}
-                      />
-                      <span className="text-sm text-foreground font-medium whitespace-nowrap">{selectedOverlay.textShadow.offsetX}px</span>
-                    </div>
-                  </div>
-
-                  {/* Shadow Offset Y */}
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 border border-border/50">
-                    <span className="text-sm font-medium text-foreground whitespace-nowrap">Offset Y</span>
-                    <div className="flex-1 flex items-center gap-3">
-                      <Slider
-                        value={[selectedOverlay.textShadow.offsetY]}
-                        onValueChange={(value) =>
-                          handleUpdateTextShadow({ offsetY: value[0] })
-                        }
-                        max={20}
-                        min={-20}
-                        step={1}
-                      />
-                      <span className="text-sm text-foreground font-medium whitespace-nowrap">{selectedOverlay.textShadow.offsetY}px</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div className="space-y-4">
-              <p className="text-sm font-semibold text-foreground">
-                Position
-              </p>
-              {/* X position */}
-              <div className="p-3 rounded-lg bg-muted/50 border border-border/50">
-                <Slider
-                  value={[selectedOverlay.position.x]}
-                  onValueChange={(value) => handleUpdatePosition('x', value)}
-                  max={100}
-                  min={0}
-                  step={1}
-                  label="X Position"
-                  valueDisplay={`${Math.round(selectedOverlay.position.x)}%`}
-                />
-              </div>
-
-              {/* Y position */}
-              <div className="p-3 rounded-lg bg-muted/50 border border-border/50">
-                <Slider
-                  value={[selectedOverlay.position.y]}
-                  onValueChange={(value) => handleUpdatePosition('y', value)}
-                  max={100}
-                  min={0}
-                  step={1}
-                  label="Y Position"
-                  valueDisplay={`${Math.round(selectedOverlay.position.y)}%`}
-                />
+                <span className="text-[10px] text-muted-foreground tabular-nums w-6 text-right">{selectedOverlay.fontSize}</span>
               </div>
             </div>
           </div>
+
+          {/* Opacity */}
+          <div className="space-y-1">
+            <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Opacity</span>
+            <div className="flex items-center gap-1.5">
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={selectedOverlay.opacity}
+                onChange={(e) => updateTextOverlay(selectedOverlay.id, { opacity: Number(e.target.value) })}
+                className="flex-1 h-1 accent-primary"
+              />
+              <span className="text-[10px] text-muted-foreground tabular-nums w-6 text-right">{Math.round(selectedOverlay.opacity * 100)}%</span>
+            </div>
+          </div>
+
+          {/* Orientation toggle */}
+          <div className="flex items-center gap-0.5 p-0.5 rounded-md bg-muted/50">
+            {(['horizontal', 'vertical'] as const).map((dir) => (
+              <button
+                key={dir}
+                onClick={() => updateTextOverlay(selectedOverlay.id, { orientation: dir })}
+                className={cn(
+                  'flex-1 h-7 rounded text-[11px] font-medium transition-all capitalize',
+                  selectedOverlay.orientation === dir
+                    ? 'bg-background text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
+              >
+                {dir}
+              </button>
+            ))}
+          </div>
+
+          {/* Text shadow toggle + controls */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Shadow</span>
+              <button
+                onClick={() => updateTextOverlay(selectedOverlay.id, {
+                  textShadow: { ...selectedOverlay.textShadow, enabled: !selectedOverlay.textShadow.enabled },
+                })}
+                className={cn(
+                  'w-7 h-4 rounded-full transition-colors relative',
+                  selectedOverlay.textShadow.enabled ? 'bg-primary' : 'bg-muted-foreground/30'
+                )}
+              >
+                <span
+                  className={cn(
+                    'absolute top-0.5 w-3 h-3 rounded-full bg-white transition-transform shadow-sm',
+                    selectedOverlay.textShadow.enabled ? 'left-3.5' : 'left-0.5'
+                  )}
+                />
+              </button>
+            </div>
+
+            {selectedOverlay.textShadow.enabled && (
+              <div className="space-y-2 pl-0.5">
+                {/* Shadow blur */}
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[10px] text-muted-foreground w-10">Blur</span>
+                  <input
+                    type="range"
+                    min="0"
+                    max="20"
+                    step="1"
+                    value={selectedOverlay.textShadow.blur}
+                    onChange={(e) => updateTextOverlay(selectedOverlay.id, {
+                      textShadow: { ...selectedOverlay.textShadow, blur: Number(e.target.value) },
+                    })}
+                    className="flex-1 h-1 accent-primary"
+                  />
+                  <span className="text-[10px] text-muted-foreground tabular-nums w-4 text-right">{selectedOverlay.textShadow.blur}</span>
+                </div>
+                {/* Shadow offset X */}
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[10px] text-muted-foreground w-10">X</span>
+                  <input
+                    type="range"
+                    min="-20"
+                    max="20"
+                    step="1"
+                    value={selectedOverlay.textShadow.offsetX}
+                    onChange={(e) => updateTextOverlay(selectedOverlay.id, {
+                      textShadow: { ...selectedOverlay.textShadow, offsetX: Number(e.target.value) },
+                    })}
+                    className="flex-1 h-1 accent-primary"
+                  />
+                  <span className="text-[10px] text-muted-foreground tabular-nums w-4 text-right">{selectedOverlay.textShadow.offsetX}</span>
+                </div>
+                {/* Shadow offset Y */}
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[10px] text-muted-foreground w-10">Y</span>
+                  <input
+                    type="range"
+                    min="-20"
+                    max="20"
+                    step="1"
+                    value={selectedOverlay.textShadow.offsetY}
+                    onChange={(e) => updateTextOverlay(selectedOverlay.id, {
+                      textShadow: { ...selectedOverlay.textShadow, offsetY: Number(e.target.value) },
+                    })}
+                    className="flex-1 h-1 accent-primary"
+                  />
+                  <span className="text-[10px] text-muted-foreground tabular-nums w-4 text-right">{selectedOverlay.textShadow.offsetY}</span>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
       )}
     </div>
   );
 };
-

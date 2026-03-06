@@ -345,7 +345,7 @@ async function capture3DTransformWithModernScreenshot(
 
   if (!skipDelay) {
     // Wait for styles to apply (only needed for first/single exports, not video frames)
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
   }
 
   const canvas = await domToCanvas(element, {
@@ -398,7 +398,7 @@ async function exportHTMLCanvas(
 
   if (!skipDelay) {
     // Wait for any pending renders (only needed for first/single exports, not video frames)
-    await new Promise(resolve => setTimeout(resolve, 150));
+    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
   }
 
   // Use modern-screenshot for better CSS fidelity.
@@ -489,7 +489,8 @@ export async function exportElement(
 
   // Stage 1: DOM preparation (0 → 10%)
   report(5);
-  await new Promise(resolve => setTimeout(resolve, 200));
+  // Yield to let any pending React renders flush
+  await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
   const element = document.getElementById(elementId);
   if (!element) {
@@ -579,8 +580,8 @@ export async function exportElement(
 
     report(90);
 
-    if (!sharpResult.dataURL || sharpResult.dataURL === 'data:,') {
-      throw new Error('Failed to generate image data URL');
+    if (!sharpResult.blob || sharpResult.blob.size === 0) {
+      throw new Error('Failed to generate image');
     }
 
     report(95);

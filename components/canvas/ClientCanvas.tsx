@@ -19,6 +19,9 @@ import {
   HTMLMainImageLayer,
   HTMLTextOverlayLayer,
   HTMLImageOverlayLayer,
+  SVGAnnotationLayer,
+  HTMLBlurRegionLayer,
+  SnapAlignmentGuides,
 } from "./html";
 
 // Reference to the HTML canvas container for export
@@ -53,6 +56,21 @@ function CanvasRenderer({ image }: { image: HTMLImageElement }) {
     updateImageOverlay,
     removeImageOverlay,
     addImageOverlay,
+    // Annotations
+    annotations,
+    activeAnnotationTool,
+    selectedAnnotationId,
+    setSelectedAnnotationId,
+    annotationDefaults,
+    addAnnotation,
+    updateAnnotation: updateAnnotationShape,
+    removeAnnotation,
+    setActiveAnnotationTool,
+    // Blur
+    blurRegions,
+    addBlurRegion,
+    updateBlurRegion,
+    removeBlurRegion,
   } = useImageStore();
 
   // Build frame from imageBorder directly (editorStore sync may be stale)
@@ -88,6 +106,8 @@ function CanvasRenderer({ image }: { image: HTMLImageElement }) {
   );
   const [isMainImageSelected, setIsMainImageSelected] = useState(false);
   const [selectedTextId, setSelectedTextId] = useState<string | null>(null);
+  const [isDraggingMainImage, setIsDraggingMainImage] = useState(false);
+  const [selectedBlurId, setSelectedBlurId] = useState<string | null>(null);
 
   const containerWidth = responsiveDimensions.width;
   const containerHeight = responsiveDimensions.height;
@@ -122,6 +142,7 @@ function CanvasRenderer({ image }: { image: HTMLImageElement }) {
         setSelectedOverlayId(null);
         setIsMainImageSelected(false);
         setSelectedTextId(null);
+        setSelectedAnnotationId(null);
       }
     };
 
@@ -289,14 +310,15 @@ function CanvasRenderer({ image }: { image: HTMLImageElement }) {
     perspective3D.translateY !== 0 ||
     perspective3D.scale !== 1;
 
-  // Handle canvas click to deselect
-  const handleCanvasClick = (e: React.MouseEvent) => {
-    // Only deselect if clicking on the canvas background (not on an overlay)
-    if (e.target === e.currentTarget) {
-      setSelectedOverlayId(null);
-      setIsMainImageSelected(false);
-      setSelectedTextId(null);
-    }
+  // Deselect everything on mousedown on the canvas background.
+  // Child elements (image, overlays) call e.stopPropagation() on mousedown,
+  // so this only fires when clicking empty canvas area.
+  const handleCanvasDeselect = () => {
+    setSelectedOverlayId(null);
+    setIsMainImageSelected(false);
+    setSelectedTextId(null);
+    setSelectedBlurId(null);
+    setSelectedAnnotationId(null);
   };
 
   return (
@@ -318,7 +340,7 @@ function CanvasRenderer({ image }: { image: HTMLImageElement }) {
         width={canvasW}
         height={canvasH}
         borderRadius={backgroundBorderRadius}
-        onClick={handleCanvasClick}
+        onPointerDown={handleCanvasDeselect}
         style={{
           isolation: "isolate",
         }}
@@ -377,29 +399,39 @@ function CanvasRenderer({ image }: { image: HTMLImageElement }) {
 
         {/* Main Image Layer - renders when no 3D transform and no mockups */}
         {!hasMockups && !has3DTransform && (
-          <HTMLMainImageLayer
-            image={image}
-            canvasW={canvasW}
-            canvasH={canvasH}
-            framedW={framedW}
-            framedH={framedH}
-            frameOffset={frameOffset}
-            windowPadding={windowPadding}
-            windowHeader={windowHeader}
-            imageScaledW={imageScaledW}
-            imageScaledH={imageScaledH}
-            screenshot={screenshot}
-            frame={frame}
-            shadow={shadow}
-            showFrame={showFrame}
-            imageOpacity={imageOpacity}
-            imageFilters={imageFilters}
-            isMainImageSelected={isMainImageSelected}
-            setIsMainImageSelected={setIsMainImageSelected}
-            setSelectedOverlayId={setSelectedOverlayId}
-            setSelectedTextId={setSelectedTextId}
-            setScreenshot={setScreenshot}
-          />
+          <>
+            <SnapAlignmentGuides
+              canvasW={canvasW}
+              canvasH={canvasH}
+              offsetX={screenshot.offsetX}
+              offsetY={screenshot.offsetY}
+              isDragging={isDraggingMainImage}
+            />
+            <HTMLMainImageLayer
+              image={image}
+              canvasW={canvasW}
+              canvasH={canvasH}
+              framedW={framedW}
+              framedH={framedH}
+              frameOffset={frameOffset}
+              windowPadding={windowPadding}
+              windowHeader={windowHeader}
+              imageScaledW={imageScaledW}
+              imageScaledH={imageScaledH}
+              screenshot={screenshot}
+              frame={frame}
+              shadow={shadow}
+              showFrame={showFrame}
+              imageOpacity={imageOpacity}
+              imageFilters={imageFilters}
+              isMainImageSelected={isMainImageSelected}
+              setIsMainImageSelected={setIsMainImageSelected}
+              setSelectedOverlayId={setSelectedOverlayId}
+              setSelectedTextId={setSelectedTextId}
+              setScreenshot={setScreenshot}
+              onDragStateChange={setIsDraggingMainImage}
+            />
+          </>
         )}
 
         {/* Mockups Layer */}
@@ -435,6 +467,38 @@ function CanvasRenderer({ image }: { image: HTMLImageElement }) {
           updateImageOverlay={updateImageOverlay}
         />
 
+        {/* Blur Region Layer */}
+        <HTMLBlurRegionLayer
+          blurRegions={blurRegions}
+          selectedBlurId={selectedBlurId}
+          setSelectedBlurId={setSelectedBlurId}
+          updateBlurRegion={updateBlurRegion}
+          removeBlurRegion={removeBlurRegion}
+        />
+
+        {/* SVG Annotation Layer */}
+        <SVGAnnotationLayer
+          annotations={annotations}
+          activeAnnotationTool={activeAnnotationTool}
+          selectedAnnotationId={selectedAnnotationId}
+          setSelectedAnnotationId={setSelectedAnnotationId}
+          canvasW={canvasW}
+          canvasH={canvasH}
+          addAnnotation={addAnnotation}
+          updateAnnotation={updateAnnotationShape}
+          removeAnnotation={removeAnnotation}
+          setActiveAnnotationTool={setActiveAnnotationTool}
+          annotationDefaults={annotationDefaults}
+          onDrawBlurRegion={(rect) => {
+            addBlurRegion({
+              position: { x: rect.x, y: rect.y },
+              size: { width: rect.w, height: rect.h },
+              blurAmount: 10,
+              isVisible: true,
+            });
+          }}
+        />
+
         {/* Floating toolbar for selected overlay */}
         {selectedOverlay && (
           <OverlayToolbar
@@ -464,11 +528,10 @@ export default function ClientCanvas() {
   const { screenshot, setScreenshot } = useEditorStore();
   const { uploadedImageUrl } = useImageStore();
 
+  // Load primary image from screenshot.src
   useEffect(() => {
-    // Reset states when source changes
     setLoadError(false);
 
-    // Check both stores for image presence
     if (!screenshot.src || !uploadedImageUrl) {
       setImage(null);
       return;
@@ -477,14 +540,13 @@ export default function ClientCanvas() {
     const img = new window.Image();
     img.crossOrigin = "anonymous";
 
-    // Add timeout to prevent infinite loading
     const timeoutId = setTimeout(() => {
       if (!img.complete) {
         console.warn('Image load timeout');
         setLoadError(true);
         setScreenshot({ src: null });
       }
-    }, 10000); // 10 second timeout
+    }, 10000);
 
     img.onload = () => {
       clearTimeout(timeoutId);
@@ -505,7 +567,6 @@ export default function ClientCanvas() {
     };
   }, [screenshot.src, uploadedImageUrl, setScreenshot]);
 
-  // Show nothing if there's an error (let EditorCanvas show upload UI)
   if (loadError || !screenshot.src || !uploadedImageUrl) {
     return null;
   }

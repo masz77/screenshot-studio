@@ -12,6 +12,7 @@ interface FormatSelectorProps {
 
 const FORMATS: { value: ExportFormat; label: string; description: string }[] = [
   { value: 'png', label: 'PNG', description: 'Lossless, supports transparency' },
+  { value: 'webp', label: 'WebP', description: 'Best compression, small & sharp' },
   { value: 'jpeg', label: 'JPEG', description: 'Smaller files, no transparency' },
 ];
 
@@ -19,7 +20,7 @@ export function FormatSelector({ format, onFormatChange }: FormatSelectorProps) 
   return (
     <div className="space-y-3">
       <label className="text-sm font-medium text-foreground">Format</label>
-      <div className="grid grid-cols-2 gap-2 p-1 bg-muted dark:bg-card/50 rounded-xl">
+      <div className="grid grid-cols-3 gap-2 p-1 bg-muted dark:bg-card/50 rounded-xl">
         {FORMATS.map((f) => {
           const isSelected = f.value === format;
           return (

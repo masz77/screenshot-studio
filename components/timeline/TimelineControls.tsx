@@ -13,7 +13,7 @@ import {
 } from 'hugeicons-react';
 import { useImageStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
-import { trackTimelinePlayback } from '@/lib/analytics';
+
 
 function formatTime(ms: number): string {
   const totalSeconds = Math.floor(ms / 1000);
@@ -37,20 +37,9 @@ export function TimelineControls() {
 
   const { isPlaying, isLooping, playhead, duration } = timeline;
 
-  const handleSkipToStart = () => {
-    trackTimelinePlayback('skip_start');
-    setPlayhead(0);
-  };
-
-  const handleSkipToEnd = () => {
-    trackTimelinePlayback('skip_end');
-    setPlayhead(duration);
-  };
-
-  const handleToggleLoop = () => {
-    trackTimelinePlayback('toggle_loop');
-    setTimeline({ isLooping: !isLooping });
-  };
+  const handleSkipToStart = () => setPlayhead(0);
+  const handleSkipToEnd = () => setPlayhead(duration);
+  const handleToggleLoop = () => setTimeline({ isLooping: !isLooping });
 
   return (
     <div className="flex items-center gap-4 px-4 py-2 bg-card border-b border-border/40">

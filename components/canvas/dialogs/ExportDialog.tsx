@@ -48,7 +48,7 @@ export function ExportDialog({
     }
   };
 
-  const formatLabel = format === 'jpeg' ? 'JPEG' : 'PNG';
+  const formatLabel = format === 'jpeg' ? 'JPEG' : format === 'webp' ? 'WebP' : 'PNG';
 
   return (
     <Dialog open={open} onOpenChange={isExporting ? undefined : onOpenChange}>

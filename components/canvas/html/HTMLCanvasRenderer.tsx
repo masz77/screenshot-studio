@@ -10,6 +10,7 @@ interface HTMLCanvasRendererProps {
   className?: string;
   style?: CSSProperties;
   onClick?: (e: React.MouseEvent) => void;
+  onPointerDown?: (e: React.PointerEvent) => void;
 }
 
 /**
@@ -18,7 +19,7 @@ interface HTMLCanvasRendererProps {
  */
 export const HTMLCanvasRenderer = forwardRef<HTMLDivElement, HTMLCanvasRendererProps>(
   function HTMLCanvasRenderer(
-    { width, height, borderRadius = 0, children, className, style, onClick },
+    { width, height, borderRadius = 0, children, className, style, onClick, onPointerDown },
     ref
   ) {
     return (
@@ -27,6 +28,7 @@ export const HTMLCanvasRenderer = forwardRef<HTMLDivElement, HTMLCanvasRendererP
         className={className}
         data-html-canvas="true"
         onClick={onClick}
+        onPointerDown={onPointerDown}
         style={{
           position: 'relative',
           width: `${width}px`,

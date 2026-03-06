@@ -16,6 +16,11 @@ export const metadata: Metadata = {
     "social media graphics",
     "animation maker",
     "3d effects",
+    "screenshot mockup features",
+    "browser frame mockup",
+    "image background remover alternative",
+    "screenshot gradient background",
+    "screenshot presentation tool",
   ],
   openGraph: {
     title: "Features - Screenshot Studio",
@@ -85,7 +90,7 @@ export default function FeaturesPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
 
-      <Navigation ctaLabel="Try Free" ctaHref="/home" />
+      <Navigation ctaLabel="Try Free" ctaHref="/" />
 
       <main className="flex-1">
         {/* Hero Section */}
@@ -148,7 +153,7 @@ export default function FeaturesPage() {
               All features, zero cost. Start creating in seconds.
             </p>
             <Link
-              href="/home"
+              href="/"
               className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-semibold px-8 py-4 rounded-full hover:opacity-90 transition-opacity"
             >
               Open Editor

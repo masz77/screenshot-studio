@@ -1,98 +1,38 @@
-import { Metadata } from "next";
-import { LandingPage } from "@/components/landing/LandingPage";
+import type { Metadata } from "next";
+import { EditorLayout } from "@/components/editor/EditorLayout";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 export const metadata: Metadata = {
-  title: "Screenshot Studio - Free Screenshot Editor Online | Create Stunning Graphics",
+  title: "Free Screenshot Editor Online - Screenshot Studio",
   description:
-    "Free screenshot editor online — beautify screenshots with 100+ backgrounds, 3D effects, animations, and video export. No signup, no watermarks. Open and start editing instantly.",
+    "Free screenshot editor and mockup maker online — add gradient backgrounds, browser frames, shadows, 3D effects, and animations to your screenshots. Better free alternative to Pika Style and Shots.so. Export as PNG, JPG, or video. No signup needed.",
   keywords: [
     "screenshot editor online free",
     "free screenshot editor",
-    "online screenshot editor",
-    "screenshot beautifier",
-    "free image editor online",
-    "beautify screenshots",
-    "screenshot background editor",
-    "screenshot to social media",
+    "online image editor",
+    "screenshot beautifier online",
+    "screenshot mockup tool",
+    "pika style alternative",
+    "shots.so alternative",
+    "browser mockup generator",
+    "screenshot wrapper tool",
+    "add background to screenshot free",
   ],
-  openGraph: {
-    title: "Screenshot Studio - Free Screenshot Editor Online",
-    description:
-      "Free screenshot editor online — beautify screenshots with 100+ backgrounds, 3D effects, animations, and video export. No signup required.",
-    url: "/",
-  },
   alternates: {
     canonical: "/",
   },
+  openGraph: {
+    title: "Free Screenshot Editor Online - Screenshot Studio",
+    description:
+      "Free screenshot editor online — add backgrounds, shadows, 3D effects, and animations. Export as PNG, JPG, or video.",
+    url: "/",
+  },
 };
 
-// Features - benefit-focused, concise
-const features = [
-  {
-    title: "Drop. Style. Done.",
-    description:
-      "Upload any image, add backgrounds and shadows, adjust until perfect. No learning curve.",
-    icon: "upload",
-  },
-  {
-    title: "50+ Backgrounds Built In",
-    description:
-      "Gradients, textures, and patterns ready to use. Or upload your own.",
-    icon: "layers",
-  },
-  {
-    title: "Export Up to 5x Resolution",
-    description:
-      "PNG with transparency or JPG. High-res output for any platform.",
-    icon: "export",
-  },
-];
-
-// How It Works - 3 steps
-const howItWorks = [
-  {
-    step: 1,
-    title: "Drop Your Image",
-    description: "Drag any screenshot or photo",
-  },
-  {
-    step: 2,
-    title: "Style It",
-    description: "Add backgrounds, shadows, text",
-  },
-  {
-    step: 3,
-    title: "Export",
-    description: "Download in seconds",
-  },
-];
-
-// Video testimonials
-const videoTestimonials = [
-  {
-    videoId: "NAS4BEP2KtA",
-    startTime: 3562,
-    endTime: 3768,
-  },
-];
-
-export default function Home() {
+export default async function EditorPage() {
   return (
-    <LandingPage
-      // Clean, memorable headline
-      heroTitle="Beautiful images."
-      heroSubtitle="Zero effort."
-      // One line that says it all
-      heroDescription="The free browser editor that makes your screenshots look professional."
-      // Clear CTA
-      ctaLabel="Start Creating"
-      ctaHref="/home"
-      features={features}
-      featuresTitle="Simple by Design"
-      howItWorks={howItWorks}
-      videoTestimonials={videoTestimonials}
-      videoTestimonialsTitle="Creators Love Screenshot Studio"
-      brandName="Screenshot Studio"
-    />
+    <ErrorBoundary>
+      <EditorLayout />
+    </ErrorBoundary>
   );
 }

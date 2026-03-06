@@ -8,7 +8,7 @@ import sharp from 'sharp';
 import { QUALITY_PRESETS, type ExportApiRequest, type ExportApiResponse, type ExportFormat, type QualityPreset } from '@/lib/export/types';
 
 function isValidFormat(format: string): format is ExportFormat {
-  return format === 'png' || format === 'jpeg';
+  return format === 'png' || format === 'jpeg' || format === 'webp';
 }
 
 function isValidQualityPreset(preset: string): preset is QualityPreset {
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
 
     if (!format || !isValidFormat(format)) {
       return NextResponse.json(
-        { error: 'Invalid format. Must be "png" or "jpeg"' },
+        { error: 'Invalid format. Must be "png", "jpeg", or "webp"' },
         { status: 400 }
       );
     }
@@ -51,18 +51,21 @@ export async function POST(request: NextRequest) {
     let mimeType: string;
 
     if (format === 'jpeg') {
-      // Convert to JPEG with quality setting
       outputBuffer = await sharpInstance
         .jpeg({
           quality: qualitySettings.jpeg,
-          mozjpeg: true, // Use mozjpeg for better compression
+          mozjpeg: true,
         })
         .toBuffer();
       mimeType = 'image/jpeg';
+    } else if (format === 'webp') {
+      outputBuffer = await sharpInstance
+        .webp({
+          quality: qualitySettings.webp,
+        })
+        .toBuffer();
+      mimeType = 'image/webp';
     } else {
-      // Lossless PNG — only compressionLevel + adaptiveFiltering.
-      // Do NOT pass effort/quality/colours — they enable palette mode
-      // which quantises to ≤256 colours and destroys shadow gradients.
       outputBuffer = await sharpInstance
         .png({
           compressionLevel: qualitySettings.pngCompression,

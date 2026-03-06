@@ -7,7 +7,7 @@ import { ArrowRight, Sparkles, Palette, Download, Layers } from "lucide-react";
 export const metadata: Metadata = {
   title: "Free Screenshot Beautifier - Make Screenshots Look Professional",
   description:
-    "Transform plain screenshots into stunning visuals with our free screenshot beautifier. Add backgrounds, shadows, rounded corners, and export in high resolution. No signup required.",
+    "Transform plain screenshots into stunning mockups with our free screenshot beautifier. Add gradient backgrounds, browser frames, shadows, rounded corners, and padding. Better than Pika Style — export in high resolution. No signup required.",
   keywords: [
     "screenshot beautifier",
     "screenshot editor online free",
@@ -19,6 +19,14 @@ export const metadata: Metadata = {
     "screenshot shadows",
     "free screenshot tool",
     "online screenshot beautifier",
+    "pika style alternative",
+    "shots.so alternative",
+    "screenshot wrapper tool",
+    "mac window mockup screenshot",
+    "browser frame screenshot tool",
+    "screenshot border radius shadow",
+    "gradient background screenshot maker",
+    "screenshot padding tool",
   ],
   openGraph: {
     title: "Free Screenshot Beautifier - Make Screenshots Look Professional",
@@ -94,23 +102,58 @@ export default function ScreenshotBeautifierPage() {
 
   const structuredData = {
     "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    name: "Screenshot Studio - Screenshot Beautifier",
-    applicationCategory: "DesignApplication",
-    operatingSystem: "Web Browser",
-    description:
-      "Free online tool to beautify screenshots with backgrounds, shadows, and professional styling.",
-    offers: {
-      "@type": "Offer",
-      price: "0",
-      priceCurrency: "USD",
-    },
-    featureList: [
-      "Gradient backgrounds",
-      "Custom shadows",
-      "Rounded corners",
-      "High-resolution export",
-      "No signup required",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        name: "Screenshot Studio - Screenshot Beautifier",
+        applicationCategory: "DesignApplication",
+        operatingSystem: "Web Browser",
+        description:
+          "Free online tool to beautify screenshots with backgrounds, shadows, and professional styling.",
+        offers: {
+          "@type": "Offer",
+          price: "0",
+          priceCurrency: "USD",
+        },
+        featureList: [
+          "Gradient backgrounds",
+          "Custom shadows",
+          "Rounded corners",
+          "High-resolution export",
+          "No signup required",
+        ],
+      },
+      {
+        "@type": "HowTo",
+        name: "How to Beautify Screenshots",
+        description:
+          "Transform plain screenshots into professional visuals in 3 easy steps using Screenshot Studio.",
+        totalTime: "PT1M",
+        tool: {
+          "@type": "HowToTool",
+          name: "Screenshot Studio",
+        },
+        step: [
+          {
+            "@type": "HowToStep",
+            name: "Upload Your Screenshot",
+            text: "Drag and drop any image or paste from clipboard. Supports PNG, JPG, and WebP.",
+            position: 1,
+          },
+          {
+            "@type": "HowToStep",
+            name: "Choose Your Style",
+            text: "Pick from 100+ backgrounds, adjust shadows, corners, and padding to match your brand.",
+            position: 2,
+          },
+          {
+            "@type": "HowToStep",
+            name: "Export & Share",
+            text: "Download in PNG or JPG. Scale up to 5x for crisp, high-res output.",
+            position: 3,
+          },
+        ],
+      },
     ],
   };
 
@@ -118,14 +161,14 @@ export default function ScreenshotBeautifierPage() {
     <div className="min-h-screen flex flex-col bg-background">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
 
-      <Navigation ctaLabel="Try Free" ctaHref="/home" />
+      <Navigation ctaLabel="Try Free" ctaHref="/" />
 
       <main className="flex-1">
         {/* Hero Section */}
@@ -140,7 +183,7 @@ export default function ScreenshotBeautifierPage() {
               resolution.
             </p>
             <Link
-              href="/home"
+              href="/"
               className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-semibold px-8 py-4 rounded-full hover:opacity-90 transition-opacity"
             >
               Beautify Your Screenshot
@@ -260,6 +303,38 @@ export default function ScreenshotBeautifierPage() {
           </div>
         </section>
 
+        {/* Related Features */}
+        <section className="py-16 px-4 bg-muted/30">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-2xl font-bold mb-8 text-center">
+              Explore More Features
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <Link
+                href="/features/social-media-graphics"
+                className="flex items-center justify-between p-4 bg-background border rounded-xl hover:border-primary transition-colors group"
+              >
+                <span className="font-medium text-sm">Social Media Graphics</span>
+                <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+              </Link>
+              <Link
+                href="/features/animation-maker"
+                className="flex items-center justify-between p-4 bg-background border rounded-xl hover:border-primary transition-colors group"
+              >
+                <span className="font-medium text-sm">Animation Maker</span>
+                <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+              </Link>
+              <Link
+                href="/features/3d-effects"
+                className="flex items-center justify-between p-4 bg-background border rounded-xl hover:border-primary transition-colors group"
+              >
+                <span className="font-medium text-sm">3D Effects</span>
+                <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+              </Link>
+            </div>
+          </div>
+        </section>
+
         {/* CTA */}
         <section className="py-20 px-4">
           <div className="max-w-4xl mx-auto text-center">
@@ -270,7 +345,7 @@ export default function ScreenshotBeautifierPage() {
               Join thousands of creators making professional graphics.
             </p>
             <Link
-              href="/home"
+              href="/"
               className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-semibold px-8 py-4 rounded-full hover:opacity-90 transition-opacity"
             >
               Start Free

@@ -16,6 +16,12 @@ export const metadata: Metadata = {
     "social media image editor",
     "free graphics maker",
     "social media templates",
+    "twitter post image maker",
+    "og image generator free",
+    "social media screenshot tool",
+    "product hunt screenshot maker",
+    "social media mockup generator",
+    "twitter banner maker free",
   ],
   openGraph: {
     title: "Free Social Media Graphics Maker - Create Stunning Posts",
@@ -126,7 +132,7 @@ export default function SocialMediaGraphicsPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
       />
 
-      <Navigation ctaLabel="Try Free" ctaHref="/home" />
+      <Navigation ctaLabel="Try Free" ctaHref="/" />
 
       <main className="flex-1">
         {/* Hero Section */}
@@ -141,7 +147,7 @@ export default function SocialMediaGraphicsPage() {
               engagement.
             </p>
             <Link
-              href="/home"
+              href="/"
               className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-semibold px-8 py-4 rounded-full hover:opacity-90 transition-opacity"
             >
               Create Graphics Free
@@ -232,6 +238,38 @@ export default function SocialMediaGraphicsPage() {
           </div>
         </section>
 
+        {/* Related Features */}
+        <section className="py-16 px-4 bg-muted/30">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-2xl font-bold mb-8 text-center">
+              Explore More Features
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <Link
+                href="/features/screenshot-beautifier"
+                className="flex items-center justify-between p-4 bg-background border rounded-xl hover:border-primary transition-colors group"
+              >
+                <span className="font-medium text-sm">Screenshot Beautifier</span>
+                <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+              </Link>
+              <Link
+                href="/features/animation-maker"
+                className="flex items-center justify-between p-4 bg-background border rounded-xl hover:border-primary transition-colors group"
+              >
+                <span className="font-medium text-sm">Animation Maker</span>
+                <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+              </Link>
+              <Link
+                href="/features/3d-effects"
+                className="flex items-center justify-between p-4 bg-background border rounded-xl hover:border-primary transition-colors group"
+              >
+                <span className="font-medium text-sm">3D Effects</span>
+                <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+              </Link>
+            </div>
+          </div>
+        </section>
+
         {/* CTA */}
         <section className="py-20 px-4">
           <div className="max-w-4xl mx-auto text-center">
@@ -242,7 +280,7 @@ export default function SocialMediaGraphicsPage() {
               No design experience required. Start creating in 30 seconds.
             </p>
             <Link
-              href="/home"
+              href="/"
               className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-semibold px-8 py-4 rounded-full hover:opacity-90 transition-opacity"
             >
               Try Free Now

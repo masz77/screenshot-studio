@@ -11,6 +11,7 @@ import {
   VideoReplayIcon,
   Cancel01Icon,
   ArrowRight01Icon,
+  RefreshIcon,
 } from 'hugeicons-react';
 import {
   SettingsSection,
@@ -20,24 +21,25 @@ import {
   BackgroundSection,
   TextSection,
   TransformsGallery,
+  AnnotateSection,
 } from './sections';
 import { cn } from '@/lib/utils';
 import { useImageStore } from '@/lib/store';
 import { AnimationPresetGallery } from '@/components/timeline/AnimationPresetGallery';
-import { trackTabChange } from '@/lib/analytics';
+
 
 type TabType = 'settings' | 'edit' | 'background' | 'transforms' | 'animate';
 
 const tabs: { id: TabType; icon: React.ReactNode; label: string }[] = [
-  { id: 'settings', icon: <Settings02Icon size={20} />, label: 'Settings' },
   { id: 'edit', icon: <SlidersHorizontalIcon size={20} />, label: 'Edit' },
   { id: 'background', icon: <ColorsIcon size={20} />, label: 'BG' },
+  { id: 'settings', icon: <Settings02Icon size={20} />, label: 'Settings' },
   { id: 'transforms', icon: <RotateSquareIcon size={20} />, label: '3D' },
   { id: 'animate', icon: <VideoReplayIcon size={20} />, label: 'Animate' },
 ];
 
 export function UnifiedRightPanel() {
-  const { activeRightPanelTab, setActiveRightPanelTab } = useImageStore();
+  const { activeRightPanelTab, setActiveRightPanelTab, uploadedImageUrl, resetCanvasSettings } = useImageStore();
   const activeTab = activeRightPanelTab;
   const setActiveTab = setActiveRightPanelTab;
   const activeIndex = tabs.findIndex((t) => t.id === activeTab);
@@ -69,22 +71,34 @@ export function UnifiedRightPanel() {
   }, [templatesOpen]);
 
   return (
-    <div className="w-full h-full bg-card flex flex-col overflow-hidden md:w-[460px] border-l border-border/40 relative">
-      {/* Templates Button */}
-      <div className="px-3 pt-3 shrink-0">
-        <button
-          onClick={() => setTemplatesOpen(true)}
-          className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-muted/80 dark:bg-muted/50 border border-border/20 hover:bg-accent transition-colors duration-150 group"
-        >
-          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary">
-            <MagicWand01Icon size={18} />
-          </div>
-          <span className="text-sm font-medium text-foreground">Templates</span>
-          <ArrowRight01Icon
-            size={16}
-            className="ml-auto text-muted-foreground group-hover:text-foreground transition-colors duration-150"
-          />
-        </button>
+    <div className="w-full h-full bg-card flex flex-col overflow-hidden md:w-[460px] border-r border-border/40 relative">
+      {/* Templates + Reset */}
+      <div className="px-3 pt-3 shrink-0 space-y-2">
+        <div className="flex gap-2">
+          {/* Templates */}
+          <button
+            onClick={() => setTemplatesOpen(true)}
+            className="flex-1 flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-muted/80 dark:bg-muted/50 border border-border/20 hover:bg-accent transition-colors duration-150 group"
+          >
+            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary">
+              <MagicWand01Icon size={18} />
+            </div>
+            <span className="text-sm font-medium text-foreground">Templates</span>
+            <ArrowRight01Icon
+              size={16}
+              className="ml-auto text-muted-foreground group-hover:text-foreground transition-colors duration-150"
+            />
+          </button>
+          {uploadedImageUrl && (
+            <button
+              onClick={resetCanvasSettings}
+              className="flex items-center justify-center w-11 rounded-xl bg-muted/80 dark:bg-muted/50 border border-border/20 hover:bg-accent transition-colors duration-150 text-muted-foreground hover:text-foreground"
+              title="Reset to defaults"
+            >
+              <RefreshIcon size={18} />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Tab Navigation */}
@@ -101,10 +115,7 @@ export function UnifiedRightPanel() {
           {tabs.map((tab) => (
             <button
               key={tab.id}
-              onClick={() => {
-                trackTabChange(tab.id);
-                setActiveTab(tab.id);
-              }}
+              onClick={() => setActiveTab(tab.id)}
               className={cn(
                 'relative z-10 flex-1 flex flex-col items-center gap-1 py-2.5 px-2 rounded-lg transition-colors duration-150',
                 activeTab === tab.id
@@ -136,10 +147,11 @@ export function UnifiedRightPanel() {
 
           {contentKey === 'edit' && (
             <div className="space-y-2">
+              <AnnotateSection />
+              <TextSection />
               <EditSection />
               <FramesSection />
               <ShadowSection />
-              <TextSection />
             </div>
           )}
 
@@ -161,7 +173,7 @@ export function UnifiedRightPanel() {
           'absolute inset-0 z-50 bg-card flex flex-col transition-all duration-300 ease-out',
           templatesOpen
             ? 'translate-x-0 opacity-100'
-            : 'translate-x-full opacity-0 pointer-events-none'
+            : '-translate-x-full opacity-0 pointer-events-none'
         )}
       >
         {/* Overlay Header */}

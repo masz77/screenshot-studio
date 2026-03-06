@@ -18,6 +18,12 @@ export const metadata: Metadata = {
     "pan animation",
     "ken burns effect",
     "free animation tool",
+    "animated screenshot maker",
+    "product demo animation",
+    "screenshot gif maker",
+    "app preview video maker",
+    "animated mockup generator",
+    "screenshot video export free",
   ],
   openGraph: {
     title: "Free Animation Maker - Create Animated Screenshots & Slideshows",
@@ -97,24 +103,59 @@ export default function AnimationMakerPage() {
 
   const structuredData = {
     "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    name: "Screenshot Studio - Animation Maker",
-    applicationCategory: "MultimediaApplication",
-    operatingSystem: "Web Browser",
-    description:
-      "Free online tool to create animated screenshots and slideshows with zoom, pan, and fade effects.",
-    offers: {
-      "@type": "Offer",
-      price: "0",
-      priceCurrency: "USD",
-    },
-    featureList: [
-      "Zoom animations",
-      "Pan effects",
-      "Ken Burns effect",
-      "Timeline editor",
-      "Video export",
-      "Slideshow builder",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        name: "Screenshot Studio - Animation Maker",
+        applicationCategory: "MultimediaApplication",
+        operatingSystem: "Web Browser",
+        description:
+          "Free online tool to create animated screenshots and slideshows with zoom, pan, and fade effects.",
+        offers: {
+          "@type": "Offer",
+          price: "0",
+          priceCurrency: "USD",
+        },
+        featureList: [
+          "Zoom animations",
+          "Pan effects",
+          "Ken Burns effect",
+          "Timeline editor",
+          "Video export",
+          "Slideshow builder",
+        ],
+      },
+      {
+        "@type": "HowTo",
+        name: "How to Create Screenshot Animations",
+        description:
+          "Create stunning animations from screenshots in 3 steps using Screenshot Studio's free animation maker.",
+        totalTime: "PT2M",
+        tool: {
+          "@type": "HowToTool",
+          name: "Screenshot Studio",
+        },
+        step: [
+          {
+            "@type": "HowToStep",
+            name: "Upload Your Screenshots",
+            text: "Add one or more screenshots to create a slideshow or animate a single image.",
+            position: 1,
+          },
+          {
+            "@type": "HowToStep",
+            name: "Choose Animation Preset",
+            text: "Select from 20+ presets like zoom, pan, Ken Burns, or create custom animations with the timeline.",
+            position: 2,
+          },
+          {
+            "@type": "HowToStep",
+            name: "Export as Video",
+            text: "Download as MP4 video or GIF. Share directly to social media or embed anywhere.",
+            position: 3,
+          },
+        ],
+      },
     ],
   };
 
@@ -129,7 +170,7 @@ export default function AnimationMakerPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
       />
 
-      <Navigation ctaLabel="Try Free" ctaHref="/home" />
+      <Navigation ctaLabel="Try Free" ctaHref="/" />
 
       <main className="flex-1">
         {/* Hero Section */}
@@ -144,7 +185,7 @@ export default function AnimationMakerPage() {
               or GIF.
             </p>
             <Link
-              href="/home"
+              href="/"
               className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-semibold px-8 py-4 rounded-full hover:opacity-90 transition-opacity"
             >
               Create Animation Free
@@ -311,6 +352,38 @@ export default function AnimationMakerPage() {
           </div>
         </section>
 
+        {/* Related Features */}
+        <section className="py-16 px-4 bg-muted/30">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-2xl font-bold mb-8 text-center">
+              Explore More Features
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <Link
+                href="/features/screenshot-beautifier"
+                className="flex items-center justify-between p-4 bg-background border rounded-xl hover:border-primary transition-colors group"
+              >
+                <span className="font-medium text-sm">Screenshot Beautifier</span>
+                <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+              </Link>
+              <Link
+                href="/features/social-media-graphics"
+                className="flex items-center justify-between p-4 bg-background border rounded-xl hover:border-primary transition-colors group"
+              >
+                <span className="font-medium text-sm">Social Media Graphics</span>
+                <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+              </Link>
+              <Link
+                href="/features/3d-effects"
+                className="flex items-center justify-between p-4 bg-background border rounded-xl hover:border-primary transition-colors group"
+              >
+                <span className="font-medium text-sm">3D Effects</span>
+                <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+              </Link>
+            </div>
+          </div>
+        </section>
+
         {/* CTA */}
         <section className="py-20 px-4">
           <div className="max-w-4xl mx-auto text-center">
@@ -322,7 +395,7 @@ export default function AnimationMakerPage() {
               animations in minutes.
             </p>
             <Link
-              href="/home"
+              href="/"
               className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-semibold px-8 py-4 rounded-full hover:opacity-90 transition-opacity"
             >
               Try Animation Maker Free

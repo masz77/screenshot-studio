@@ -95,8 +95,12 @@ export const getBackgroundCSS = (
     }
 
     case 'image': {
+      // Local assets (from /public) are served directly
+      const isLocalPath = typeof value === 'string' && value.startsWith('/');
+
       // Check if it's a known R2 background path
       const isR2Path = typeof value === 'string' &&
+        !isLocalPath &&
         !value.startsWith('blob:') &&
         !value.startsWith('http') &&
         !value.startsWith('data:') &&

@@ -6,6 +6,9 @@ export { BeautifulPresetsDemo } from './compositions/BeautifulPresetsDemo';
 export { ShareExportDemo } from './compositions/ShareExportDemo';
 export { Transform3DDemo } from './compositions/Transform3DDemo';
 export { AnimateDemo } from './compositions/AnimateDemo';
+export { FeatureDragDropDemo } from './compositions/FeatureDragDropDemo';
+export { Feature3DFramesDemo } from './compositions/Feature3DFramesDemo';
+export { FeatureAnimateExportDemo } from './compositions/FeatureAnimateExportDemo';
 
 // Animation export composition
 export { AnimationExport } from './compositions/AnimationExport';

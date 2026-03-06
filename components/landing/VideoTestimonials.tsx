@@ -1,12 +1,6 @@
 "use client";
 
-import { motion } from "motion/react";
-import { Instrument_Serif } from "next/font/google";
-
-const instrumentSerif = Instrument_Serif({
-  weight: ["400"],
-  subsets: ["latin"],
-});
+import { cn } from "@/lib/utils";
 
 interface VideoTestimonial {
   videoId: string;
@@ -36,8 +30,8 @@ function VideoTestimonialCard({
   const videoTitle = title || "Screenshot Studio testimonial";
 
   return (
-    <article className="space-y-4">
-      <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-muted/30">
+    <article className="space-y-3">
+      <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-muted/30 border border-border/30">
         <iframe
           width="100%"
           height="100%"
@@ -50,12 +44,12 @@ function VideoTestimonialCard({
         />
       </div>
       {(title || author) && (
-        <div className="px-1">
+        <div className="px-0.5">
           {title && (
-            <h3 className="font-semibold text-foreground">{title}</h3>
+            <h3 className="font-medium text-sm text-foreground">{title}</h3>
           )}
           {author && (
-            <p className="text-sm text-muted-foreground">{author}</p>
+            <p className="text-xs text-muted-foreground">{author}</p>
           )}
         </div>
       )}
@@ -69,32 +63,28 @@ export function VideoTestimonials({
 }: VideoTestimonialsProps) {
   if (!testimonials || testimonials.length === 0) return null;
 
+  const count = testimonials.length;
+
   return (
-    <section className="py-20 sm:py-28 px-6 bg-background">
-      <div className="container mx-auto max-w-4xl">
+    <section className="py-16 sm:py-24 px-6 bg-background">
+      <div className="max-w-6xl mx-auto">
         {title && (
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className={`text-3xl sm:text-4xl md:text-5xl font-bold text-center mb-12 sm:mb-16 ${instrumentSerif.className}`}
-          >
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-center mb-12 tracking-tight">
             {title}
-          </motion.h2>
+          </h2>
         )}
 
-        <div className="flex flex-wrap justify-center gap-8">
+        <div
+          className={cn(
+            "grid gap-6",
+            count === 1 && "grid-cols-1 max-w-3xl mx-auto",
+            count === 2 && "grid-cols-1 md:grid-cols-2",
+            count === 3 && "grid-cols-1 md:grid-cols-2 lg:grid-cols-3",
+            count >= 4 && "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3",
+          )}
+        >
           {testimonials.map((testimonial, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1, duration: 0.5 }}
-              className="w-full max-w-2xl"
-            >
-              <VideoTestimonialCard {...testimonial} />
-            </motion.div>
+            <VideoTestimonialCard key={index} {...testimonial} />
           ))}
         </div>
       </div>

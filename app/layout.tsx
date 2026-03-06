@@ -31,6 +31,7 @@ import {
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { QueryProvider } from "@/lib/query-client";
+import { GlobalDropZone } from "@/components/GlobalDropZone";
 
 // System UI fonts
 const geistSans = Geist({
@@ -230,7 +231,7 @@ const fontVariables = [
 
 export const metadata: Metadata = {
   title: {
-    default: "Screenshot Studio - Free Screenshot Editor Online | Beautify Images Instantly",
+    default: "Screenshot Studio - Free Screenshot Editor Online",
     template: "%s | Screenshot Studio",
   },
   // Add your Google Search Console verification code here
@@ -240,7 +241,7 @@ export const metadata: Metadata = {
     // yandex: "your-yandex-verification",
     // bing: "your-bing-verification",
   },
-  description: "Free screenshot editor online — transform plain screenshots into professional graphics in seconds. 100+ backgrounds, animations, 3D effects, and video export. No signup needed.",
+  description: "Free screenshot editor and mockup tool — transform plain screenshots into professional graphics in seconds. 100+ gradient backgrounds, browser frames, shadows, animations, 3D effects, and video export. The best free alternative to Pika Style and Shots.so. No signup needed.",
   keywords: [
     // Primary keywords
     "screenshot editor online free",
@@ -251,15 +252,24 @@ export const metadata: Metadata = {
     "screenshot studio",
     "free image editor",
     "online image editor",
+    // Competitor & alternative keywords
+    "pika style alternative",
+    "shots.so alternative",
+    "screenshot mockup tool",
+    "browser mockup generator",
+    "window mockup generator",
+    "screenshot wrapper",
     // Feature keywords
     "social media graphics maker",
     "image background editor",
     "screenshot animation maker",
-    "browser image editor",
-    "canvas editor online",
+    "browser frame screenshot",
+    "screenshot with gradient background",
+    "mac window screenshot mockup",
     // Use case keywords
     "product screenshot tool",
     "SaaS screenshot maker",
+    "app screenshot maker",
     "developer portfolio images",
     "Twitter card generator",
     "Instagram post creator",
@@ -269,8 +279,10 @@ export const metadata: Metadata = {
     "beautify screenshots online",
     "add background to screenshot",
     "screenshot to video converter",
-    "animated slideshow maker",
+    "screenshot padding and shadow tool",
+    "screenshot border radius editor",
     "free online screenshot beautifier",
+    "image presentation maker",
   ],
   authors: [{ name: "Screenshot Studio", url: "https://screenshot-studio.com" }],
   creator: "Screenshot Studio",
@@ -284,7 +296,7 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: "/",
     siteName: "Screenshot Studio",
-    title: "Screenshot Studio - Free Screenshot Editor Online | Beautify Images Instantly",
+    title: "Screenshot Studio - Free Screenshot Editor Online",
     description: "Free screenshot editor online — create stunning social media graphics in seconds. 100+ backgrounds, animations, 3D effects, video export. No signup required.",
     images: [
       {
@@ -341,7 +353,9 @@ export default function RootLayout({
         className={`${fontVariables} antialiased`}
       >
         <QueryProvider>
-          {children}
+          <GlobalDropZone>
+            {children}
+          </GlobalDropZone>
           <Toaster />
         </QueryProvider>
       </body>

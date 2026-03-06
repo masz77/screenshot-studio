@@ -4,7 +4,7 @@ import { Navigation } from "@/components/landing/Navigation";
 import { Footer } from "@/components/landing/Footer";
 
 export const metadata: Metadata = {
-  title: "Changelog - Screenshot Studio | Latest Updates & New Features",
+  title: "Changelog - Latest Updates & Features",
   description:
     "See what's new in Screenshot Studio. Latest updates including animation timeline, video export, 3D effects, and more.",
   keywords: [
@@ -37,6 +37,67 @@ interface ChangelogEntry {
 }
 
 const changelog: ChangelogEntry[] = [
+  {
+    date: "March 6, 2026",
+    version: "2.3.0",
+    title: "Annotation Tools, Text Overlay Revamp & UI Polish",
+    description:
+      "Draw arrows, curves, rectangles, circles, and blur regions directly on the canvas. Text overlay controls redesigned. Changelog and landing page refreshed.",
+    changes: [
+      {
+        type: "added",
+        text: "Annotation tools — draw arrows, curved arrows, lines, rectangles, circles, and blur regions on canvas",
+      },
+      {
+        type: "added",
+        text: "Annotations auto-select after drawing for immediate color and stroke editing from the sidebar",
+      },
+      {
+        type: "added",
+        text: "Per-annotation editing — click any shape on canvas to change its color and stroke width",
+      },
+      {
+        type: "added",
+        text: "Draggable curve control point for curved arrows with guide lines",
+      },
+      {
+        type: "added",
+        text: "Blur tool — draw regions on canvas that apply backdrop blur, with per-region intensity control",
+      },
+      {
+        type: "added",
+        text: "Stroke width range increased to 24px with preset buttons and fine-control slider",
+      },
+      {
+        type: "improved",
+        text: "Text overlay controls completely redesigned — compact inline editing, quick color swatches, native font/weight selectors, shadow toggle",
+      },
+      {
+        type: "improved",
+        text: "Annotate section moved to the top of the Edit panel for faster access",
+      },
+      {
+        type: "improved",
+        text: "Changelog page redesigned with a cleaner, minimal layout grouped by change type",
+      },
+      {
+        type: "improved",
+        text: "Video testimonials section now uses a responsive grid supporting multiple videos",
+      },
+      {
+        type: "improved",
+        text: "Arrow heads redesigned with sleek notched shape and line shortening to prevent overlap",
+      },
+      {
+        type: "fixed",
+        text: "YouTube embeds on landing page no longer blocked by Cross-Origin-Embedder-Policy headers",
+      },
+      {
+        type: "fixed",
+        text: "Annotation stroke width slider max increased from 8 to 24 — previously too thin on large canvases",
+      },
+    ],
+  },
   {
     date: "February 28, 2026",
     version: "2.2.0",
@@ -235,104 +296,139 @@ const changelog: ChangelogEntry[] = [
   },
 ];
 
-const typeConfig = {
-  added: {
-    label: "Added",
-    className: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-  },
-  improved: {
-    label: "Improved",
-    className: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-  },
-  fixed: {
-    label: "Fixed",
-    className: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-  },
-};
+const typeBadge = {
+  added: "text-emerald-500",
+  improved: "text-blue-500",
+  fixed: "text-amber-500",
+} as const;
+
+const typeDot = {
+  added: "bg-emerald-500",
+  improved: "bg-blue-500",
+  fixed: "bg-amber-500",
+} as const;
 
 export default function ChangelogPage() {
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Home",
+            item: "https://screenshot-studio.com",
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "Changelog",
+            item: "https://screenshot-studio.com/changelog",
+          },
+        ],
+      },
+      {
+        "@type": "WebPage",
+        name: "Screenshot Studio Changelog",
+        description:
+          "Latest updates, new features, and improvements to Screenshot Studio.",
+        url: "https://screenshot-studio.com/changelog",
+        mainEntity: {
+          "@type": "ItemList",
+          name: "Screenshot Studio Release History",
+          itemListElement: changelog.map((entry, index) => ({
+            "@type": "ListItem",
+            position: index + 1,
+            name: `v${entry.version} - ${entry.title}`,
+            description: entry.description,
+          })),
+        },
+      },
+    ],
+  };
+
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <Navigation ctaLabel="Open Editor" ctaHref="/home" />
+    <div className="min-h-screen flex flex-col bg-background text-foreground">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+      <Navigation ctaLabel="Open Editor" ctaHref="/" />
 
-      <main className="flex-1">
-        {/* Hero */}
-        <section className="pt-32 pb-16 px-4">
-          <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">Changelog</h1>
-            <p className="text-lg text-muted-foreground">
-              New features, improvements, and fixes for Screenshot Studio.
+      <main className="flex-1 pt-28 pb-20 px-4">
+        <div className="max-w-2xl mx-auto">
+
+          {/* Header */}
+          <header className="mb-16">
+            <h1 className="text-3xl font-semibold tracking-tight mb-2">Changelog</h1>
+            <p className="text-muted-foreground text-sm">
+              New features, improvements, and fixes.
             </p>
-          </div>
-        </section>
+          </header>
 
-        {/* Changelog entries */}
-        <section className="pb-24 px-4">
-          <div className="max-w-3xl mx-auto">
-            <div className="relative">
-              {/* Timeline line */}
-              <div className="absolute left-[7px] top-2 bottom-0 w-px bg-border hidden md:block" />
+          {/* Entries */}
+          <div className="space-y-0">
+            {changelog.map((entry, entryIndex) => (
+              <article
+                key={entry.version}
+                className={entryIndex !== changelog.length - 1 ? "pb-12 mb-12 border-b border-border/50" : "pb-12"}
+              >
+                {/* Date + version */}
+                <div className="flex items-baseline gap-3 mb-4">
+                  <time className="text-xs text-muted-foreground font-mono">
+                    {entry.date}
+                  </time>
+                  <span className="text-xs text-muted-foreground font-mono">
+                    v{entry.version}
+                  </span>
+                </div>
 
-              <div className="space-y-16">
-                {changelog.map((entry) => (
-                  <article key={entry.version} className="relative">
-                    {/* Timeline dot */}
-                    <div className="absolute left-0 top-2 w-[15px] h-[15px] rounded-full bg-primary border-2 border-background hidden md:block" />
+                <h2 className="text-lg font-semibold tracking-tight mb-1.5">
+                  {entry.title}
+                </h2>
+                <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
+                  {entry.description}
+                </p>
 
-                    <div className="md:pl-10">
-                      {/* Header */}
-                      <div className="flex flex-wrap items-center gap-3 mb-3">
-                        <span className="text-sm font-mono text-muted-foreground">
-                          {entry.date}
-                        </span>
-                        <span className="text-xs font-mono px-2 py-0.5 rounded-full border border-border bg-muted/50">
-                          v{entry.version}
-                        </span>
-                      </div>
-
-                      <h2 className="text-2xl font-bold mb-2">{entry.title}</h2>
-                      <p className="text-muted-foreground mb-6">
-                        {entry.description}
-                      </p>
-
-                      {/* Changes */}
-                      <ul className="space-y-3">
-                        {entry.changes.map((change, i) => (
-                          <li key={i} className="flex items-start gap-3">
-                            <span
-                              className={`shrink-0 text-xs font-medium px-2 py-0.5 rounded-full border mt-0.5 ${typeConfig[change.type].className}`}
-                            >
-                              {typeConfig[change.type].label}
-                            </span>
-                            <span className="text-sm text-foreground/80">
-                              {change.text}
-                            </span>
+                {/* Group changes by type */}
+                {(["added", "improved", "fixed"] as const).map((type) => {
+                  const items = entry.changes.filter((c) => c.type === type);
+                  if (items.length === 0) return null;
+                  return (
+                    <div key={type} className="mb-4 last:mb-0">
+                      <h3 className={`text-xs font-medium uppercase tracking-wider mb-2 ${typeBadge[type]}`}>
+                        {type}
+                      </h3>
+                      <ul className="space-y-1.5">
+                        {items.map((change, i) => (
+                          <li key={i} className="flex items-start gap-2.5 text-sm text-foreground/80 leading-relaxed">
+                            <span className={`shrink-0 w-1.5 h-1.5 rounded-full mt-[7px] ${typeDot[type]}`} />
+                            {change.text}
                           </li>
                         ))}
                       </ul>
                     </div>
-                  </article>
-                ))}
-              </div>
-            </div>
+                  );
+                })}
+              </article>
+            ))}
           </div>
-        </section>
 
-        {/* CTA */}
-        <section className="py-16 px-4 bg-muted/30">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-2xl font-bold mb-3">Try It Out</h2>
-            <p className="text-muted-foreground mb-6">
+          {/* CTA */}
+          <div className="pt-8 border-t border-border/50 text-center">
+            <p className="text-sm text-muted-foreground mb-4">
               All features are free. No signup required.
             </p>
             <Link
-              href="/home"
-              className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-semibold px-6 py-3 rounded-full hover:opacity-90 transition-opacity"
+              href="/"
+              className="inline-flex items-center gap-2 bg-primary text-primary-foreground text-sm font-medium px-5 py-2.5 rounded-full hover:bg-primary/90 transition-colors"
             >
               Open Editor
             </Link>
           </div>
-        </section>
+        </div>
       </main>
 
       <Footer brandName="Screenshot Studio" />

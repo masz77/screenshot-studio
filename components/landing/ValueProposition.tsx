@@ -1,10 +1,12 @@
 "use client";
 
 import { Component, type ReactNode } from "react";
-import { motion } from "motion/react";
-import { Instrument_Serif } from "next/font/google";
 import { Player } from "@remotion/player";
-import { LightningFastDemo, Transform3DDemo, AnimateDemo } from "@/remotion";
+import {
+  FeatureDragDropDemo,
+  Feature3DFramesDemo,
+  FeatureAnimateExportDemo,
+} from "@/remotion";
 
 // Silent error boundary for Remotion players
 class PlayerErrorBoundary extends Component<
@@ -19,80 +21,15 @@ class PlayerErrorBoundary extends Component<
     return { hasError: true };
   }
   render() {
-    if (this.state.hasError) return null;
+    if (this.state.hasError) {
+      return (
+        <div className="w-full aspect-[3/2] rounded-xl bg-card border border-border/50 flex items-center justify-center text-muted-foreground text-sm">
+          Preview unavailable
+        </div>
+      );
+    }
     return this.props.children;
   }
-}
-
-const instrumentSerif = Instrument_Serif({
-  weight: ["400"],
-  subsets: ["latin"],
-});
-
-// Remotion-based visual for "Lightning Fast"
-function LightningFastVisual() {
-  return (
-    <div className="h-32 mb-6 overflow-hidden rounded-xl">
-      <PlayerErrorBoundary>
-        <Player
-          component={LightningFastDemo}
-          durationInFrames={180}
-          fps={60}
-          compositionWidth={400}
-          compositionHeight={160}
-          autoPlay
-          loop
-          controls={false}
-          acknowledgeRemotionLicense
-          style={{ width: '100%', height: '100%' }}
-        />
-      </PlayerErrorBoundary>
-    </div>
-  );
-}
-
-// Remotion-based visual for "3D Transforms"
-function Transform3DVisual() {
-  return (
-    <div className="h-32 mb-6 overflow-hidden rounded-xl">
-      <PlayerErrorBoundary>
-        <Player
-          component={Transform3DDemo}
-          durationInFrames={180}
-          fps={60}
-          compositionWidth={400}
-          compositionHeight={160}
-          autoPlay
-          loop
-          controls={false}
-          acknowledgeRemotionLicense
-          style={{ width: '100%', height: '100%' }}
-        />
-      </PlayerErrorBoundary>
-    </div>
-  );
-}
-
-// Remotion-based visual for "Animate Everything"
-function AnimateVisual() {
-  return (
-    <div className="h-32 mb-6 overflow-hidden rounded-xl">
-      <PlayerErrorBoundary>
-        <Player
-          component={AnimateDemo}
-          durationInFrames={180}
-          fps={60}
-          compositionWidth={400}
-          compositionHeight={160}
-          autoPlay
-          loop
-          controls={false}
-          acknowledgeRemotionLicense
-          style={{ width: '100%', height: '100%' }}
-        />
-      </PlayerErrorBoundary>
-    </div>
-  );
 }
 
 interface ValuePropositionProps {
@@ -100,80 +37,136 @@ interface ValuePropositionProps {
   headline?: string;
 }
 
+const features = [
+  {
+    title: "Lightning Fast Editing",
+    description:
+      "Create stunning images in seconds, not hours. Our intuitive editor eliminates the learning curve.",
+    bullets: [
+      "Drag and drop any screenshot",
+      "100+ gradient and texture backgrounds",
+      "Customizable shadows, borders, and padding",
+    ],
+    Demo: FeatureDragDropDemo,
+    durationInFrames: 360,
+    width: 800,
+    height: 500,
+  },
+  {
+    title: "3D Transforms & Frames",
+    description:
+      "Add depth and dimension with 30+ perspective presets. Browser frames, Polaroid borders, and dramatic angles.",
+    bullets: [
+      "macOS, Windows, and Arc browser frames",
+      "30+ 3D perspective presets",
+      "Polaroid and custom border styles",
+    ],
+    Demo: Feature3DFramesDemo,
+    durationInFrames: 360,
+    width: 800,
+    height: 500,
+  },
+  {
+    title: "Animate & Export",
+    description:
+      "Create cinematic slideshows with 20+ animation presets. Export as high-res images or animated videos.",
+    bullets: [
+      "20+ animation presets (zoom, pan, Ken Burns)",
+      "Export up to 5x resolution",
+      "PNG with transparency or JPG",
+    ],
+    Demo: FeatureAnimateExportDemo,
+    durationInFrames: 360,
+    width: 800,
+    height: 500,
+  },
+];
+
 export function ValueProposition({
-  eyebrow = "OUR WHY",
-  headline = "We believe beautiful images shouldn't require expensive tools or design degrees. Screenshot Studio puts professional-quality creation in everyone's hands.",
+  eyebrow = "Why Screenshot Studio?",
 }: ValuePropositionProps) {
-  const cards = [
-    {
-      title: "Lightning Fast",
-      description:
-        "Create stunning images in seconds, not hours. Our intuitive editor eliminates the learning curve.",
-      Visual: LightningFastVisual,
-    },
-    {
-      title: "3D Transforms",
-      description:
-        "Add depth and dimension with 30+ perspective presets. Magazine spreads, hero shots, and dramatic angles.",
-      Visual: Transform3DVisual,
-    },
-    {
-      title: "Animate Everything",
-      description:
-        "Create cinematic slideshows with 20+ animation presets. Zoom, pan, Ken Burns, and more.",
-      Visual: AnimateVisual,
-    },
-  ];
-
   return (
-    <section className="py-24 sm:py-32 px-6 bg-background">
-      <div className="max-w-screen-xl mx-auto">
-        {/* Eyebrow */}
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-muted-foreground uppercase tracking-[0.2em] text-xs sm:text-sm mb-6"
-        >
-          {eyebrow}
-        </motion.p>
+    <section className="py-16 sm:py-24 px-6 bg-background">
+      <div className="max-w-7xl mx-auto">
+        {/* Section header */}
+        <div className="text-center mb-16">
+          <p className="text-sm text-muted-foreground uppercase tracking-widest mb-4">
+            {eyebrow}
+          </p>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight">
+            Everything you need to make images look great
+          </h2>
+        </div>
 
-        {/* Headline */}
-        <motion.h2
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.1 }}
-          className={`text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-normal max-w-4xl mb-16 sm:mb-20 leading-[1.2] ${instrumentSerif.className}`}
-        >
-          {headline}
-        </motion.h2>
-
-        {/* Feature Cards */}
-        <div className="grid md:grid-cols-3 gap-6">
-          {cards.map((card, index) => {
-            const Visual = card.Visual;
-            return (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 + 0.2 }}
-                className="group bg-card rounded-2xl p-6 hover:bg-accent transition-all duration-300 border border-transparent hover:border-border/50"
-              >
-                {/* Visual Preview */}
-                <Visual />
-
-                <h3 className="text-xl font-semibold mb-3 text-foreground group-hover:text-primary transition-colors">
-                  {card.title}
+        {/* Alternating feature sections */}
+        <div className="space-y-20">
+          {features.map((feature, index) => (
+            <div
+              key={index}
+              className={`grid md:grid-cols-2 gap-12 items-center ${
+                index % 2 === 1 ? "md:[direction:rtl]" : ""
+              }`}
+            >
+              {/* Text side */}
+              <div className={index % 2 === 1 ? "md:[direction:ltr]" : ""}>
+                <h3 className="text-xl sm:text-2xl font-semibold mb-4 text-foreground">
+                  {feature.title}
                 </h3>
-                <p className="text-muted-foreground leading-relaxed text-sm">
-                  {card.description}
+                <p className="text-muted-foreground mb-6 leading-relaxed">
+                  {feature.description}
                 </p>
-              </motion.div>
-            );
-          })}
+                <ul className="space-y-3">
+                  {feature.bullets.map((bullet, i) => (
+                    <li
+                      key={i}
+                      className="flex items-start gap-3 text-sm text-muted-foreground"
+                    >
+                      <svg
+                        className="w-4 h-4 text-primary mt-0.5 shrink-0"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      {bullet}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Demo side */}
+              <div
+                className={`relative ${
+                  index % 2 === 1 ? "md:[direction:ltr]" : ""
+                }`}
+              >
+                <div className="rounded-xl overflow-hidden border border-border/50">
+                  <PlayerErrorBoundary>
+                    <Player
+                      component={feature.Demo}
+                      durationInFrames={feature.durationInFrames}
+                      fps={60}
+                      compositionWidth={feature.width}
+                      compositionHeight={feature.height}
+                      autoPlay
+                      loop
+                      controls={false}
+                      acknowledgeRemotionLicense
+                      style={{
+                        width: "100%",
+                        height: "auto",
+                        aspectRatio: `${feature.width}/${feature.height}`,
+                      }}
+                    />
+                  </PlayerErrorBoundary>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </section>

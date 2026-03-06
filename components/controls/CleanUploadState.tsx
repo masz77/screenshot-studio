@@ -3,7 +3,6 @@
 import * as React from 'react';
 import { useDropzone } from 'react-dropzone';
 import {
-  Image01Icon,
   Camera01Icon,
   CommandIcon,
   Globe02Icon,
@@ -285,89 +284,102 @@ export function CleanUploadState() {
       />
       <input {...getInputProps()} />
 
-      {/* Upload Card */}
+      {/* Upload area with plus icon */}
       <div
         className={cn(
-          'relative z-10 rounded-lg p-6 md:p-8',
-          'flex flex-col items-center justify-center text-center',
-          'bg-popover/90 backdrop-blur-xl',
-          'border border-border/30',
-          'cursor-pointer transition-all duration-300 ease-out',
-          'hover:scale-[1.01] hover:border-border/50',
-          'w-[85%] max-w-[400px]',
-          active && 'scale-[1.02] border-primary/40',
-          'shadow-2xl'
+          'relative z-10 flex flex-col items-center justify-center cursor-pointer',
+          'w-[80%] h-[80%] rounded-2xl',
+          'bg-foreground/5 backdrop-blur-sm',
+          'border border-foreground/10',
+          'transition-all duration-300 ease-out',
+          'hover:bg-foreground/8 hover:border-foreground/15',
+          active && 'bg-primary/10 border-primary/30 scale-[1.01]',
         )}
         onClick={open}
       >
-        {/* Icon */}
-        <div className="mb-4 p-4 rounded-lg bg-muted/40 border border-border/30">
-          <Image01Icon size={40} className="text-muted-foreground" />
-        </div>
+        {/* Plus icon */}
+        <svg
+          width="48"
+          height="48"
+          viewBox="0 0 48 48"
+          fill="none"
+          className="transition-colors duration-200 mb-4"
+          style={{ color: active ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.45)', filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.3))' }}
+        >
+          <line x1="24" y1="8" x2="24" y2="40" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+          <line x1="8" y1="24" x2="40" y2="24" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+        </svg>
 
-        {/* Title */}
-        <h2 className="text-lg font-semibold text-foreground mb-1.5">
-          {active ? 'Drop the image here...' : 'Add Your Image'}
-        </h2>
+        {/* Placeholder text */}
+        <p
+          className="text-sm font-medium mb-1"
+          style={{ color: 'rgba(255,255,255,0.7)', textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}
+        >
+          {active ? 'Drop the image here...' : 'Drag & drop, click to browse, or paste'}
+        </p>
 
-        {/* Subtitle */}
         {!active && (
-          <p className="text-sm text-muted-foreground mb-4">
-            Drag & drop, click to browse, or paste
-          </p>
+          <div className="hidden sm:flex items-center gap-1.5 text-xs mt-1" style={{ color: 'rgba(255,255,255,0.5)' }}>
+            <kbd
+              className="px-1.5 py-0.5 rounded font-medium text-xs"
+              style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.7)' }}
+            >
+              <span className="flex items-center gap-0.5">
+                <CommandIcon size={10} />V
+              </span>
+            </kbd>
+            <span>to paste</span>
+          </div>
         )}
 
-        {/* Paste Hint */}
+        {/* Screenshot URL input */}
         {!active && (
-          <div className="flex flex-col gap-3 items-center">
-            <div className="hidden sm:flex items-center gap-2 text-sm text-muted-foreground">
-              <kbd className="bg-muted/60 border border-border/40 px-2 py-1 rounded-lg font-medium text-foreground/80 text-xs">
-                <span className="flex items-center gap-1">
-                  <CommandIcon size={12} />V
-                </span>
-              </kbd>
-              <span>to Paste</span>
+          <div className="hidden lg:flex flex-col items-center gap-2 mt-4 w-full max-w-[280px]" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center gap-2 w-full max-w-[140px]">
+              <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.15)' }} />
+              <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.4)' }}>or</span>
+              <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.15)' }} />
             </div>
-
-            <span className="sm:hidden text-sm font-medium text-muted-foreground">
-              Tap to browse
-            </span>
-
-            <div className="flex items-center gap-3 w-full max-w-[160px]">
-              <div className="flex-1 h-px bg-border/30" />
-              <span className="text-xs text-muted-foreground/70">or</span>
-              <div className="flex-1 h-px bg-border/30" />
-            </div>
-
-            {/* Screenshot URL Input - shown directly */}
-            <div className="hidden lg:block w-full max-w-[260px]" onClick={(e) => e.stopPropagation()}>
-              <div className="flex gap-1.5">
-                <div className="relative flex-1">
-                  <Globe02Icon size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground/60" />
-                  <Input
-                    type="url"
-                    placeholder="Enter URL to capture..."
-                    value={screenshotUrl}
-                    onChange={(e) => setScreenshotUrl(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleCaptureScreenshot()}
-                    disabled={isCapturing}
-                    className="pl-8 h-8 bg-muted/30 border-border/30 text-foreground placeholder:text-muted-foreground/50 text-xs"
-                  />
-                </div>
-                <Button
-                  onClick={handleCaptureScreenshot}
-                  disabled={isCapturing || !screenshotUrl.trim()}
-                  size="sm"
-                  className="h-8 bg-foreground text-background hover:bg-foreground/90 px-3 transition-all duration-200"
-                >
-                  {isCapturing ? <Loading03Icon size={14} className="animate-spin" /> : <Camera01Icon size={14} />}
-                </Button>
+            <div className="flex gap-1.5 w-full">
+              <div className="relative flex-1">
+                <Globe02Icon size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2" style={{ color: 'rgba(255,255,255,0.45)' }} />
+                <Input
+                  type="url"
+                  placeholder="Enter website URL..."
+                  value={screenshotUrl}
+                  onChange={(e) => setScreenshotUrl(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleCaptureScreenshot()}
+                  disabled={isCapturing}
+                  className="pl-8 h-9 text-xs rounded-lg"
+                  style={{
+                    background: 'rgba(0,0,0,0.25)',
+                    borderColor: 'rgba(255,255,255,0.15)',
+                    color: 'rgba(255,255,255,0.9)',
+                  }}
+                />
               </div>
+              <Button
+                onClick={handleCaptureScreenshot}
+                disabled={isCapturing || !screenshotUrl.trim()}
+                size="sm"
+                className="h-9 px-3 rounded-lg transition-all duration-200"
+                style={{
+                  background: 'rgba(0,0,0,0.3)',
+                  borderColor: 'rgba(255,255,255,0.15)',
+                  color: 'rgba(255,255,255,0.8)',
+                }}
+              >
+                {isCapturing ? <Loading03Icon size={14} className="animate-spin" /> : <Camera01Icon size={14} />}
+              </Button>
             </div>
           </div>
         )}
 
-        {error && <div className="mt-3 text-sm text-destructive">{error}</div>}
+        {error && (
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-sm text-destructive bg-background/90 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-destructive/20">
+            {error}
+          </div>
+        )}
       </div>
     </div>
   );

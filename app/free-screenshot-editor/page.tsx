@@ -14,10 +14,9 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title:
-    "Free Screenshot Editor Online - Beautify Screenshots Instantly | Screenshot Studio",
+  title: "Free Screenshot Editor Online - Beautify Screenshots",
   description:
-    "Looking for a free screenshot editor online? Screenshot Studio lets you beautify screenshots with 100+ backgrounds, shadows, 3D effects, animations, and video export. No signup, no watermarks — just open and edit.",
+    "Looking for a free screenshot editor online? Screenshot Studio is the best free alternative to Pika Style and Shots.so. Beautify screenshots with 100+ gradient backgrounds, browser mockups, shadows, 3D effects, animations, and video export. No signup, no watermarks.",
   keywords: [
     "screenshot editor online free",
     "free screenshot editor",
@@ -29,6 +28,13 @@ export const metadata: Metadata = {
     "beautify screenshots online free",
     "screenshot editor no signup",
     "free image editor for screenshots",
+    "pika style alternative free",
+    "shots.so alternative free",
+    "screenshot mockup generator free",
+    "browser mockup tool online",
+    "screenshot wrapper no watermark",
+    "add gradient background to screenshot",
+    "screenshot shadow and border editor",
   ],
   openGraph: {
     title: "Free Screenshot Editor Online - Screenshot Studio",
@@ -202,6 +208,37 @@ export default function FreeScreenshotEditorPage() {
         },
       },
       {
+        "@type": "HowTo",
+        name: "How to Edit Screenshots Online for Free",
+        description:
+          "Beautify any screenshot in 3 easy steps using Screenshot Studio's free online editor.",
+        totalTime: "PT1M",
+        tool: {
+          "@type": "HowToTool",
+          name: "Screenshot Studio",
+        },
+        step: [
+          {
+            "@type": "HowToStep",
+            name: "Upload Your Screenshot",
+            text: "Drag and drop any image or paste from clipboard. Supports PNG, JPG, WebP, and more.",
+            position: 1,
+          },
+          {
+            "@type": "HowToStep",
+            name: "Style It",
+            text: "Choose a background, add shadows, apply 3D transforms, or pick a one-click preset.",
+            position: 2,
+          },
+          {
+            "@type": "HowToStep",
+            name: "Export & Share",
+            text: "Download as high-res PNG/JPG or export animations as MP4, WebM, or GIF.",
+            position: 3,
+          },
+        ],
+      },
+      {
         "@type": "FAQPage",
         mainEntity: faqs.map((faq) => ({
           "@type": "Question",
@@ -221,7 +258,7 @@ export default function FreeScreenshotEditorPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      <Navigation ctaLabel="Open Editor" ctaHref="/home" />
+      <Navigation ctaLabel="Open Editor" ctaHref="/" />
 
       <main className="flex-1">
         {/* Hero Section */}
@@ -240,7 +277,7 @@ export default function FreeScreenshotEditorPage() {
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link
-                href="/home"
+                href="/"
                 className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-semibold px-8 py-4 rounded-full hover:opacity-90 transition-opacity"
               >
                 Open Free Editor
@@ -434,7 +471,7 @@ export default function FreeScreenshotEditorPage() {
               create.
             </p>
             <Link
-              href="/home"
+              href="/"
               className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-semibold px-8 py-4 rounded-full hover:opacity-90 transition-opacity"
             >
               Open Free Screenshot Editor

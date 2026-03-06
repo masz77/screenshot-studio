@@ -74,7 +74,8 @@ export function useBackgroundImage(
         typeof imageUrl === 'string' &&
         !imageUrl.startsWith('http') &&
         !imageUrl.startsWith('blob:') &&
-        !imageUrl.startsWith('data:')
+        !imageUrl.startsWith('data:') &&
+        !imageUrl.startsWith('/')
       ) {
         if (backgroundPaths.includes(imageUrl)) {
           imageUrl = getR2ImageUrl({ src: imageUrl });
@@ -179,7 +180,12 @@ export function useOverlayImages(imageOverlays: ImageOverlay[]) {
           }
 
           const img = new window.Image();
-          img.crossOrigin = 'anonymous';
+          // Don't set crossOrigin for blob/data URLs — they're same-origin
+          // and setting it can cause loading failures
+          const isBlobOrData = imageUrl.startsWith('blob:') || imageUrl.startsWith('data:');
+          if (!isBlobOrData) {
+            img.crossOrigin = 'anonymous';
+          }
 
           img.onload = () => {
             if (!abortController.signal.aborted) {

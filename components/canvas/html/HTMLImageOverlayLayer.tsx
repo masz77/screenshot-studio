@@ -35,12 +35,6 @@ function DraggableImage({
   const [isResizing, setIsResizing] = useState(false);
   const resizeStartRef = useRef<{ mouseX: number; mouseY: number; size: number; handle: string } | null>(null);
 
-  // Check if it's an arrow overlay (needs inversion)
-  const isArrow = useMemo(() =>
-    typeof overlay.src === 'string' && overlay.src.startsWith('/arrow/'),
-    [overlay.src]
-  );
-
   // Check if it's a shadow overlay (decorative, non-interactive)
   const isShadow = useMemo(() =>
     typeof overlay.src === 'string' && overlay.src.includes('overlay-shadow'),
@@ -200,8 +194,6 @@ function DraggableImage({
           height: '100%',
           objectFit: 'contain',
           display: 'block',
-          // Apply inversion for arrow overlays
-          filter: isArrow ? 'brightness(0) invert(1)' : undefined,
         }}
       />
 

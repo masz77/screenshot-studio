@@ -20,9 +20,6 @@ import { Cancel01Icon, Image01Icon, ShuffleIcon } from 'hugeicons-react';
 import { cn } from '@/lib/utils';
 import { CachedImage } from '@/components/ui/cached-image';
 
-// Arrow URLs
-const ARROW_URLS = Array.from({ length: 10 }, (_, i) => `/arrow/arrow-${i + 1}.svg`);
-
 // Shadow overlay IDs
 const OVERLAY_SHADOW_IDS = [
   '023', '001', '002', '007', '017', '019', '031', '037', '041', '050',
@@ -123,15 +120,6 @@ export function BackgroundSection() {
     };
   };
 
-  const getDefaultPosition = () => {
-    const canvasWidth = responsiveDimensions.width || 1920;
-    const overlaySize = 100;
-    return {
-      x: Math.max(20, (canvasWidth / 2) - (overlaySize / 2)),
-      y: 50,
-    };
-  };
-
   const handleAddShadow = (shadowUrl: string) => {
     // Remove any existing shadows first (only one shadow at a time)
     imageOverlays.forEach((overlay) => {
@@ -166,20 +154,6 @@ export function BackgroundSection() {
   const currentShadow = imageOverlays.find(
     (overlay) => typeof overlay.src === 'string' && overlay.src.includes('overlay-shadow')
   );
-
-  const handleAddArrow = (arrowUrl: string) => {
-    const pos = getDefaultPosition();
-    addImageOverlay({
-      src: arrowUrl,
-      position: { x: pos.x, y: pos.y },
-      size: 80,
-      rotation: 45,
-      opacity: 0.9,
-      flipX: false,
-      flipY: false,
-      isVisible: true,
-    });
-  };
 
   const shuffleMagicGradient = () => {
     const keys = Object.keys(magicGradients) as MagicGradientKey[];
@@ -229,25 +203,6 @@ export function BackgroundSection() {
               </button>
             ))}
           </div>
-        </div>
-      </SectionWrapper>
-
-      {/* Arrows */}
-      <SectionWrapper title="Arrows" defaultOpen={false}>
-        <div className="grid grid-cols-5 gap-2">
-          {ARROW_URLS.map((arrowUrl, index) => (
-            <button
-              key={index}
-              onClick={() => handleAddArrow(arrowUrl)}
-              className="aspect-square flex items-center justify-center rounded-lg border border-border/40 bg-background dark:bg-accent hover:border-primary/60 hover:scale-105 transition-all p-2"
-            >
-              <img
-                src={arrowUrl}
-                alt={`Arrow ${index + 1}`}
-                className="w-full h-full object-contain dark:invert"
-              />
-            </button>
-          ))}
         </div>
       </SectionWrapper>
 

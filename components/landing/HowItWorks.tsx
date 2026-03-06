@@ -1,13 +1,4 @@
-"use client";
-
 import { useId } from "react";
-import { motion } from "motion/react";
-import { Instrument_Serif } from "next/font/google";
-
-const instrumentSerif = Instrument_Serif({
-  weight: ["400"],
-  subsets: ["latin"],
-});
 
 interface Step {
   step: number;
@@ -26,43 +17,31 @@ export function HowItWorks({
 }: HowItWorksProps) {
   const titleId = useId();
   return (
-    <section aria-labelledby={titleId} className="py-20 sm:py-28 md:py-32 px-6 bg-background">
-      <div className="container mx-auto max-w-4xl">
-        <motion.h2
+    <section
+      aria-labelledby={titleId}
+      className="py-16 sm:py-24 px-6 bg-background"
+    >
+      <div className="max-w-4xl mx-auto">
+        <h2
           id={titleId}
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className={`text-3xl sm:text-4xl md:text-5xl font-bold text-center mb-16 sm:mb-20 ${instrumentSerif.className}`}
+          className="text-2xl sm:text-3xl md:text-4xl font-semibold text-center mb-16 tracking-tight"
         >
           {title}
-        </motion.h2>
+        </h2>
 
-        <div className="grid md:grid-cols-[auto_auto_auto] gap-12 md:gap-10 justify-center">
-          {steps.map((step, index) => (
-            <motion.div
-              key={step.step}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.15, duration: 0.5 }}
-              className="text-center md:text-left"
-            >
-              {/* Step number */}
-              <span className="inline-block text-6xl sm:text-7xl font-bold text-primary/20 mb-4 leading-none">
+        <div className="grid md:grid-cols-3 gap-12 md:gap-10">
+          {steps.map((step) => (
+            <div key={step.step} className="text-center md:text-left">
+              <span className="inline-block text-5xl font-bold text-primary/20 mb-4 leading-none">
                 {step.step}
               </span>
-
-              {/* Title */}
-              <h3 className="text-xl sm:text-2xl font-semibold mb-2 text-foreground">
+              <h3 className="text-lg font-semibold mb-2 text-foreground">
                 {step.title}
               </h3>
-
-              {/* Description */}
-              <p className="text-muted-foreground">
+              <p className="text-muted-foreground text-sm">
                 {step.description}
               </p>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>

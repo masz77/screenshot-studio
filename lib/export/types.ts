@@ -2,7 +2,7 @@
  * Type definitions for Sharp-based image export
  */
 
-export type ExportFormat = 'png' | 'jpeg';
+export type ExportFormat = 'png' | 'jpeg' | 'webp';
 export type QualityPreset = 'high' | 'medium' | 'low';
 
 export interface ExportApiRequest {
@@ -20,14 +20,13 @@ export interface ExportApiResponse {
 export interface QualitySettings {
   jpeg: number;
   pngCompression: number;
-  // NOTE: Do NOT add `effort` — sharp treats it as a palette-mode flag
-  // which quantises to ≤256 colours and destroys shadow gradients.
+  webp: number;
 }
 
 export const QUALITY_PRESETS: Record<QualityPreset, QualitySettings> = {
-  high: { jpeg: 92, pngCompression: 6 },
-  medium: { jpeg: 80, pngCompression: 9 },
-  low: { jpeg: 60, pngCompression: 9 },
+  high: { jpeg: 92, pngCompression: 6, webp: 90 },
+  medium: { jpeg: 80, pngCompression: 9, webp: 80 },
+  low: { jpeg: 60, pngCompression: 9, webp: 60 },
 };
 
 export const QUALITY_PRESET_LABELS: Record<QualityPreset, { label: string; description: Record<ExportFormat, string> }> = {
@@ -36,6 +35,7 @@ export const QUALITY_PRESET_LABELS: Record<QualityPreset, { label: string; descr
     description: {
       png: 'Best quality, larger file',
       jpeg: '92% quality, minimal compression',
+      webp: '90% quality, small file size',
     },
   },
   medium: {
@@ -43,6 +43,7 @@ export const QUALITY_PRESET_LABELS: Record<QualityPreset, { label: string; descr
     description: {
       png: 'Balanced size, lossless',
       jpeg: '80% quality, moderate compression',
+      webp: '80% quality, very small file',
     },
   },
   low: {
@@ -50,6 +51,7 @@ export const QUALITY_PRESET_LABELS: Record<QualityPreset, { label: string; descr
     description: {
       png: 'Smallest file, lossless',
       jpeg: '60% quality, maximum compression',
+      webp: '60% quality, tiny file',
     },
   },
 };

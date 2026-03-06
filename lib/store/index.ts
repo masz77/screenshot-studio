@@ -15,23 +15,13 @@ import { DEFAULT_TIMELINE_STATE } from "@/types/animation";
 import { clonePresetTracks, getPresetById, ANIMATION_PRESETS } from "@/lib/animation/presets";
 import {
   trackImageUpload,
-  trackImageRemove,
   trackBackgroundChange,
   trackEffectApply,
   trackFrameApply,
   trackOverlayAdd,
-  trackOverlayRemove,
   trackAspectRatioChange,
   trackPresetApply,
   trackAnimationClipAdd,
-  trackAnimationClipRemove,
-  trackAnimationPlay,
-  trackAnimationPause,
-  trackTimelineOpen,
-  trackTimelineClose,
-  trackFilterChange,
-  trackSlideAdd,
-  trackSlideRemove,
 } from "@/lib/analytics";
 
 interface TextShadow {
@@ -83,6 +73,32 @@ export interface ImageOverlay {
   flipY: boolean;
   isVisible: boolean;
   isCustom?: boolean; // Whether it's a custom uploaded overlay
+}
+
+export interface BlurRegion {
+  id: string;
+  position: { x: number; y: number };
+  size: { width: number; height: number };
+  blurAmount: number;
+  isVisible: boolean;
+}
+
+export type AnnotationToolType = 'arrow' | 'curved-arrow' | 'rectangle' | 'circle' | 'line' | 'blur';
+
+export interface AnnotationShape {
+  id: string;
+  type: AnnotationToolType;
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+  cx?: number;
+  cy?: number;
+  strokeColor: string;
+  strokeWidth: number;
+  fillColor: string;
+  opacity: number;
+  isVisible: boolean;
 }
 
 export interface ImageBorder {
@@ -560,6 +576,7 @@ export interface ImageState {
   setPerspective3D: (perspective: Partial<ImageState["perspective3D"]>) => void;
   setImageFilter: (key: keyof ImageFilters, value: number) => void;
   resetImageFilters: () => void;
+  resetCanvasSettings: () => void;
   setExportSettings: (settings: Partial<ImageState["exportSettings"]>) => void;
   exportImage: () => Promise<void>;
   // Slideshow
@@ -610,6 +627,26 @@ export interface ImageState {
   removeAnimationClip: (clipId: string) => void;
   clearAnimationClips: () => void;
 
+  // Annotations (custom SVG)
+  annotations: AnnotationShape[];
+  activeAnnotationTool: AnnotationToolType | null;
+  selectedAnnotationId: string | null;
+  annotationDefaults: { strokeColor: string; strokeWidth: number; fillColor: string };
+  addAnnotation: (annotation: Omit<AnnotationShape, 'id'>) => void;
+  updateAnnotation: (id: string, updates: Partial<AnnotationShape>) => void;
+  removeAnnotation: (id: string) => void;
+  clearAnnotations: () => void;
+  setActiveAnnotationTool: (tool: AnnotationToolType | null) => void;
+  setSelectedAnnotationId: (id: string | null) => void;
+  setAnnotationDefaults: (defaults: Partial<{ strokeColor: string; strokeWidth: number; fillColor: string }>) => void;
+
+  // Blur regions
+  blurRegions: BlurRegion[];
+  addBlurRegion: (region: Omit<BlurRegion, 'id'>) => void;
+  updateBlurRegion: (id: string, updates: Partial<BlurRegion>) => void;
+  removeBlurRegion: (id: string) => void;
+  clearBlurRegions: () => void;
+
   // UI State
   activeRightPanelTab: 'settings' | 'edit' | 'background' | 'transforms' | 'animate';
   setActiveRightPanelTab: (tab: 'settings' | 'edit' | 'background' | 'transforms' | 'animate') => void;
@@ -639,7 +676,7 @@ export const useImageStore = create<ImageState>()(
     selectedGradient: "vibrant_orange_pink",
     borderRadius: 10,
     backgroundBorderRadius: 10,
-    selectedAspectRatio: "16_9",
+    selectedAspectRatio: "4_3",
     backgroundConfig: {
       type: "image",
       value: "backgrounds/raycast/red_distortion_4.webp",
@@ -774,6 +811,10 @@ export const useImageStore = create<ImageState>()(
         textOverlays: [],
         imageOverlays: [],
         mockups: [],
+        // Reset annotations & blur
+        annotations: [],
+        activeAnnotationTool: null,
+        blurRegions: [],
         // Reset timeline/animation
         timeline: { ...DEFAULT_TIMELINE_STATE },
         animationClips: [],
@@ -783,9 +824,6 @@ export const useImageStore = create<ImageState>()(
 
     clearImage: () => {
       const { uploadedImageUrl, slides, imageOverlays } = get();
-
-      // Track image removal
-      trackImageRemove();
 
       // Revoke main image URL
       if (uploadedImageUrl) {
@@ -870,6 +908,10 @@ export const useImageStore = create<ImageState>()(
         textOverlays: [],
         imageOverlays: [],
         mockups: [],
+        // Reset annotations & blur
+        annotations: [],
+        activeAnnotationTool: null,
+        blurRegions: [],
         // Reset timeline/animation
         timeline: { ...DEFAULT_TIMELINE_STATE },
         animationClips: [],
@@ -993,7 +1035,6 @@ export const useImageStore = create<ImageState>()(
     },
 
     removeTextOverlay: (id) => {
-      trackOverlayRemove('text');
       set((state) => ({
         textOverlays: state.textOverlays.filter((overlay) => overlay.id !== id),
       }));
@@ -1022,7 +1063,6 @@ export const useImageStore = create<ImageState>()(
     },
 
     removeImageOverlay: (id) => {
-      trackOverlayRemove('sticker');
       set((state) => ({
         imageOverlays: state.imageOverlays.filter(
           (overlay) => overlay.id !== id
@@ -1103,7 +1143,6 @@ export const useImageStore = create<ImageState>()(
     },
 
     setImageFilter: (key: keyof ImageFilters, value: number) => {
-      trackFilterChange(key, value);
       const currentFilters = get().imageFilters;
       set({
         imageFilters: {
@@ -1128,6 +1167,65 @@ export const useImageStore = create<ImageState>()(
       });
     },
 
+    resetCanvasSettings: () => {
+      set({
+        imageScale: 100,
+        imageOpacity: 1,
+        borderRadius: 10,
+        backgroundBorderRadius: 10,
+        backgroundConfig: {
+          type: "image",
+          value: "backgrounds/raycast/red_distortion_4.webp",
+          opacity: 1,
+        },
+        backgroundBlur: 0,
+        backgroundNoise: 0,
+        selectedGradient: "vibrant_orange_pink",
+        imageShadow: {
+          enabled: true,
+          blur: 15,
+          offsetX: 5,
+          offsetY: 8,
+          spread: 3,
+          color: "rgba(0, 0, 0, 0.6)",
+          opacity: 0.5,
+        },
+        imageBorder: {
+          enabled: false,
+          width: 8,
+          color: "#000000",
+          type: "none",
+          padding: 20,
+          title: "",
+        },
+        perspective3D: {
+          perspective: 200,
+          rotateX: 0,
+          rotateY: 0,
+          rotateZ: 0,
+          translateX: 0,
+          translateY: 0,
+          scale: 1,
+        },
+        imageFilters: {
+          brightness: 100,
+          contrast: 100,
+          grayscale: 0,
+          blur: 0,
+          hueRotate: 0,
+          invert: 0,
+          saturate: 100,
+          sepia: 0,
+        },
+        textOverlays: [],
+        imageOverlays: [],
+        mockups: [],
+        annotations: [],
+        activeAnnotationTool: null,
+        blurRegions: [],
+      });
+    },
+
     setExportSettings: (settings: Partial<ImageState["exportSettings"]>) => {
       const currentSettings = get().exportSettings;
       set({
@@ -1147,7 +1245,6 @@ export const useImageStore = create<ImageState>()(
       }
     },
     addImages: (files: File[]) => {
-      trackSlideAdd(files.length);
       const { slides, slideshow, timeline } = get();
 
       const newSlides = files.map((file) => ({
@@ -1194,7 +1291,6 @@ export const useImageStore = create<ImageState>()(
     },
 
     removeSlide: (id) => {
-      trackSlideRemove();
       const { slides, activeSlideId } = get();
       const slide = slides.find((s) => s.id === id);
       if (slide) URL.revokeObjectURL(slide.src);
@@ -1245,12 +1341,6 @@ export const useImageStore = create<ImageState>()(
     },
 
     toggleTimeline: () => {
-      const current = get().showTimeline;
-      if (current) {
-        trackTimelineClose();
-      } else {
-        trackTimelineOpen();
-      }
       set((state) => ({ showTimeline: !state.showTimeline }));
     },
 
@@ -1261,26 +1351,18 @@ export const useImageStore = create<ImageState>()(
     },
 
     togglePlayback: () => {
-      const wasPlaying = get().timeline.isPlaying;
-      if (wasPlaying) {
-        trackAnimationPause();
-      } else {
-        trackAnimationPlay();
-      }
       set((state) => ({
         timeline: { ...state.timeline, isPlaying: !state.timeline.isPlaying },
       }));
     },
 
     startPlayback: () => {
-      trackAnimationPlay();
       set((state) => ({
         timeline: { ...state.timeline, isPlaying: true },
       }));
     },
 
     stopPlayback: () => {
-      trackAnimationPause();
       set((state) => ({
         timeline: { ...state.timeline, isPlaying: false },
       }));
@@ -1501,7 +1583,6 @@ export const useImageStore = create<ImageState>()(
     },
 
     removeAnimationClip: (clipId) => {
-      trackAnimationClipRemove(clipId);
       set((state) => ({
         animationClips: state.animationClips.filter((clip) => clip.id !== clipId),
         timeline: {
@@ -1518,6 +1599,62 @@ export const useImageStore = create<ImageState>()(
         timeline: { ...DEFAULT_TIMELINE_STATE },
       });
     },
+
+    // Annotations (custom SVG)
+    annotations: [],
+    activeAnnotationTool: null,
+    selectedAnnotationId: null,
+    annotationDefaults: { strokeColor: '#ef4444', strokeWidth: 6, fillColor: 'transparent' },
+    addAnnotation: (annotation) => {
+      const id = `ann-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      set((state) => ({
+        annotations: [...state.annotations, { ...annotation, id }],
+        selectedAnnotationId: id,
+      }));
+    },
+    updateAnnotation: (id, updates) => {
+      set((state) => ({
+        annotations: state.annotations.map((a) =>
+          a.id === id ? { ...a, ...updates } : a
+        ),
+      }));
+    },
+    removeAnnotation: (id) => {
+      set((state) => ({
+        annotations: state.annotations.filter((a) => a.id !== id),
+        selectedAnnotationId: state.selectedAnnotationId === id ? null : state.selectedAnnotationId,
+      }));
+    },
+    clearAnnotations: () => set({ annotations: [], selectedAnnotationId: null }),
+    setActiveAnnotationTool: (tool) => set({ activeAnnotationTool: tool }),
+    setSelectedAnnotationId: (id) => set({ selectedAnnotationId: id }),
+    setAnnotationDefaults: (defaults) => {
+      set((state) => ({
+        annotationDefaults: { ...state.annotationDefaults, ...defaults },
+      }));
+    },
+
+    // Blur regions
+    blurRegions: [],
+    addBlurRegion: (region) => {
+      const id = `blur-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      set((state) => ({
+        blurRegions: [...state.blurRegions, { ...region, id }],
+      }));
+    },
+    updateBlurRegion: (id, updates) => {
+      set((state) => ({
+        blurRegions: state.blurRegions.map((r) =>
+          r.id === id ? { ...r, ...updates } : r
+        ),
+      }));
+    },
+    removeBlurRegion: (id) => {
+      set((state) => ({
+        blurRegions: state.blurRegions.filter((r) => r.id !== id),
+      }));
+    },
+    clearBlurRegions: () => set({ blurRegions: [] }),
 
     // UI State
     activeRightPanelTab: 'edit',

@@ -38,8 +38,9 @@ const nextConfig: NextConfig = {
   // Permanent redirects for SEO (301)
   async redirects() {
     return [
+      // Old /home editor URL → new / root
       {
-        source: "/landing",
+        source: "/home",
         destination: "/",
         permanent: true,
       },

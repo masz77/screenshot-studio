@@ -195,13 +195,13 @@ export function useExport(selectedAspectRatio: string) {
         (percent) => anim.set(percent)
       );
 
-      if (!result.dataURL || result.dataURL === 'data:,') {
+      if (!result.blob || result.blob.size === 0) {
         throw new Error('Invalid image data generated');
       }
 
       // Save to storage (95 → 97%)
       anim.set(96);
-      const fileExtension = settings.format === 'jpeg' ? 'jpg' : 'png';
+      const fileExtension = settings.format === 'jpeg' ? 'jpg' : settings.format === 'webp' ? 'webp' : 'png';
       const fileName = `screenshot-studio-${Date.now()}.${fileExtension}`;
 
       try {
@@ -229,12 +229,17 @@ export function useExport(selectedAspectRatio: string) {
         durationMs
       );
 
+      const url = URL.createObjectURL(result.blob);
       const link = document.createElement('a');
       link.download = fileName;
-      link.href = result.dataURL;
+      link.href = url;
       document.body.appendChild(link);
       link.click();
-      setTimeout(() => document.body.removeChild(link), 100);
+      setTimeout(() => {
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        if (result.dataURL.startsWith('blob:')) URL.revokeObjectURL(result.dataURL);
+      }, 100);
 
       // Done
       anim.snap(100);
@@ -307,36 +312,34 @@ export function useExport(selectedAspectRatio: string) {
         (percent) => anim.set(percent)
       );
 
-      if (!result.dataURL || result.dataURL === 'data:,') {
+      if (!result.blob || result.blob.size === 0) {
         throw new Error('Invalid image data generated');
       }
 
-      // Prepare clipboard blob (95 → 97%)
+      // Prepare clipboard blob — clipboard requires PNG
       anim.set(96);
       const blob = result.blob.type === 'image/png'
         ? result.blob
         : await new Promise<Blob>((resolve, reject) => {
+          const url = URL.createObjectURL(result.blob);
           const img = new Image();
           img.onload = () => {
             const canvas = document.createElement('canvas');
             canvas.width = img.width;
             canvas.height = img.height;
             const ctx = canvas.getContext('2d');
+            URL.revokeObjectURL(url);
             if (!ctx) {
               reject(new Error('Failed to get canvas context'));
               return;
             }
             ctx.drawImage(img, 0, 0);
-            canvas.toBlob((blob) => {
-              if (!blob) {
-                reject(new Error('Failed to create blob'));
-                return;
-              }
-              resolve(blob);
+            canvas.toBlob((b) => {
+              b ? resolve(b) : reject(new Error('Failed to create blob'));
             }, 'image/png');
           };
-          img.onerror = reject;
-          img.src = result.dataURL;
+          img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Failed to load image')); };
+          img.src = url;
         });
 
       // Stage 4: Write to clipboard (85 → 100%)

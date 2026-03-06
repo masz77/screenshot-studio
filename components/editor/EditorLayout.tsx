@@ -59,6 +59,9 @@ function EditorMain() {
       )}
 
       <div className="flex-1 flex overflow-hidden">
+        {/* Left Panel - Desktop */}
+        {!isMobile && <UnifiedRightPanel />}
+
         {/* Center Canvas */}
         <div className="flex-1 flex flex-col overflow-hidden bg-background relative">
           <div className="flex-1 flex items-center justify-center overflow-y-auto overflow-x-hidden">
@@ -71,14 +74,11 @@ function EditorMain() {
           {hasContent && showTimeline && !isMobile && <TimelineEditor />}
         </div>
 
-        {/* Right Panel - Desktop */}
-        {!isMobile && <UnifiedRightPanel />}
-
-        {/* Right Panel - Mobile Sheet */}
+        {/* Left Panel - Mobile Sheet */}
         {isMobile && (
           <Sheet open={rightPanelOpen} onOpenChange={setRightPanelOpen}>
             <SheetContent
-              side="right"
+              side="left"
               className="w-[460px] p-0 sm:max-w-[460px]"
             >
               <UnifiedRightPanel />

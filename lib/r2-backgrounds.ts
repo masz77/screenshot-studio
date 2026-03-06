@@ -14,17 +14,13 @@ export interface BackgroundCategory {
 // Background image paths in R2 (with actual file extensions)
 export const backgroundCategories: BackgroundCategory = {
   "assets": [
-    "backgrounds/assets/asset-2.jpg",
-    "backgrounds/assets/asset-12.jpg",
-    "backgrounds/assets/asset-13.jpg",
-    "backgrounds/assets/asset-18.jpg",
-    "backgrounds/assets/asset-19.jpg",
-    "backgrounds/assets/asset-25.jpg",
-    "backgrounds/assets/asset-26.jpeg",
-    "backgrounds/assets/asset-27.jpeg",
-    "backgrounds/assets/asset-28.jpeg",
-    "backgrounds/assets/asset-29.jpeg",
-    "backgrounds/assets/asset-30.jpeg",
+    "/assets/asset-1.avif",
+    "/assets/asset-2.jpg",
+    "/assets/asset-3.avif",
+    "/assets/asset-4.jpg",
+    "/assets/asset-5.jpg",
+    "/assets/asset-13.jpg",
+    "/assets/asset-19.jpg",
   ],
   "mac": [
     "backgrounds/mac/mac-asset-1.jpeg",
@@ -80,17 +76,6 @@ export const backgroundCategories: BackgroundCategory = {
     "backgrounds/demo/demo-9.png",
     "backgrounds/demo/demo-10.png",
     "backgrounds/demo/demo-11.png",
-    "backgrounds/demo/demo-12.png",
-    "backgrounds/demo/demo-13.png",
-    "backgrounds/demo/demo-14.png",
-    "backgrounds/demo/demo-15.png",
-  ],
-  "silk": [
-    "backgrounds/silk/amber.png",
-    "backgrounds/silk/dark.png",
-    "backgrounds/silk/monochrome.png",
-    "backgrounds/silk/silver.png",
-    "backgrounds/silk/sky.png",
   ],
   "paper": [
     "backgrounds/paper/01.webp",
@@ -156,6 +141,7 @@ export const SIGN_UP_BACKGROUND_PATH = 'backgrounds/mac/mac-asset-2.jpg';
  * Get full R2 URL for a background image
  */
 export function getBackgroundUrl(path: string): string {
+  if (path.startsWith('/')) return path;
   return getR2PublicUrl(path);
 }
 
@@ -165,8 +151,8 @@ export function getBackgroundUrl(path: string): string {
  * Consider using Cloudflare Images or pre-generating thumbnails.
  */
 export function getBackgroundThumbnailUrl(path: string): string {
-  // For now, return the full image URL
-  // TODO: Implement thumbnail support via Cloudflare Images or pre-generated thumbnails
+  // Local assets (from /public) are served as-is
+  if (path.startsWith('/')) return path;
   return getR2PublicUrl(path);
 }
 

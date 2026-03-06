@@ -15,7 +15,6 @@ import {
   deleteDraft,
   migrateFromLocalStorage,
   checkStorageAndCleanup,
-  getStorageInfo,
   autoCleanIndexedDB,
 } from "@/lib/draft-storage";
 
@@ -26,6 +25,7 @@ export function useAutosaveDraft() {
   const imageStore = useImageStore();
   const saveTimeoutRef = useRef<NodeJS.Timeout>(null);
   const hasLoadedRef = useRef(false);
+  const lastSnapshotRef = useRef<string>('');
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
 
@@ -39,14 +39,7 @@ export function useAutosaveDraft() {
         await migrateFromLocalStorage();
 
         // Auto-clean IndexedDB on startup (removes old/corrupted data)
-        const cleanupResult = await autoCleanIndexedDB();
-        if (cleanupResult.cleaned) {
-          console.log(`🧹 IndexedDB cleaned: ${cleanupResult.reason}`);
-        }
-
-        // Log storage info
-        const storageInfo = await getStorageInfo();
-        console.log('📦 IndexedDB Storage:', storageInfo);
+        await autoCleanIndexedDB();
 
         const draft = await getDraft();
         if (!draft) {
@@ -145,14 +138,7 @@ export function useAutosaveDraft() {
       }
 
       saveTimeoutRef.current = setTimeout(async () => {
-        setIsSaving(true);
         try {
-          // Check storage and cleanup if needed before saving
-          const wasCleanedUp = await checkStorageAndCleanup();
-          if (wasCleanedUp) {
-            console.log('Storage was cleaned up due to limit. Continuing with save...');
-          }
-
           const {
             screenshot,
             background,
@@ -181,6 +167,40 @@ export function useAutosaveDraft() {
             imageShadow,
             perspective3D,
           } = imageStore;
+
+          // Quick dirty check: fingerprint non-blob state to skip redundant saves
+          const snapshot = JSON.stringify({
+            ss: screenshot.src ? screenshot.src.slice(0, 40) : null,
+            bg: background,
+            sh: shadow,
+            pt: pattern,
+            fr: frame,
+            cv: canvas,
+            ns: noise,
+            br: borderRadius,
+            bbr: backgroundBorderRadius,
+            ar: selectedAspectRatio,
+            bgt: backgroundConfig.type,
+            bbl: backgroundBlur,
+            bbn: backgroundNoise,
+            io: imageOpacity,
+            is: imageScale,
+            ib: imageBorder,
+            ish: imageShadow,
+            p3d: perspective3D,
+            tc: textOverlays.length,
+            oc: imageOverlays.length,
+            mc: mockups.length,
+          });
+
+          if (snapshot === lastSnapshotRef.current) {
+            return; // Nothing changed — skip save
+          }
+
+          setIsSaving(true);
+
+          // Check storage limits periodically
+          await checkStorageAndCleanup();
 
           // Convert screenshot blob URL to base64
           let processedScreenshotSrc = screenshot.src;
@@ -278,13 +298,19 @@ export function useAutosaveDraft() {
             },
             showTimeline: false,
             animationClips: [],
+            annotations: [],
+            activeAnnotationTool: null,
+            selectedAnnotationId: null,
+            annotationDefaults: { strokeColor: '#ef4444', strokeWidth: 6, fillColor: 'transparent' },
+            blurRegions: [],
             activeRightPanelTab: 'edit',
           };
 
           await saveDraft(editorState, imageState);
+          lastSnapshotRef.current = snapshot;
           setLastSaved(new Date());
-        } catch (error) {
-          console.error("Failed to auto-save draft:", error);
+        } catch {
+          // Failed to auto-save — non-critical
         } finally {
           setIsSaving(false);
         }

@@ -51,7 +51,7 @@ export function Pricing() {
               </ul>
             </CardContent>
             <CardFooter>
-              <Link href="/home" className="w-full">
+              <Link href="/" className="w-full">
                 <Button variant="integration" className="w-full">
                   Get Started
                 </Button>
@@ -92,7 +92,7 @@ export function Pricing() {
               </ul>
             </CardContent>
             <CardFooter>
-              <Link href="/home" className="w-full">
+              <Link href="/" className="w-full">
                 <Button variant="integration" className="w-full">
                   Upgrade to Pro
                 </Button>

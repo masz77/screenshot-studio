@@ -13,7 +13,7 @@ export function getStatusMessage(progress: number): string {
 
 export function ImageExportProgressView({ progress, format }: { progress: number; format: ExportFormat }) {
   const statusMessage = useMemo(() => getStatusMessage(progress), [progress]);
-  const formatLabel = format === "jpeg" ? "JPEG" : "PNG";
+  const formatLabel = format === "jpeg" ? "JPEG" : format === "webp" ? "WebP" : "PNG";
 
   return (
     <div className="flex flex-col items-center py-8 space-y-6">

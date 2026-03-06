@@ -1,23 +1,15 @@
+import Image from "next/image";
 import { Navigation } from "./Navigation";
 import { Hero } from "./Hero";
 import { HowItWorks } from "./HowItWorks";
-import { Features } from "./Features";
 import { Footer } from "./Footer";
-import { MasonryGrid } from "./MasonryGrid";
 import { FAQ } from "./FAQ";
-import { SponsorButton } from "@/components/SponsorButton";
 import { VideoTestimonials } from "./VideoTestimonials";
 import { FinalCTA } from "./FinalCTA";
 import { StructuredData } from "./StructuredData";
 import { ValueProposition } from "./ValueProposition";
-import { Marquee } from "./Marquee";
 import { BackedBy } from "./BackedBy";
-
-interface Feature {
-  title: string;
-  description: string;
-  icon?: string;
-}
+import { MasonryGrid } from "./MasonryGrid";
 
 interface HowItWorksStep {
   step: number;
@@ -39,7 +31,7 @@ interface LandingPageProps {
   heroDescription: string;
   ctaLabel?: string;
   ctaHref?: string;
-  features: Feature[];
+  features?: { title: string; description: string; icon?: string }[];
   featuresTitle?: string;
   howItWorks?: HowItWorksStep[];
   brandName?: string;
@@ -57,15 +49,12 @@ export function LandingPage({
   heroSubtitle,
   heroDescription,
   ctaLabel = "Start Creating",
-  ctaHref = "/home",
-  features,
-  featuresTitle,
+  ctaHref = "/",
   howItWorks,
   brandName = "Screenshot Studio",
   videoTestimonials,
   videoTestimonialsTitle,
   valueProposition,
-  marqueeText,
 }: LandingPageProps) {
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -81,18 +70,32 @@ export function LandingPage({
         ctaHref={ctaHref}
       />
 
+      {/* Hero Screenshot */}
+      <section className="pb-20 px-6">
+        <div className="max-w-5xl mx-auto">
+          <Image
+            src="/og.png"
+            alt="Screenshot Studio editor preview"
+            width={1200}
+            height={630}
+            className="w-full h-auto rounded-xl border border-border/50"
+            priority
+          />
+        </div>
+      </section>
+
       <BackedBy />
 
-      <MasonryGrid />
-
-      {/* Value Proposition Section */}
       <ValueProposition
         eyebrow={valueProposition?.eyebrow}
         headline={valueProposition?.headline}
       />
 
-      {/* Marquee Section */}
-      <Marquee text={marqueeText} />
+      <MasonryGrid />
+
+      {howItWorks && howItWorks.length > 0 && (
+        <HowItWorks steps={howItWorks} title="How It Works" />
+      )}
 
       {videoTestimonials && videoTestimonials.length > 0 && (
         <VideoTestimonials
@@ -100,12 +103,6 @@ export function LandingPage({
           title={videoTestimonialsTitle}
         />
       )}
-
-      {howItWorks && howItWorks.length > 0 && (
-        <HowItWorks steps={howItWorks} title="How It Works" />
-      )}
-
-      <Features features={features} title={featuresTitle} />
 
       <FAQ />
 
@@ -117,8 +114,6 @@ export function LandingPage({
       />
 
       <Footer brandName={brandName} />
-
-      <SponsorButton variant="floating" />
     </div>
   );
 }

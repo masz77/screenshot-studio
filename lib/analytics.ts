@@ -73,7 +73,7 @@ export function resetUser(): void {
 }
 
 // =============================================================================
-// Image Upload Events
+// Image Upload
 // =============================================================================
 
 export function trackImageUpload(source: 'file' | 'paste' | 'drop' | 'url', fileSize?: number): void {
@@ -83,20 +83,12 @@ export function trackImageUpload(source: 'file' | 'paste' | 'drop' | 'url', file
   });
 }
 
-export function trackImageRemove(): void {
-  trackEvent('image_remove', {});
-}
-
 // =============================================================================
 // Export Events
 // =============================================================================
 
 export function trackExportStart(format: string, quality: string, scale: number): void {
-  trackEvent('export_start', {
-    format,
-    quality,
-    scale,
-  });
+  trackEvent('export_start', { format, quality, scale });
 }
 
 export function trackExportComplete(
@@ -106,117 +98,57 @@ export function trackExportComplete(
   fileSizeKb: number,
   durationMs: number
 ): void {
-  trackEvent('export_complete', {
-    format,
-    quality,
-    scale,
-    file_size_kb: fileSizeKb,
-    duration_ms: durationMs,
-  });
+  trackEvent('export_complete', { format, quality, scale, file_size_kb: fileSizeKb, duration_ms: durationMs });
 }
 
 export function trackExportError(format: string, error: string): void {
-  trackEvent('export_error', {
-    format,
-    error: error.substring(0, 100),
-  });
+  trackEvent('export_error', { format, error: error.substring(0, 100) });
 }
 
 export function trackCopyToClipboard(success: boolean): void {
-  trackEvent('copy_to_clipboard', {
-    success,
-  });
+  trackEvent('copy_to_clipboard', { success });
 }
 
 // =============================================================================
-// Background Events
+// Feature Usage — high-level actions that help understand what people use
 // =============================================================================
 
 export function trackBackgroundChange(
   type: 'gradient' | 'solid' | 'image' | 'transparent',
   value?: string
 ): void {
-  trackEvent('background_change', {
-    type,
-    value: value?.substring(0, 50) || '',
-  });
+  trackEvent('background_change', { type, value: value?.substring(0, 50) || '' });
 }
-
-// =============================================================================
-// Effect Events
-// =============================================================================
 
 export function trackEffectApply(
   effectType: 'shadow' | 'border' | 'radius' | 'blur' | 'noise' | 'filter' | '3d_transform',
   value?: string | number
 ): void {
-  trackEvent('effect_apply', {
-    effect_type: effectType,
-    value: String(value || '').substring(0, 50),
-  });
+  trackEvent('effect_apply', { effect_type: effectType, value: String(value || '').substring(0, 50) });
 }
 
 export function trackFrameApply(frameType: string): void {
-  trackEvent('frame_apply', {
-    frame_type: frameType,
-  });
+  trackEvent('frame_apply', { frame_type: frameType });
 }
-
-// =============================================================================
-// Preset Events
-// =============================================================================
 
 export function trackPresetApply(presetId: string, presetName: string): void {
-  trackEvent('preset_apply', {
-    preset_id: presetId,
-    preset_name: presetName.substring(0, 50),
-  });
+  trackEvent('preset_apply', { preset_id: presetId, preset_name: presetName.substring(0, 50) });
 }
-
-// =============================================================================
-// Overlay Events
-// =============================================================================
 
 export function trackOverlayAdd(overlayType: 'text' | 'image' | 'sticker'): void {
-  trackEvent('overlay_add', {
-    overlay_type: overlayType,
-  });
+  trackEvent('overlay_add', { overlay_type: overlayType });
 }
-
-export function trackOverlayRemove(overlayType: 'text' | 'image' | 'sticker'): void {
-  trackEvent('overlay_remove', {
-    overlay_type: overlayType,
-  });
-}
-
-// =============================================================================
-// Aspect Ratio Events
-// =============================================================================
 
 export function trackAspectRatioChange(ratio: string): void {
-  trackEvent('aspect_ratio_change', {
-    ratio,
-  });
+  trackEvent('aspect_ratio_change', { ratio });
+}
+
+export function trackAnimationClipAdd(presetId: string, presetName: string, duration: number): void {
+  trackEvent('animation_clip_add', { preset_id: presetId, preset_name: presetName.substring(0, 50), duration_ms: duration });
 }
 
 // =============================================================================
-// Feature Discovery Events
-// =============================================================================
-
-export function trackFeatureClick(feature: string): void {
-  trackEvent('feature_click', {
-    feature,
-  });
-}
-
-export function trackTabChange(tab: string): void {
-  trackEvent('tab_change', {
-    tab,
-  });
-}
-
-// =============================================================================
-// Session Events
+// Session & Navigation
 // =============================================================================
 
 export function trackSessionStart(): void {
@@ -229,93 +161,14 @@ export function trackEditorOpen(): void {
   trackEvent('editor_open', {});
 }
 
+export function trackCTAClick(location: string, label: string): void {
+  trackEvent('cta_click', { location, label: label.substring(0, 50) });
+}
+
 // =============================================================================
-// Error Events
+// Errors
 // =============================================================================
 
 export function trackError(errorType: string, message: string): void {
-  trackEvent('error', {
-    error_type: errorType,
-    message: message.substring(0, 200),
-  });
-}
-
-// =============================================================================
-// Animation Clip Events
-// =============================================================================
-
-export function trackAnimationClipAdd(presetId: string, presetName: string, duration: number): void {
-  trackEvent('animation_clip_add', {
-    preset_id: presetId,
-    preset_name: presetName.substring(0, 50),
-    duration_ms: duration,
-  });
-}
-
-export function trackAnimationClipRemove(clipId: string): void {
-  trackEvent('animation_clip_remove', {
-    clip_id: clipId,
-  });
-}
-
-export function trackAnimationPlay(): void {
-  trackEvent('animation_play', {});
-}
-
-export function trackAnimationPause(): void {
-  trackEvent('animation_pause', {});
-}
-
-// =============================================================================
-// Timeline Events
-// =============================================================================
-
-export function trackTimelineOpen(): void {
-  trackEvent('timeline_open', {});
-}
-
-export function trackTimelineClose(): void {
-  trackEvent('timeline_close', {});
-}
-
-export function trackTimelinePlayback(action: 'play' | 'pause' | 'skip_start' | 'skip_end' | 'toggle_loop'): void {
-  trackEvent('timeline_playback', {
-    action,
-  });
-}
-
-// =============================================================================
-// Landing Page CTA Events
-// =============================================================================
-
-export function trackCTAClick(location: string, label: string): void {
-  trackEvent('cta_click', {
-    location,
-    label: label.substring(0, 50),
-  });
-}
-
-// =============================================================================
-// Filter Events
-// =============================================================================
-
-export function trackFilterChange(filterType: string, value: number): void {
-  trackEvent('filter_change', {
-    filter_type: filterType,
-    value,
-  });
-}
-
-// =============================================================================
-// Slide Events
-// =============================================================================
-
-export function trackSlideAdd(count: number): void {
-  trackEvent('slide_add', {
-    count,
-  });
-}
-
-export function trackSlideRemove(): void {
-  trackEvent('slide_remove', {});
+  trackEvent('error', { error_type: errorType, message: message.substring(0, 200) });
 }

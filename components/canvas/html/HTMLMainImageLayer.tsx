@@ -42,7 +42,11 @@ interface HTMLMainImageLayerProps {
   setSelectedOverlayId: (id: string | null) => void;
   setSelectedTextId: (id: string | null) => void;
   setScreenshot: (updates: Partial<HTMLMainImageLayerProps['screenshot']>) => void;
+  onDragStateChange?: (isDragging: boolean) => void;
+  onRemoveImage?: () => void;
 }
+
+const SNAP_THRESHOLD = 6;
 
 /**
  * Builds CSS filter string from imageFilters
@@ -149,12 +153,16 @@ export function HTMLMainImageLayer({
   setSelectedOverlayId,
   setSelectedTextId,
   setScreenshot,
+  onDragStateChange,
+  onRemoveImage,
 }: HTMLMainImageLayerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [isResizing, setIsResizing] = useState(false);
+  const [isRotating, setIsRotating] = useState(false);
   const resizeStartRef = useRef<{ mouseX: number; mouseY: number; scale: number; handle: string } | null>(null);
+  const rotateStartRef = useRef<{ centerX: number; centerY: number; startAngle: number; startRotation: number } | null>(null);
 
   const imageFilter = useMemo(() => buildImageFilter(imageFilters), [imageFilters]);
   const shadowFilter = useMemo(() => buildDropShadowFilter(shadow), [shadow]);
@@ -166,11 +174,12 @@ export function HTMLMainImageLayer({
   const isPolaroid = frame.type === 'photograph';
 
   // Handle drag start
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    if (isResizing) return;
+  const handleMouseDown = useCallback((e: React.PointerEvent) => {
+    if (isResizing || isRotating) return;
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(true);
+    onDragStateChange?.(true);
     setDragStart({
       x: e.clientX - screenshot.offsetX,
       y: e.clientY - screenshot.offsetY,
@@ -178,7 +187,7 @@ export function HTMLMainImageLayer({
     setIsMainImageSelected(true);
     setSelectedOverlayId(null);
     setSelectedTextId(null);
-  }, [isResizing, screenshot.offsetX, screenshot.offsetY, setIsMainImageSelected, setSelectedOverlayId, setSelectedTextId]);
+  }, [isResizing, isRotating, screenshot.offsetX, screenshot.offsetY, setIsMainImageSelected, setSelectedOverlayId, setSelectedTextId, onDragStateChange]);
 
   // Handle resize start
   const handleResizeMouseDown = useCallback((e: React.MouseEvent, handle: string) => {
@@ -193,18 +202,24 @@ export function HTMLMainImageLayer({
     };
   }, []);
 
-  // Handle drag move
+  // Handle drag move with snap-to-center
   useEffect(() => {
     if (!isDragging) return;
 
     const handleMouseMove = (e: MouseEvent) => {
-      const newOffsetX = e.clientX - dragStart.x;
-      const newOffsetY = e.clientY - dragStart.y;
+      let newOffsetX = e.clientX - dragStart.x;
+      let newOffsetY = e.clientY - dragStart.y;
+
+      // Snap to center when close
+      if (Math.abs(newOffsetX) < SNAP_THRESHOLD) newOffsetX = 0;
+      if (Math.abs(newOffsetY) < SNAP_THRESHOLD) newOffsetY = 0;
+
       setScreenshot({ offsetX: newOffsetX, offsetY: newOffsetY });
     };
 
     const handleMouseUp = () => {
       setIsDragging(false);
+      onDragStateChange?.(false);
     };
 
     window.addEventListener('mousemove', handleMouseMove);
@@ -214,7 +229,7 @@ export function HTMLMainImageLayer({
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [isDragging, dragStart, setScreenshot]);
+  }, [isDragging, dragStart, setScreenshot, onDragStateChange]);
 
   // Handle resize move
   useEffect(() => {
@@ -257,6 +272,66 @@ export function HTMLMainImageLayer({
       window.removeEventListener('mouseup', handleMouseUp);
     };
   }, [isResizing]);
+
+  // Handle rotate start
+  const handleRotateMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsRotating(true);
+
+    const rect = containerRef.current?.getBoundingClientRect();
+    if (!rect) return;
+
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const startAngle = Math.atan2(e.clientY - centerY, e.clientX - centerX) * (180 / Math.PI);
+
+    rotateStartRef.current = {
+      centerX,
+      centerY,
+      startAngle,
+      startRotation: screenshot.rotation,
+    };
+  }, [screenshot.rotation]);
+
+  // Handle rotate move
+  useEffect(() => {
+    if (!isRotating) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const start = rotateStartRef.current;
+      if (!start) return;
+
+      const currentAngle = Math.atan2(e.clientY - start.centerY, e.clientX - start.centerX) * (180 / Math.PI);
+      const delta = currentAngle - start.startAngle;
+      const newRotation = Math.round(start.startRotation + delta);
+      setScreenshot({ rotation: newRotation });
+    };
+
+    const handleMouseUp = () => {
+      setIsRotating(false);
+      rotateStartRef.current = null;
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isRotating, setScreenshot]);
+
+  // Handle remove image
+  const handleRemoveImage = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (onRemoveImage) {
+      onRemoveImage();
+    } else {
+      useImageStore.getState().clearImage();
+    }
+  }, [onRemoveImage]);
 
   // Calculate position
   const centerX = canvasW / 2 + screenshot.offsetX;
@@ -488,7 +563,7 @@ export function HTMLMainImageLayer({
     <div
       ref={containerRef}
       data-main-image-layer="true"
-      onMouseDown={handleMouseDown}
+      onPointerDown={handleMouseDown}
       style={{
         position: 'absolute',
         left: `${left}px`,
@@ -561,6 +636,80 @@ export function HTMLMainImageLayer({
               />
             );
           })}
+
+          {/* Connector line from image to rotate handle */}
+          <div
+            data-resize-handle="true"
+            style={{
+              position: 'absolute',
+              top: '-35px',
+              left: '50%',
+              width: '1px',
+              height: '30px',
+              backgroundColor: 'rgba(59, 130, 246, 0.5)',
+              transform: 'translateX(-0.5px)',
+              pointerEvents: 'none',
+              zIndex: 20,
+            }}
+          />
+
+          {/* Rotate handle */}
+          <div
+            data-resize-handle="true"
+            onMouseDown={handleRotateMouseDown}
+            title="Rotate"
+            style={{
+              position: 'absolute',
+              top: '-52px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: '22px',
+              height: '22px',
+              backgroundColor: 'white',
+              border: '2px solid rgba(59, 130, 246, 0.8)',
+              borderRadius: '50%',
+              cursor: 'grab',
+              zIndex: 21,
+              pointerEvents: 'auto',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(59, 130, 246, 0.8)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21.5 2v6h-6" />
+              <path d="M21.34 13.72A10 10 0 1 1 18.57 4.62L21.5 8" />
+            </svg>
+          </div>
+
+          {/* Remove button */}
+          <div
+            data-resize-handle="true"
+            onClick={handleRemoveImage}
+            title="Remove image"
+            style={{
+              position: 'absolute',
+              top: '-52px',
+              left: '50%',
+              transform: 'translateX(calc(-50% + 30px))',
+              width: '22px',
+              height: '22px',
+              backgroundColor: 'white',
+              border: '2px solid rgba(239, 68, 68, 0.8)',
+              borderRadius: '50%',
+              cursor: 'pointer',
+              zIndex: 21,
+              pointerEvents: 'auto',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(239, 68, 68, 0.8)" strokeWidth="3" strokeLinecap="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </div>
         </>
       )}
     </div>
