@@ -190,7 +190,7 @@ export function HTMLMainImageLayer({
   }, [isResizing, isRotating, screenshot.offsetX, screenshot.offsetY, setIsMainImageSelected, setSelectedOverlayId, setSelectedTextId, onDragStateChange]);
 
   // Handle resize start
-  const handleResizeMouseDown = useCallback((e: React.MouseEvent, handle: string) => {
+  const handleResizeMouseDown = useCallback((e: React.PointerEvent, handle: string) => {
     e.preventDefault();
     e.stopPropagation();
     setIsResizing(true);
@@ -274,7 +274,7 @@ export function HTMLMainImageLayer({
   }, [isResizing]);
 
   // Handle rotate start
-  const handleRotateMouseDown = useCallback((e: React.MouseEvent) => {
+  const handleRotateMouseDown = useCallback((e: React.PointerEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setIsRotating(true);
@@ -617,7 +617,7 @@ export function HTMLMainImageLayer({
               <div
                 key={handle}
                 data-resize-handle="true"
-                onMouseDown={(e) => handleResizeMouseDown(e, handle)}
+                onPointerDown={(e) => handleResizeMouseDown(e, handle)}
                 style={{
                   position: 'absolute',
                   width: '10px',
@@ -656,7 +656,7 @@ export function HTMLMainImageLayer({
           {/* Rotate handle */}
           <div
             data-resize-handle="true"
-            onMouseDown={handleRotateMouseDown}
+            onPointerDown={handleRotateMouseDown}
             title="Rotate"
             style={{
               position: 'absolute',

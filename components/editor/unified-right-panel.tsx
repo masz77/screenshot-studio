@@ -25,6 +25,8 @@ import {
   AnnotateSection,
   ImageOverlaySection,
   DepthSection,
+  TweetImportSection,
+  CodeSnippetSection,
 } from './sections';
 import { cn } from '@/lib/utils';
 import { useImageStore } from '@/lib/store';
@@ -151,6 +153,8 @@ export function UnifiedRightPanel() {
 
           {contentKey === 'edit' && (
             <div className="space-y-2">
+              <TweetImportSection />
+              <CodeSnippetSection />
               <ImageOverlaySection />
               <AnnotateSection />
               <TextSection />

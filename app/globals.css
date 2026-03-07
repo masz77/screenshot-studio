@@ -273,9 +273,11 @@
     }
   }
 
-  input, textarea {
-    @apply text-base;
-    font-size: 16px;
+  /* Prevent iOS zoom on focus — only enforce 16px on mobile */
+  @media (max-width: 768px) {
+    input, textarea, select {
+      font-size: 16px;
+    }
   }
 
   * {

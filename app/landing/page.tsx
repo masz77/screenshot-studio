@@ -4,7 +4,7 @@ import { LandingPage } from "@/components/landing/LandingPage";
 export const metadata: Metadata = {
   title: "Screenshot Studio - Free Screenshot Editor Online",
   description:
-    "Free screenshot editor and mockup tool — beautify screenshots with 100+ gradient backgrounds, browser frames, 3D effects, animations, and video export. A better free alternative to Pika Style and Shots.so. No signup, no watermarks.",
+    "Free screenshot editor and mockup tool — beautify screenshots with 100+ gradient backgrounds, browser frames, 3D effects, animations, and video export. Import tweets and generate code snippets as images. A better free alternative to Pika Style and Shots.so. No signup, no watermarks.",
   keywords: [
     "screenshot editor online free",
     "free screenshot editor",
@@ -20,6 +20,8 @@ export const metadata: Metadata = {
     "browser window mockup",
     "screenshot wrapper online",
     "image presentation tool free",
+    "tweet to screenshot",
+    "code snippet to image",
   ],
   openGraph: {
     title: "Screenshot Studio - Free Screenshot Editor Online",
@@ -69,7 +71,7 @@ export default function LandingPageRoute() {
     <LandingPage
       heroTitle="Beautiful images."
       heroSubtitle="Zero effort."
-      heroDescription="The free browser editor that makes your screenshots look professional."
+      heroDescription="The free browser editor that makes your screenshots, tweets, and code snippets look professional."
       ctaLabel="Open Editor"
       ctaHref="/"
       howItWorks={howItWorks}

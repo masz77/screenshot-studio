@@ -28,6 +28,9 @@ export function StructuredData() {
           "20+ animation presets",
           "Video export (MP4, WebM, GIF)",
           "High-resolution image export",
+          "Tweet to screenshot",
+          "Code snippet generator",
+          "Annotation tools",
           "No signup required",
           "Browser-based editing",
         ],
@@ -109,6 +112,14 @@ export function StructuredData() {
             acceptedAnswer: {
               "@type": "Answer",
               text: "Screenshot Studio is purpose-built for making screenshots look professional. Unlike generic image editors, it offers one-click design presets, 100+ gradient backgrounds, 3D perspective transforms, animation timeline with 20+ presets, and video export — all free with no watermarks or account required.",
+            },
+          },
+          {
+            "@type": "Question",
+            name: "Can I create tweet screenshots or code snippet images?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: "Yes. Paste any tweet URL to capture it as a high-resolution screenshot with light or dark theme support. The code snippet generator supports 20+ syntax themes, 20 programming languages, and 10 monospace fonts — ideal for sharing beautiful code on social media.",
             },
           },
         ],

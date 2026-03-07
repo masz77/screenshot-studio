@@ -54,6 +54,11 @@ const defaultFAQs: FAQItem[] = [
       "Yes. Add multiple text layers with custom fonts, sizes, colors, and shadows. Plus decorative overlays like arrows and icons.",
   },
   {
+    question: "Can I create tweet screenshots or code snippets?",
+    answer:
+      "Yes. Paste any tweet URL to capture it as a high-res screenshot with light or dark theme. The code snippet generator supports 20+ syntax themes, 20 languages, and 10 mono fonts — perfect for sharing code on social media.",
+  },
+  {
     question: "Is my data stored on your servers?",
     answer:
       "No. Screenshot Studio runs entirely in your browser. Your images never leave your device unless you export them yourself.",

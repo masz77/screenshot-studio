@@ -145,7 +145,7 @@ function CanvasRenderer({ image }: { image: HTMLImageElement }) {
         // Don't deselect when interacting with editor panel controls
         // (sliders, inputs, buttons, etc.) so users can tweak selected items
         const el = target as HTMLElement;
-        if (el.closest?.('[data-slot="slider"], input, button, [role="button"], [data-radix-collection-item], .moveable-control-box')) return;
+        if (el.closest?.('[data-slot="slider"], input, button, [role="button"], [data-radix-collection-item], .moveable-control-box, [data-resize-handle]')) return;
 
         setSelectedOverlayId(null);
         setIsMainImageSelected(false);
@@ -323,9 +323,9 @@ function CanvasRenderer({ image }: { image: HTMLImageElement }) {
   // Child elements (image, overlays) call e.stopPropagation() on mousedown,
   // so this only fires when clicking empty canvas area.
   const handleCanvasDeselect = (e: React.PointerEvent) => {
-    // Don't deselect when interacting with Moveable handles (resize, rotate, drag)
+    // Don't deselect when interacting with resize/rotate handles
     const target = e.target as HTMLElement;
-    if (target.closest?.('.moveable-control-box')) return;
+    if (target.closest?.('.moveable-control-box, [data-resize-handle]')) return;
 
     setSelectedOverlayId(null);
     setIsMainImageSelected(false);

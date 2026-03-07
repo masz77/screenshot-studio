@@ -5,7 +5,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 export const metadata: Metadata = {
   title: "Free Screenshot Editor Online - Screenshot Studio",
   description:
-    "Free screenshot editor and mockup maker online — add gradient backgrounds, browser frames, shadows, 3D effects, and animations to your screenshots. Better free alternative to Pika Style and Shots.so. Export as PNG, JPG, or video. No signup needed.",
+    "Free screenshot editor and mockup maker online — add gradient backgrounds, browser frames, shadows, 3D effects, and animations to your screenshots. Import tweets and generate code snippets as images. Better free alternative to Pika Style and Shots.so. Export as PNG, JPG, or video. No signup needed.",
   keywords: [
     "screenshot editor online free",
     "free screenshot editor",
@@ -17,6 +17,9 @@ export const metadata: Metadata = {
     "browser mockup generator",
     "screenshot wrapper tool",
     "add background to screenshot free",
+    "tweet to screenshot",
+    "code snippet screenshot",
+    "code to image generator",
   ],
   alternates: {
     canonical: "/",

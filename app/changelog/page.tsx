@@ -38,6 +38,47 @@ interface ChangelogEntry {
 
 const changelog: ChangelogEntry[] = [
   {
+    date: "March 7, 2026",
+    version: "2.4.0",
+    title: "Tweet Import, Code Snippets & Overlay Improvements",
+    description:
+      "Import tweets as screenshots, generate beautiful code snippets, and enjoy improved overlay resize and depth controls.",
+    changes: [
+      {
+        type: "added",
+        text: "Tweet Import — paste any tweet URL to preview and capture it as a high-res screenshot with light/dark theme toggle",
+      },
+      {
+        type: "added",
+        text: "Code Snippet Generator — syntax-highlighted code screenshots with 20+ themes, 20 languages, 10 mono fonts, and customizable font size, border radius, and line numbers",
+      },
+      {
+        type: "added",
+        text: "Tweet dark theme uses X's \"Lights out\" pure black instead of the default blue \"Dim\" theme",
+      },
+      {
+        type: "improved",
+        text: "Image overlay resize and rotate handles now work reliably — fixed pointer-events and deselection issues with Moveable controls",
+      },
+      {
+        type: "improved",
+        text: "Depth section simplified — removed shadow overlays for a cleaner asset picker focused on 3D objects",
+      },
+      {
+        type: "improved",
+        text: "Main image resize handles no longer deselect when clicked, fixing the resize-on-click bug for code snippets and tweet screenshots",
+      },
+      {
+        type: "fixed",
+        text: "Input and dropdown padding no longer inflated by global font-size rule — scoped to mobile only for iOS zoom prevention",
+      },
+      {
+        type: "fixed",
+        text: "Overlay context toolbar replaced with a cleaner, universal design (layer toggle, duplicate, delete)",
+      },
+    ],
+  },
+  {
     date: "March 6, 2026",
     version: "2.3.0",
     title: "Annotation Tools, Text Overlay Revamp & UI Polish",
