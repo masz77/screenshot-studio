@@ -15,6 +15,8 @@ import {
   Delete02Icon,
   ArrowTurnBackwardIcon,
   ArrowTurnForwardIcon,
+  ArrowDown01Icon,
+  Download01Icon,
 } from 'hugeicons-react';
 import { useEditorStore, useImageStore } from '@/lib/store';
 import { useExport } from '@/hooks/useExport';
@@ -25,9 +27,10 @@ import {
   PopoverTrigger,
   PopoverContent,
 } from '@/components/ui/popover';
-import { ExportDialog } from '@/components/canvas/dialogs/ExportDialog';
 import { CopyProgressDialog } from '@/components/canvas/dialogs/CopyProgressDialog';
 import { ExportSlideshowDialog } from '@/lib/export-slideshow-dialog';
+import { ImageExportProgressView } from '@/components/canvas/dialogs/ImageProgressView';
+import { FormatSelector, QualityPresetSelector, ScaleSlider } from '@/components/export';
 import { cn } from '@/lib/utils';
 import { GitHubStarButton } from '@/components/ui/github-star-button';
 
@@ -35,8 +38,9 @@ export function EditorHeader() {
   const { screenshot } = useEditorStore();
   const { selectedAspectRatio, showTimeline, toggleTimeline, slides, uploadedImageUrl, clearImage, timeline, animationClips } = useImageStore();
   const [aspectRatioOpen, setAspectRatioOpen] = React.useState(false);
-  const [exportDialogOpen, setExportDialogOpen] = React.useState(false);
+  const [exportOpen, setExportOpen] = React.useState(false);
   const [exportSlideshowOpen, setExportSlideshowOpen] = React.useState(false);
+  const [exportError, setExportError] = React.useState<string | null>(null);
 
   const currentAspectRatio = aspectRatios.find((ar) => ar.id === selectedAspectRatio);
   const hasImage = !!screenshot.src;
@@ -80,6 +84,18 @@ export function EditorHeader() {
     updateFormat,
     updateQualityPreset,
   } = useExport(selectedAspectRatio);
+
+  const handleExport = async () => {
+    setExportError(null);
+    try {
+      await exportImage();
+      setExportOpen(false);
+    } catch (err) {
+      setExportError(err instanceof Error ? err.message : 'Export failed. Please try again.');
+    }
+  };
+
+  const formatLabel = exportSettings.format === 'jpeg' ? 'JPEG' : exportSettings.format === 'webp' ? 'WebP' : 'PNG';
 
   return (
     <>
@@ -130,39 +146,21 @@ export function EditorHeader() {
           )}
         </div>
 
-        {/* Center - Action Buttons */}
-        <div className="flex items-center gap-2">
-          <Button
-            onClick={() => setExportDialogOpen(true)}
-            disabled={!hasImage}
-            variant="outline"
-            className="h-9 justify-center gap-2 rounded-lg font-medium px-4"
-          >
-            <Download04Icon size={16} />
-            <span>Save</span>
-          </Button>
-
-          <Button
-            onClick={() => copyImage()}
-            disabled={!hasImage || isExporting || isCopying}
-            variant="outline"
-            className="h-9 justify-center gap-2 rounded-lg font-medium px-4"
-          >
-            <Copy01Icon size={16} />
-            <span>Copy</span>
-          </Button>
-
+        {/* Right - All actions */}
+        <div className="flex items-center gap-1.5">
+          {/* Canvas controls */}
           <Popover open={aspectRatioOpen} onOpenChange={setAspectRatioOpen}>
             <PopoverTrigger asChild>
               <Button
-                variant="outline"
-                className="h-9 justify-center gap-2 rounded-lg font-medium px-4 bg-muted/50"
+                variant="ghost"
+                size="sm"
+                className="h-8 gap-1.5 rounded-lg text-muted-foreground hover:text-foreground px-2.5"
               >
-                <AspectRatioIcon size={16} />
-                <span>{currentAspectRatio ? `${currentAspectRatio.width}:${currentAspectRatio.height}` : 'auto'}</span>
+                <AspectRatioIcon size={15} />
+                <span className="text-xs">{currentAspectRatio ? `${currentAspectRatio.width}:${currentAspectRatio.height}` : 'Auto'}</span>
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="p-0 w-[420px]" align="center" sideOffset={8} collisionPadding={16}>
+            <PopoverContent className="p-0 w-[420px]" align="end" sideOffset={8} collisionPadding={16}>
               <AspectRatioPicker onSelect={() => setAspectRatioOpen(false)} />
             </PopoverContent>
           </Popover>
@@ -170,16 +168,20 @@ export function EditorHeader() {
           <Button
             onClick={toggleTimeline}
             disabled={!hasImage}
-            variant="outline"
-            className={`h-9 justify-center gap-2 rounded-lg font-medium px-4 ${showTimeline ? 'bg-primary/15 border-primary/40 text-primary' : ''}`}
+            variant="ghost"
+            size="sm"
+            className={cn(
+              'h-8 gap-1.5 rounded-lg px-2.5 text-xs',
+              showTimeline
+                ? 'bg-primary/15 text-primary hover:bg-primary/20'
+                : 'text-muted-foreground hover:text-foreground'
+            )}
           >
-            <VideoReplayIcon size={16} />
+            <VideoReplayIcon size={15} />
             <span>Animate</span>
           </Button>
-        </div>
 
-        {/* Right - Slide controls + Social Links */}
-        <div className="flex items-center gap-2">
+          {/* Slide controls */}
           {slides.length > 0 && (
             <label className="cursor-pointer inline-flex">
               <input
@@ -193,7 +195,7 @@ export function EditorHeader() {
                   }
                 }}
               />
-              <span className="h-8 inline-flex items-center justify-center gap-2 rounded-lg bg-muted hover:bg-muted/80 text-foreground text-sm transition-all font-medium border border-border px-3">
+              <span className="h-8 inline-flex items-center justify-center gap-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent text-xs transition-all font-medium px-2.5">
                 <Add01Icon size={14} />
                 <span>Add Slide</span>
               </span>
@@ -204,26 +206,98 @@ export function EditorHeader() {
             <Button
               onClick={() => setExportSlideshowOpen(true)}
               size="sm"
-              className="h-8 justify-center gap-2 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground transition-all font-medium px-3"
+              className="h-8 gap-1.5 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-medium px-3"
             >
               <Video01Icon size={14} />
               <span>Export Video</span>
             </Button>
           )}
 
+          {/* Separator */}
+          {hasImage && <div className="w-px h-5 bg-border/60 mx-1" />}
+
+          {/* Export actions */}
+          <Button
+            onClick={() => copyImage()}
+            disabled={!hasImage || isExporting || isCopying}
+            variant="ghost"
+            size="sm"
+            className="h-8 gap-1.5 rounded-lg text-muted-foreground hover:text-foreground px-2.5 text-xs"
+          >
+            <Copy01Icon size={15} />
+            <span>Copy</span>
+          </Button>
+
+          <Popover open={exportOpen} onOpenChange={isExporting ? undefined : setExportOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                disabled={!hasImage}
+                size="sm"
+                className="h-8 gap-1.5 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-medium px-3"
+              >
+                <Download04Icon size={15} />
+                <span>Save</span>
+                <ArrowDown01Icon size={12} className="ml-0.5 opacity-70" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent
+              className="w-[340px] p-0"
+              align="end"
+              sideOffset={8}
+              collisionPadding={16}
+              onPointerDownOutside={isExporting ? (e) => e.preventDefault() : undefined}
+            >
+              {isExporting ? (
+                <div className="p-5">
+                  <p className="text-sm font-medium text-foreground mb-1">Exporting...</p>
+                  <p className="text-xs text-muted-foreground mb-4">Rendering your creation</p>
+                  <ImageExportProgressView progress={progress} format={exportSettings.format} />
+                </div>
+              ) : (
+                <div className="p-4 space-y-4">
+                  <FormatSelector format={exportSettings.format} onFormatChange={updateFormat} />
+                  <QualityPresetSelector
+                    qualityPreset={exportSettings.qualityPreset}
+                    format={exportSettings.format}
+                    onQualityPresetChange={updateQualityPreset}
+                  />
+                  <ScaleSlider scale={exportSettings.scale} onScaleChange={updateScale} />
+
+                  {exportError && (
+                    <div className="text-xs text-destructive bg-destructive/10 p-2.5 rounded-lg border border-destructive/20">
+                      {exportError}
+                    </div>
+                  )}
+
+                  <Button
+                    onClick={handleExport}
+                    disabled={isExporting}
+                    className="w-full h-10 text-sm font-semibold bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-all"
+                  >
+                    <Download01Icon size={16} className="mr-2" />
+                    Export as {formatLabel}
+                  </Button>
+                </div>
+              )}
+            </PopoverContent>
+          </Popover>
+
+          {/* Separator */}
+          {hasImage && <div className="w-px h-5 bg-border/60 mx-1" />}
+
           {hasImage && (
             <Button
               onClick={clearImage}
               variant="ghost"
               size="sm"
-              className="h-8 justify-center gap-2 px-3 text-muted-foreground hover:text-destructive"
+              className="h-8 gap-1.5 px-2.5 text-xs text-muted-foreground hover:text-destructive"
             >
               <Delete02Icon size={14} />
               <span>Remove</span>
             </Button>
           )}
 
-          <div className="flex items-center gap-1.5 ml-1">
+          <div className="flex items-center gap-1 ml-1">
             <GitHubStarButton compact />
             <a
               href="https://x.com/code_kartik"
@@ -238,20 +312,6 @@ export function EditorHeader() {
       </header>
 
       <CopyProgressDialog open={isCopying} progress={copyProgress} />
-
-      <ExportDialog
-        open={exportDialogOpen}
-        onOpenChange={setExportDialogOpen}
-        onExport={() => exportImage().then(() => {})}
-        scale={exportSettings.scale}
-        format={exportSettings.format}
-        qualityPreset={exportSettings.qualityPreset}
-        isExporting={isExporting}
-        progress={progress}
-        onScaleChange={updateScale}
-        onFormatChange={updateFormat}
-        onQualityPresetChange={updateQualityPreset}
-      />
 
       <ExportSlideshowDialog
         open={exportSlideshowOpen}

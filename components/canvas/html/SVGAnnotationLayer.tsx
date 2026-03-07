@@ -132,13 +132,14 @@ function DraggableHandle({ cx: x, cy: y, primary, onDrag }: {
 
 const DRAG_THRESHOLD = 3; // px before drag actually starts
 
-function AnnotationElement({ annotation, isSelected, isHovered, onSelect, onDragStart, onControlDrag, onHover }: {
+function AnnotationElement({ annotation, isSelected, isHovered, onSelect, onDragStart, onControlDrag, onEndpointDrag, onHover }: {
   annotation: AnnotationShape;
   isSelected: boolean;
   isHovered: boolean;
   onSelect: () => void;
   onDragStart: (e: React.PointerEvent) => void;
   onControlDrag?: (e: React.PointerEvent) => void;
+  onEndpointDrag?: (endpoint: 'p1' | 'p2', e: React.PointerEvent) => void;
   onHover: (hovering: boolean) => void;
 }) {
   if (!annotation.isVisible) return null;
@@ -190,10 +191,10 @@ function AnnotationElement({ annotation, isSelected, isHovered, onSelect, onDrag
           <line x1={x1} y1={y1} x2={x2} y2={y2} {...hitProps} />
           <line x1={x1} y1={y1} x2={end.x} y2={end.y} {...commonProps} fill="none" strokeLinecap="round" />
           <ArrowHead x={x2} y={y2} angle={angle} color={strokeColor} size={headSize} strokeW={strokeWidth} />
-          {isSelected && (
+          {isSelected && onEndpointDrag && (
             <>
-              <Handle cx={x1} cy={y1} primary={sel} />
-              <Handle cx={x2} cy={y2} primary={sel} />
+              <DraggableHandle cx={x1} cy={y1} primary={sel} onDrag={(e) => onEndpointDrag('p1', e)} />
+              <DraggableHandle cx={x2} cy={y2} primary={sel} onDrag={(e) => onEndpointDrag('p2', e)} />
             </>
           )}
         </g>
@@ -219,8 +220,12 @@ function AnnotationElement({ annotation, isSelected, isHovered, onSelect, onDrag
               <line x1={ctrlX} y1={ctrlY} x2={x2} y2={y2}
                 stroke={sel} strokeWidth={0.75} strokeDasharray="4 3" opacity={0.4}
                 style={{ pointerEvents: 'none' }} />
-              <Handle cx={x1} cy={y1} primary={sel} />
-              <Handle cx={x2} cy={y2} primary={sel} />
+              {onEndpointDrag && (
+                <>
+                  <DraggableHandle cx={x1} cy={y1} primary={sel} onDrag={(e) => onEndpointDrag('p1', e)} />
+                  <DraggableHandle cx={x2} cy={y2} primary={sel} onDrag={(e) => onEndpointDrag('p2', e)} />
+                </>
+              )}
               {onControlDrag ? (
                 <DraggableHandle cx={ctrlX} cy={ctrlY} primary={sel} onDrag={onControlDrag} />
               ) : (
@@ -236,10 +241,10 @@ function AnnotationElement({ annotation, isSelected, isHovered, onSelect, onDrag
         <g style={groupStyle}>
           <line x1={x1} y1={y1} x2={x2} y2={y2} {...hitProps} />
           <line x1={x1} y1={y1} x2={x2} y2={y2} {...commonProps} fill="none" strokeLinecap="round" />
-          {isSelected && (
+          {isSelected && onEndpointDrag && (
             <>
-              <Handle cx={x1} cy={y1} primary={sel} />
-              <Handle cx={x2} cy={y2} primary={sel} />
+              <DraggableHandle cx={x1} cy={y1} primary={sel} onDrag={(e) => onEndpointDrag('p1', e)} />
+              <DraggableHandle cx={x2} cy={y2} primary={sel} onDrag={(e) => onEndpointDrag('p2', e)} />
             </>
           )}
         </g>
@@ -260,10 +265,12 @@ function AnnotationElement({ annotation, isSelected, isHovered, onSelect, onDrag
               <rect x={rx} y={ry} width={rw} height={rh}
                 fill="none" stroke={sel} strokeWidth={1.5} strokeDasharray="6 3"
                 style={{ pointerEvents: 'none' }} />
-              <Handle cx={rx} cy={ry} primary={sel} />
-              <Handle cx={rx + rw} cy={ry} primary={sel} />
-              <Handle cx={rx} cy={ry + rh} primary={sel} />
-              <Handle cx={rx + rw} cy={ry + rh} primary={sel} />
+              {onEndpointDrag && (
+                <>
+                  <DraggableHandle cx={x1} cy={y1} primary={sel} onDrag={(e) => onEndpointDrag('p1', e)} />
+                  <DraggableHandle cx={x2} cy={y2} primary={sel} onDrag={(e) => onEndpointDrag('p2', e)} />
+                </>
+              )}
             </>
           )}
         </g>
@@ -283,10 +290,12 @@ function AnnotationElement({ annotation, isSelected, isHovered, onSelect, onDrag
               <ellipse cx={ecx} cy={ecy} rx={erx} ry={ery}
                 fill="none" stroke={sel} strokeWidth={1.5} strokeDasharray="6 3"
                 style={{ pointerEvents: 'none' }} />
-              <Handle cx={ecx - erx} cy={ecy} primary={sel} />
-              <Handle cx={ecx + erx} cy={ecy} primary={sel} />
-              <Handle cx={ecx} cy={ecy - ery} primary={sel} />
-              <Handle cx={ecx} cy={ecy + ery} primary={sel} />
+              {onEndpointDrag && (
+                <>
+                  <DraggableHandle cx={x1} cy={y1} primary={sel} onDrag={(e) => onEndpointDrag('p1', e)} />
+                  <DraggableHandle cx={x2} cy={y2} primary={sel} onDrag={(e) => onEndpointDrag('p2', e)} />
+                </>
+              )}
             </>
           )}
         </g>
@@ -523,6 +532,57 @@ export function SVGAnnotationLayer({
     };
   }, [ctrlDragging, canvasW, canvasH, updateAnnotation]);
 
+  // --- Dragging endpoint (resize) ---
+  const [endpointDragging, setEndpointDragging] = useState<{
+    annotationId: string;
+    endpoint: 'p1' | 'p2';
+    startX: number; startY: number;
+    origX: number; origY: number;
+  } | null>(null);
+
+  const handleEndpointDragStart = useCallback(
+    (annotationId: string, endpoint: 'p1' | 'p2', e: React.PointerEvent) => {
+      const annotation = annotations.find((a) => a.id === annotationId);
+      if (!annotation) return;
+      const pt = getSVGPoint(e);
+      setEndpointDragging({
+        annotationId,
+        endpoint,
+        startX: pt.x,
+        startY: pt.y,
+        origX: endpoint === 'p1' ? annotation.x1 : annotation.x2,
+        origY: endpoint === 'p1' ? annotation.y1 : annotation.y2,
+      });
+    },
+    [annotations, getSVGPoint]
+  );
+
+  useEffect(() => {
+    if (!endpointDragging) return;
+    const handleMove = (e: PointerEvent) => {
+      const svg = svgRef.current;
+      if (!svg) return;
+      const rect = svg.getBoundingClientRect();
+      const px = ((e.clientX - rect.left) / rect.width) * canvasW;
+      const py = ((e.clientY - rect.top) / rect.height) * canvasH;
+      const dx = px - endpointDragging.startX;
+      const dy = py - endpointDragging.startY;
+      const newX = endpointDragging.origX + dx;
+      const newY = endpointDragging.origY + dy;
+      const updates: Partial<AnnotationShape> = endpointDragging.endpoint === 'p1'
+        ? { x1: newX, y1: newY }
+        : { x2: newX, y2: newY };
+      updateAnnotation(endpointDragging.annotationId, updates);
+    };
+    const handleUp = () => setEndpointDragging(null);
+    window.addEventListener('pointermove', handleMove);
+    window.addEventListener('pointerup', handleUp);
+    return () => {
+      window.removeEventListener('pointermove', handleMove);
+      window.removeEventListener('pointerup', handleUp);
+    };
+  }, [endpointDragging, canvasW, canvasH, updateAnnotation]);
+
   // --- Keyboard ---
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -662,6 +722,7 @@ export function SVGAnnotationLayer({
               ? (e) => handleControlDragStart(annotation.id, e)
               : undefined
           }
+          onEndpointDrag={(endpoint, e) => handleEndpointDragStart(annotation.id, endpoint, e)}
           onHover={(h) => setHoveredId(h ? annotation.id : null)}
         />
       ))}

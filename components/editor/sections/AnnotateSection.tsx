@@ -76,10 +76,13 @@ const COLORS = [
   { value: '#f97316', name: 'Orange' },
   { value: '#eab308', name: 'Yellow' },
   { value: '#22c55e', name: 'Green' },
+  { value: '#06b6d4', name: 'Cyan' },
   { value: '#3b82f6', name: 'Blue' },
   { value: '#8b5cf6', name: 'Purple' },
   { value: '#ec4899', name: 'Pink' },
+  { value: '#f43f5e', name: 'Rose' },
   { value: '#171717', name: 'Black' },
+  { value: '#6b7280', name: 'Gray' },
   { value: '#ffffff', name: 'White' },
 ];
 
@@ -202,7 +205,7 @@ export function AnnotateSection() {
             {/* Color palette */}
             <div className="space-y-2">
               <span className="text-xs font-medium text-muted-foreground">Color</span>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 flex-wrap">
                 {COLORS.map(({ value, name }) => (
                   <button
                     key={value}
