@@ -10,7 +10,6 @@ import { MockupRenderer } from "@/components/mockups/MockupRenderer";
 import { calculateCanvasDimensions } from "./utils/canvas-dimensions";
 import { Perspective3DOverlay } from "./overlays/Perspective3DOverlay";
 import { useBackgroundImage, useOverlayImages } from "./hooks/useImageLoading";
-import { OverlayToolbar } from "./OverlayToolbar";
 import {
   HTMLCanvasRenderer,
   HTMLBackgroundLayer,
@@ -72,6 +71,10 @@ function CanvasRenderer({ image }: { image: HTMLImageElement }) {
     updateBlurRegion,
     removeBlurRegion,
   } = useImageStore();
+
+  // Split overlays into front (default) and back (behind main image)
+  const backOverlays = imageOverlays.filter((o) => o.layer === 'back');
+  const frontOverlays = imageOverlays.filter((o) => o.layer !== 'back');
 
   // Build frame from imageBorder directly (editorStore sync may be stale)
   const frame = {
@@ -142,7 +145,7 @@ function CanvasRenderer({ image }: { image: HTMLImageElement }) {
         // Don't deselect when interacting with editor panel controls
         // (sliders, inputs, buttons, etc.) so users can tweak selected items
         const el = target as HTMLElement;
-        if (el.closest?.('[data-slot="slider"], input, button, [role="button"], [data-radix-collection-item]')) return;
+        if (el.closest?.('[data-slot="slider"], input, button, [role="button"], [data-radix-collection-item], .moveable-control-box')) return;
 
         setSelectedOverlayId(null);
         setIsMainImageSelected(false);
@@ -319,7 +322,11 @@ function CanvasRenderer({ image }: { image: HTMLImageElement }) {
   // Deselect everything on mousedown on the canvas background.
   // Child elements (image, overlays) call e.stopPropagation() on mousedown,
   // so this only fires when clicking empty canvas area.
-  const handleCanvasDeselect = () => {
+  const handleCanvasDeselect = (e: React.PointerEvent) => {
+    // Don't deselect when interacting with Moveable handles (resize, rotate, drag)
+    const target = e.target as HTMLElement;
+    if (target.closest?.('.moveable-control-box')) return;
+
     setSelectedOverlayId(null);
     setIsMainImageSelected(false);
     setSelectedTextId(null);
@@ -403,6 +410,22 @@ function CanvasRenderer({ image }: { image: HTMLImageElement }) {
           imageFilters={imageFilters}
         />
 
+        {/* Back Image Overlays - rendered behind the main image */}
+        {backOverlays.length > 0 && (
+          <HTMLImageOverlayLayer
+            imageOverlays={backOverlays}
+            loadedOverlayImages={loadedOverlayImages}
+            selectedOverlayId={selectedOverlayId}
+            setSelectedOverlayId={setSelectedOverlayId}
+            setIsMainImageSelected={setIsMainImageSelected}
+            setSelectedTextId={setSelectedTextId}
+            updateImageOverlay={updateImageOverlay}
+            onDuplicate={handleDuplicateOverlay}
+            onDelete={handleDeleteOverlay}
+            zIndex={10}
+          />
+        )}
+
         {/* Main Image Layer - renders when no 3D transform and no mockups */}
         {!hasMockups && !has3DTransform && (
           <>
@@ -462,15 +485,17 @@ function CanvasRenderer({ image }: { image: HTMLImageElement }) {
           updateTextOverlay={updateTextOverlay}
         />
 
-        {/* Image Overlay Layer */}
+        {/* Front Image Overlay Layer */}
         <HTMLImageOverlayLayer
-          imageOverlays={imageOverlays}
+          imageOverlays={frontOverlays}
           loadedOverlayImages={loadedOverlayImages}
           selectedOverlayId={selectedOverlayId}
           setSelectedOverlayId={setSelectedOverlayId}
           setIsMainImageSelected={setIsMainImageSelected}
           setSelectedTextId={setSelectedTextId}
           updateImageOverlay={updateImageOverlay}
+          onDuplicate={handleDuplicateOverlay}
+          onDelete={handleDeleteOverlay}
         />
 
         {/* Blur Region Layer */}
@@ -505,20 +530,7 @@ function CanvasRenderer({ image }: { image: HTMLImageElement }) {
           }}
         />
 
-        {/* Floating toolbar for selected overlay */}
-        {selectedOverlay && (
-          <OverlayToolbar
-            position={{
-              x: selectedOverlay.position.x,
-              y: selectedOverlay.position.y - selectedOverlay.size / 2,
-            }}
-            overlay={selectedOverlay}
-            onDelete={handleDeleteOverlay}
-            onDuplicate={handleDuplicateOverlay}
-            onUpdate={(updates) => updateImageOverlay(selectedOverlay.id, updates)}
-            containerRef={canvasContainerRef}
-          />
-        )}
+        {/* Toolbar is now integrated inside HTMLImageOverlayLayer */}
       </HTMLCanvasRenderer>
     </div>
   );

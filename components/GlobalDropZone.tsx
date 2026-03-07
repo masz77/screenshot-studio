@@ -19,7 +19,7 @@ export function GlobalDropZone({ children }: GlobalDropZoneProps) {
   const pathname = usePathname();
 
   const { setScreenshot } = useEditorStore();
-  const { addImages } = useImageStore();
+  const { addImages, addImageOverlay } = useImageStore();
 
   const isEditorPage = pathname === '/';
 
@@ -50,19 +50,39 @@ export function GlobalDropZone({ children }: GlobalDropZoneProps) {
 
       // Small delay for the animation to play
       setTimeout(() => {
-        const imageUrl = URL.createObjectURL(imageFiles[0]);
-        addImages(imageFiles);
-        setScreenshot({ src: imageUrl });
+        const hasMainImage = !!useImageStore.getState().uploadedImageUrl;
 
-        if (!isEditorPage) {
-          router.push('/');
+        if (isEditorPage && hasMainImage) {
+          // Add as overlay images on top of existing canvas
+          imageFiles.forEach((file) => {
+            const url = URL.createObjectURL(file);
+            addImageOverlay({
+              src: url,
+              position: { x: 200 + Math.random() * 100, y: 200 + Math.random() * 100 },
+              size: 250,
+              rotation: 0,
+              opacity: 1,
+              flipX: false,
+              flipY: false,
+              isVisible: true,
+              isCustom: true,
+            });
+          });
+        } else {
+          const imageUrl = URL.createObjectURL(imageFiles[0]);
+          addImages(imageFiles);
+          setScreenshot({ src: imageUrl });
+
+          if (!isEditorPage) {
+            router.push('/');
+          }
         }
 
         setIsProcessing(false);
         setIsDraggingOver(false);
       }, 300);
     },
-    [validateFile, addImages, setScreenshot, isEditorPage, router]
+    [validateFile, addImages, addImageOverlay, setScreenshot, isEditorPage, router]
   );
 
   // Global drag events

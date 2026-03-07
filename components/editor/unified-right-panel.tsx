@@ -12,6 +12,7 @@ import {
   Cancel01Icon,
   ArrowRight01Icon,
   RefreshIcon,
+  LayersLogoIcon,
 } from 'hugeicons-react';
 import {
   SettingsSection,
@@ -22,16 +23,19 @@ import {
   TextSection,
   TransformsGallery,
   AnnotateSection,
+  ImageOverlaySection,
+  DepthSection,
 } from './sections';
 import { cn } from '@/lib/utils';
 import { useImageStore } from '@/lib/store';
 import { AnimationPresetGallery } from '@/components/timeline/AnimationPresetGallery';
 
 
-type TabType = 'settings' | 'edit' | 'background' | 'transforms' | 'animate';
+type TabType = 'settings' | 'edit' | 'background' | 'transforms' | 'animate' | 'depth';
 
 const tabs: { id: TabType; icon: React.ReactNode; label: string }[] = [
   { id: 'edit', icon: <SlidersHorizontalIcon size={20} />, label: 'Edit' },
+  { id: 'depth', icon: <LayersLogoIcon size={20} />, label: 'Depth' },
   { id: 'background', icon: <ColorsIcon size={20} />, label: 'BG' },
   { id: 'settings', icon: <Settings02Icon size={20} />, label: 'Settings' },
   { id: 'transforms', icon: <RotateSquareIcon size={20} />, label: '3D' },
@@ -147,6 +151,7 @@ export function UnifiedRightPanel() {
 
           {contentKey === 'edit' && (
             <div className="space-y-2">
+              <ImageOverlaySection />
               <AnnotateSection />
               <TextSection />
               <EditSection />
@@ -154,6 +159,8 @@ export function UnifiedRightPanel() {
               <ShadowSection />
             </div>
           )}
+
+          {contentKey === 'depth' && <DepthSection />}
 
           {contentKey === 'background' && (
             <div className="space-y-2">

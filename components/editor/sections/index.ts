@@ -9,3 +9,5 @@ export { ShadowSection } from './ShadowSection';
 export { BackgroundSection } from './BackgroundSection';
 export { TextSection } from './TextSection';
 export { AnnotateSection } from './AnnotateSection';
+export { ImageOverlaySection } from './ImageOverlaySection';
+export { DepthSection } from './DepthSection';

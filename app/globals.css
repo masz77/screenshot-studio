@@ -333,4 +333,13 @@
   .animate-marquee:hover {
     animation-play-state: paused;
   }
+
+}
+
+/* Moveable control box — must be outside @layer base so it isn't
+   de-prioritised by Tailwind v4's cascade layers. The parent container
+   has pointer-events:none; this ensures the handles stay interactive. */
+.moveable-control-box,
+.moveable-control-box * {
+  pointer-events: auto !important;
 }

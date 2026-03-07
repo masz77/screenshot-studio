@@ -73,6 +73,7 @@ export interface ImageOverlay {
   flipY: boolean;
   isVisible: boolean;
   isCustom?: boolean; // Whether it's a custom uploaded overlay
+  layer?: 'front' | 'back'; // Render in front of or behind the main image
 }
 
 export interface BlurRegion {
@@ -648,8 +649,9 @@ export interface ImageState {
   clearBlurRegions: () => void;
 
   // UI State
-  activeRightPanelTab: 'settings' | 'edit' | 'background' | 'transforms' | 'animate';
-  setActiveRightPanelTab: (tab: 'settings' | 'edit' | 'background' | 'transforms' | 'animate') => void;
+  activeRightPanelTab: 'settings' | 'edit' | 'background' | 'transforms' | 'animate' | 'depth';
+  setActiveRightPanelTab: (tab: 'settings' | 'edit' | 'background' | 'transforms' | 'animate' | 'depth') => void;
+  reorderImageOverlay: (id: string, direction: 'up' | 'down' | 'top' | 'bottom') => void;
 }
 
 export const useImageStore = create<ImageState>()(
@@ -1072,6 +1074,35 @@ export const useImageStore = create<ImageState>()(
 
     clearImageOverlays: () => {
       set({ imageOverlays: [] });
+    },
+
+    reorderImageOverlay: (id, direction) => {
+      set((state) => {
+        const overlays = [...state.imageOverlays];
+        const index = overlays.findIndex((o) => o.id === id);
+        if (index === -1) return state;
+
+        let newIndex: number;
+        switch (direction) {
+          case 'up':
+            newIndex = Math.min(overlays.length - 1, index + 1);
+            break;
+          case 'down':
+            newIndex = Math.max(0, index - 1);
+            break;
+          case 'top':
+            newIndex = overlays.length - 1;
+            break;
+          case 'bottom':
+            newIndex = 0;
+            break;
+        }
+
+        if (newIndex === index) return state;
+        const [item] = overlays.splice(index, 1);
+        overlays.splice(newIndex, 0, item);
+        return { imageOverlays: overlays };
+      });
     },
 
     addMockup: (mockup) => {

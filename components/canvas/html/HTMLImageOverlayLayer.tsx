@@ -1,7 +1,17 @@
 'use client';
 
-import { useRef, useState, useCallback, useEffect, useMemo } from 'react';
+import { useRef, useCallback, useMemo, useState } from 'react';
+import Moveable from 'react-moveable';
 import type { ImageOverlay } from '@/lib/store';
+import { cn } from '@/lib/utils';
+import {
+  Delete02Icon,
+  Copy01Icon,
+  LayerSendToBackIcon,
+  LayerBringToFrontIcon,
+} from 'hugeicons-react';
+
+// ── Types ────────────────────────────────────────────────────────────────────
 
 interface HTMLImageOverlayLayerProps {
   imageOverlays: ImageOverlay[];
@@ -11,177 +21,78 @@ interface HTMLImageOverlayLayerProps {
   setIsMainImageSelected: (selected: boolean) => void;
   setSelectedTextId: (id: string | null) => void;
   updateImageOverlay: (id: string, updates: Partial<ImageOverlay>) => void;
+  onDuplicate?: (id: string) => void;
+  onDelete?: (id: string) => void;
+  zIndex?: number;
 }
 
-interface DraggableImageProps {
-  overlay: ImageOverlay;
-  overlayImg: HTMLImageElement;
-  isSelected: boolean;
-  onSelect: () => void;
-  onUpdate: (updates: Partial<ImageOverlay>) => void;
-}
+// ── Single overlay element ───────────────────────────────────────────────────
 
-function DraggableImage({
+function OverlayElement({
   overlay,
   overlayImg,
-  isSelected,
   onSelect,
-  onUpdate,
-}: DraggableImageProps) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-  const [initialPos, setInitialPos] = useState({ x: 0, y: 0 });
-  const [isResizing, setIsResizing] = useState(false);
-  const resizeStartRef = useRef<{ mouseX: number; mouseY: number; size: number; handle: string } | null>(null);
-
-  // Check if it's a shadow overlay (decorative, non-interactive)
-  const isShadow = useMemo(() =>
-    typeof overlay.src === 'string' && overlay.src.includes('overlay-shadow'),
+  elRef,
+}: {
+  overlay: ImageOverlay;
+  overlayImg: HTMLImageElement;
+  onSelect: () => void;
+  elRef: (el: HTMLDivElement | null) => void;
+}) {
+  const isShadow = useMemo(
+    () => typeof overlay.src === 'string' && overlay.src.includes('overlay-shadow'),
     [overlay.src]
   );
 
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    if (isResizing) return;
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(true);
-    setDragStart({ x: e.clientX, y: e.clientY });
-    setInitialPos({ x: overlay.position.x, y: overlay.position.y });
-    onSelect();
-  }, [isResizing, overlay.position.x, overlay.position.y, onSelect]);
-
-  const handleResizeMouseDown = useCallback((e: React.MouseEvent, handle: string) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsResizing(true);
-    resizeStartRef.current = {
-      mouseX: e.clientX,
-      mouseY: e.clientY,
-      size: overlay.size,
-      handle,
-    };
-    onSelect();
-  }, [overlay.size, onSelect]);
-
-  useEffect(() => {
-    if (!isDragging) return;
-
-    const handleMouseMove = (e: PointerEvent) => {
-      const deltaX = e.clientX - dragStart.x;
-      const deltaY = e.clientY - dragStart.y;
-      const newX = initialPos.x + deltaX;
-      const newY = initialPos.y + deltaY;
-
-      onUpdate({ position: { x: newX, y: newY } });
-    };
-
-    const handleMouseUp = () => {
-      setIsDragging(false);
-    };
-
-    window.addEventListener('pointermove', handleMouseMove);
-    window.addEventListener('pointerup', handleMouseUp);
-
-    return () => {
-      window.removeEventListener('pointermove', handleMouseMove);
-      window.removeEventListener('pointerup', handleMouseUp);
-    };
-  }, [isDragging, dragStart, initialPos, onUpdate]);
-
-  // Handle resize move
-  useEffect(() => {
-    if (!isResizing) return;
-
-    const handleMouseMove = (e: PointerEvent) => {
-      const start = resizeStartRef.current;
-      if (!start) return;
-
-      const dx = e.clientX - start.mouseX;
-      const dy = e.clientY - start.mouseY;
-
-      let dirX = 1, dirY = 1;
-      if (start.handle === 'tl') { dirX = -1; dirY = -1; }
-      else if (start.handle === 'tr') { dirX = 1; dirY = -1; }
-      else if (start.handle === 'bl') { dirX = -1; dirY = 1; }
-
-      const diagonal = (dx * dirX + dy * dirY) / 2;
-      const newSize = Math.round(Math.min(800, Math.max(20, start.size + diagonal)));
-      onUpdate({ size: newSize });
-    };
-
-    const handleMouseUp = () => {
-      setIsResizing(false);
-      resizeStartRef.current = null;
-    };
-
-    window.addEventListener('pointermove', handleMouseMove);
-    window.addEventListener('pointerup', handleMouseUp);
-
-    return () => {
-      window.removeEventListener('pointermove', handleMouseMove);
-      window.removeEventListener('pointerup', handleMouseUp);
-    };
-  }, [isResizing, onUpdate]);
-
   if (!overlay.isVisible) return null;
 
-  // Build transform string
-  const transform = [
-    `rotate(${overlay.rotation}deg)`,
-    overlay.flipX ? 'scaleX(-1)' : '',
-    overlay.flipY ? 'scaleY(-1)' : '',
-  ].filter(Boolean).join(' ');
-
-  // Shadows are decorative and should cover the entire canvas
   if (isShadow) {
     return (
       <div
-        ref={ref}
-        data-image-overlay-id={overlay.id}
+        ref={elRef}
+        data-overlay-id={overlay.id}
         style={{
           position: 'absolute',
-          inset: 0, // Fill entire canvas
+          inset: 0,
           opacity: overlay.opacity,
           userSelect: 'none',
-          zIndex: 5, // Low z-index for shadows (above background, below image)
-          pointerEvents: 'none', // Shadows don't block interactions
+          zIndex: 5,
+          pointerEvents: 'none',
         }}
       >
         <img
           src={overlayImg.src}
           alt="Shadow overlay"
           draggable={false}
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover', // Cover entire canvas, may crop but ensures full coverage
-            display: 'block',
-          }}
+          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
         />
       </div>
     );
   }
 
+  const flipTransform = [
+    overlay.flipX ? 'scaleX(-1)' : '',
+    overlay.flipY ? 'scaleY(-1)' : '',
+  ].filter(Boolean).join(' ');
+
   return (
     <div
-      ref={ref}
-      data-image-overlay-id={overlay.id}
-      onMouseDown={handleMouseDown}
+      ref={elRef}
+      data-overlay-id={overlay.id}
+      onPointerDown={(e) => {
+        e.stopPropagation();
+        onSelect();
+      }}
       style={{
         position: 'absolute',
-        left: `${overlay.position.x}px`,
-        top: `${overlay.position.y}px`,
+        left: `${overlay.position.x - overlay.size / 2}px`,
+        top: `${overlay.position.y - overlay.size / 2}px`,
         width: `${overlay.size}px`,
         height: `${overlay.size}px`,
-        transform: `translate(-50%, -50%) ${transform}`,
-        transformOrigin: 'center center',
+        transform: `rotate(${overlay.rotation}deg)`,
         opacity: overlay.opacity,
-        cursor: isResizing ? 'default' : isDragging ? 'grabbing' : 'grab',
+        cursor: 'grab',
         userSelect: 'none',
-        outline: isSelected ? '2px solid rgba(59, 130, 246, 0.5)' : 'none',
-        outlineOffset: '2px',
-        zIndex: 200, // Higher z-index for interactive overlays
         pointerEvents: 'auto',
       }}
     >
@@ -194,49 +105,81 @@ function DraggableImage({
           height: '100%',
           objectFit: 'contain',
           display: 'block',
+          transform: flipTransform || undefined,
+          pointerEvents: 'none',
         }}
       />
-
-      {/* Resize handles — visible when selected, excluded from export */}
-      {isSelected && (
-        <>
-          {(['tl', 'tr', 'bl', 'br'] as const).map((handle) => {
-            const isTop = handle[0] === 't';
-            const isLeft = handle[1] === 'l';
-            const cursor = (handle === 'tl' || handle === 'br') ? 'nwse-resize' : 'nesw-resize';
-            return (
-              <div
-                key={handle}
-                data-resize-handle="true"
-                onMouseDown={(e) => handleResizeMouseDown(e, handle)}
-                style={{
-                  position: 'absolute',
-                  width: '10px',
-                  height: '10px',
-                  backgroundColor: 'white',
-                  border: '2px solid rgba(59, 130, 246, 0.8)',
-                  borderRadius: '2px',
-                  top: isTop ? '-5px' : undefined,
-                  bottom: isTop ? undefined : '-5px',
-                  left: isLeft ? '-5px' : undefined,
-                  right: isLeft ? undefined : '-5px',
-                  cursor,
-                  zIndex: 20,
-                  pointerEvents: 'auto',
-                }}
-              />
-            );
-          })}
-        </>
-      )}
     </div>
   );
 }
 
-/**
- * HTML/CSS-based image overlay layer that replaces Konva ImageOverlayLayer.
- * Renders image overlays with drag support.
- */
+// ── Context toolbar (minimal, bottom-anchored) ──────────────────────────────
+
+function ContextToolbar({
+  overlay,
+  onUpdate,
+  onDuplicate,
+  onDelete,
+}: {
+  overlay: ImageOverlay;
+  onUpdate: (updates: Partial<ImageOverlay>) => void;
+  onDuplicate: () => void;
+  onDelete: () => void;
+}) {
+  const isFront = (overlay.layer || 'front') === 'front';
+
+  return (
+    <div
+      className={cn(
+        'absolute left-1/2 -translate-x-1/2 bottom-0 translate-y-[calc(100%+8px)]',
+        'z-[999] flex items-center gap-1 px-1.5 py-1',
+        'bg-card/90 backdrop-blur-md rounded-lg',
+        'border border-border/50 shadow-lg',
+        'animate-in fade-in-0 zoom-in-95 duration-100'
+      )}
+      style={{ pointerEvents: 'auto' }}
+      onPointerDown={(e) => e.stopPropagation()}
+    >
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onUpdate({ layer: isFront ? 'back' : 'front' });
+        }}
+        className={cn(
+          'flex items-center justify-center w-7 h-7 rounded-md transition-colors duration-100',
+          'text-muted-foreground hover:text-foreground hover:bg-accent'
+        )}
+        title={isFront ? 'Send behind image' : 'Bring to front'}
+      >
+        {isFront ? <LayerSendToBackIcon size={15} /> : <LayerBringToFrontIcon size={15} />}
+      </button>
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onDuplicate();
+        }}
+        className="flex items-center justify-center w-7 h-7 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors duration-100"
+        title="Duplicate"
+      >
+        <Copy01Icon size={15} />
+      </button>
+      <div className="w-px h-4 bg-border/50" />
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onDelete();
+        }}
+        className="flex items-center justify-center w-7 h-7 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors duration-100"
+        title="Delete"
+      >
+        <Delete02Icon size={15} />
+      </button>
+    </div>
+  );
+}
+
+// ── Main layer component ─────────────────────────────────────────────────────
+
 export function HTMLImageOverlayLayer({
   imageOverlays,
   loadedOverlayImages,
@@ -245,12 +188,36 @@ export function HTMLImageOverlayLayer({
   setIsMainImageSelected,
   setSelectedTextId,
   updateImageOverlay,
+  onDuplicate,
+  onDelete,
+  zIndex = 200,
 }: HTMLImageOverlayLayerProps) {
-  const handleSelect = useCallback((id: string) => {
-    setSelectedOverlayId(id);
-    setIsMainImageSelected(false);
-    setSelectedTextId(null);
-  }, [setSelectedOverlayId, setIsMainImageSelected, setSelectedTextId]);
+  const overlayRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+  const [interacting, setInteracting] = useState(false);
+
+  const setOverlayRef = useCallback((id: string) => (el: HTMLDivElement | null) => {
+    if (el) {
+      overlayRefs.current.set(id, el);
+    } else {
+      overlayRefs.current.delete(id);
+    }
+  }, []);
+
+  const handleSelect = useCallback(
+    (id: string) => {
+      setSelectedOverlayId(id);
+      setIsMainImageSelected(false);
+      setSelectedTextId(null);
+    },
+    [setSelectedOverlayId, setIsMainImageSelected, setSelectedTextId]
+  );
+
+  const selectedOverlay = selectedOverlayId
+    ? imageOverlays.find((o) => o.id === selectedOverlayId)
+    : null;
+
+  const selectedEl = selectedOverlayId ? overlayRefs.current.get(selectedOverlayId) ?? null : null;
+  const isShadow = selectedOverlay?.src.includes('overlay-shadow');
 
   return (
     <div
@@ -258,26 +225,113 @@ export function HTMLImageOverlayLayer({
         position: 'absolute',
         inset: 0,
         pointerEvents: 'none',
-        zIndex: 200,
+        zIndex,
+        overflow: 'visible',
       }}
     >
       {imageOverlays.map((overlay) => {
         if (!overlay.isVisible) return null;
-
         const overlayImg = loadedOverlayImages[overlay.id];
         if (!overlayImg) return null;
 
         return (
-          <DraggableImage
+          <OverlayElement
             key={overlay.id}
             overlay={overlay}
             overlayImg={overlayImg}
-            isSelected={selectedOverlayId === overlay.id}
             onSelect={() => handleSelect(overlay.id)}
-            onUpdate={(updates) => updateImageOverlay(overlay.id, updates)}
+            elRef={setOverlayRef(overlay.id)}
           />
         );
       })}
+
+      {/* Moveable + Context toolbar for selected overlay */}
+      {selectedOverlay && selectedEl && !isShadow && (
+        <>
+          <Moveable
+            target={selectedEl}
+            draggable={true}
+            resizable={true}
+            rotatable={true}
+            keepRatio={true}
+            throttleDrag={0}
+            throttleResize={0}
+            throttleRotate={0}
+            renderDirections={['nw', 'ne', 'sw', 'se']}
+            rotationPosition={'top'}
+            origin={false}
+            edge={false}
+            onDragStart={() => setInteracting(true)}
+            onDrag={({ target, left, top }) => {
+              target.style.left = `${left}px`;
+              target.style.top = `${top}px`;
+            }}
+            onDragEnd={({ target }) => {
+              setInteracting(false);
+              const left = parseFloat(target.style.left);
+              const top = parseFloat(target.style.top);
+              const w = parseFloat(target.style.width);
+              const h = parseFloat(target.style.height);
+              updateImageOverlay(selectedOverlay.id, {
+                position: { x: left + w / 2, y: top + h / 2 },
+              });
+            }}
+            onResizeStart={() => setInteracting(true)}
+            onResize={({ target, width, height, drag }) => {
+              target.style.width = `${width}px`;
+              target.style.height = `${height}px`;
+              target.style.left = `${drag.left}px`;
+              target.style.top = `${drag.top}px`;
+            }}
+            onResizeEnd={({ target }) => {
+              setInteracting(false);
+              const w = parseFloat(target.style.width);
+              const h = parseFloat(target.style.height);
+              const left = parseFloat(target.style.left);
+              const top = parseFloat(target.style.top);
+              updateImageOverlay(selectedOverlay.id, {
+                size: Math.round(Math.max(w, h)),
+                position: { x: left + w / 2, y: top + h / 2 },
+              });
+            }}
+            onRotateStart={() => setInteracting(true)}
+            onRotate={({ target, transform }) => {
+              target.style.transform = transform;
+            }}
+            onRotateEnd={({ target }) => {
+              setInteracting(false);
+              const match = target.style.transform.match(/rotate\(([-\d.]+)deg\)/);
+              if (match) {
+                let deg = parseFloat(match[1]) % 360;
+                if (deg > 180) deg -= 360;
+                if (deg < -180) deg += 360;
+                updateImageOverlay(selectedOverlay.id, { rotation: Math.round(deg) });
+              }
+            }}
+          />
+
+          {/* Minimal context toolbar below the selected overlay */}
+          {!interacting && (
+            <div
+              style={{
+                position: 'absolute',
+                left: `${selectedOverlay.position.x - selectedOverlay.size / 2}px`,
+                top: `${selectedOverlay.position.y - selectedOverlay.size / 2}px`,
+                width: `${selectedOverlay.size}px`,
+                height: `${selectedOverlay.size}px`,
+                pointerEvents: 'none',
+              }}
+            >
+              <ContextToolbar
+                overlay={selectedOverlay}
+                onUpdate={(updates) => updateImageOverlay(selectedOverlay.id, updates)}
+                onDuplicate={() => onDuplicate?.(selectedOverlay.id)}
+                onDelete={() => onDelete?.(selectedOverlay.id)}
+              />
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }
