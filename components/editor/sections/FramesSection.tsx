@@ -83,31 +83,25 @@ export function FramesSection() {
       </div>
 
       {isArcFrame && (
-        <div className="space-y-3 pt-2">
-          <div className="space-y-2">
-            <label className="text-[10px] text-muted-foreground block">Width</label>
-            <Slider
-              value={[imageBorder.width]}
-              onValueChange={(value) => setImageBorder({ width: value[0], enabled: true })}
-              min={1}
-              max={20}
-              step={1}
-              label="Width"
-              valueDisplay={`${imageBorder.width}px`}
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-[10px] text-muted-foreground block">Opacity</label>
-            <Slider
-              value={[Math.round((imageBorder.opacity ?? (imageBorder.type === 'arc-light' ? 0.5 : 0.7)) * 100)]}
-              onValueChange={(value) => setImageBorder({ opacity: value[0] / 100, enabled: true })}
-              min={0}
-              max={100}
-              step={1}
-              label="Opacity"
-              valueDisplay={`${Math.round((imageBorder.opacity ?? (imageBorder.type === 'arc-light' ? 0.5 : 0.7)) * 100)}%`}
-            />
-          </div>
+        <div className="space-y-2 pt-2">
+          <Slider
+            value={[imageBorder.width]}
+            onValueChange={(value) => setImageBorder({ width: value[0], enabled: true })}
+            min={1}
+            max={20}
+            step={1}
+            label="Width"
+            valueDisplay={`${imageBorder.width}px`}
+          />
+          <Slider
+            value={[Math.round((imageBorder.opacity ?? (imageBorder.type === 'arc-light' ? 0.5 : 0.7)) * 100)]}
+            onValueChange={(value) => setImageBorder({ opacity: value[0] / 100, enabled: true })}
+            min={0}
+            max={100}
+            step={1}
+            label="Opacity"
+            valueDisplay={`${Math.round((imageBorder.opacity ?? (imageBorder.type === 'arc-light' ? 0.5 : 0.7)) * 100)}%`}
+          />
         </div>
       )}
 

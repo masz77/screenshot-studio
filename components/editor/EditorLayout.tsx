@@ -1,6 +1,8 @@
 "use client";
 
 import * as React from "react";
+import { LeftEditPanel } from "./LeftEditPanel";
+import { RightSettingsPanel } from "./RightSettingsPanel";
 import { UnifiedRightPanel } from "./unified-right-panel";
 import { EditorContent } from "./EditorContent";
 import { EditorCanvas } from "@/components/canvas/EditorCanvas";
@@ -18,8 +20,8 @@ import { trackEditorOpen } from "@/lib/analytics";
 
 function EditorMain() {
   const isMobile = useIsMobile();
-  const [rightPanelOpen, setRightPanelOpen] = React.useState(false);
-  const { timeline, uploadedImageUrl, slides, showTimeline } = useImageStore();
+  const [mobileSheetOpen, setMobileSheetOpen] = React.useState(false);
+  const { uploadedImageUrl, slides, showTimeline } = useImageStore();
 
   // enable autosave
   useAutosaveDraft();
@@ -50,7 +52,7 @@ function EditorMain() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => setRightPanelOpen(true)}
+            onClick={() => setMobileSheetOpen(true)}
             className="h-9 w-9"
           >
             <Settings02Icon size={20} />
@@ -60,7 +62,7 @@ function EditorMain() {
 
       <div className="flex-1 flex overflow-hidden">
         {/* Left Panel - Desktop */}
-        {!isMobile && <UnifiedRightPanel />}
+        {!isMobile && <LeftEditPanel />}
 
         {/* Center Canvas */}
         <div className="flex-1 flex flex-col overflow-hidden bg-background relative">
@@ -74,9 +76,12 @@ function EditorMain() {
           {hasContent && showTimeline && !isMobile && <TimelineEditor />}
         </div>
 
-        {/* Left Panel - Mobile Sheet */}
+        {/* Right Panel - Desktop */}
+        {!isMobile && <RightSettingsPanel />}
+
+        {/* Mobile Sheet - uses full UnifiedRightPanel with all tabs */}
         {isMobile && (
-          <Sheet open={rightPanelOpen} onOpenChange={setRightPanelOpen}>
+          <Sheet open={mobileSheetOpen} onOpenChange={setMobileSheetOpen}>
             <SheetContent
               side="left"
               className="w-[460px] p-0 sm:max-w-[460px]"

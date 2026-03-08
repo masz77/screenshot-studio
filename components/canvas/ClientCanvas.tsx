@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useEditorStore } from "@/lib/store";
 import { useImageStore } from "@/lib/store";
 import { generatePattern } from "@/lib/patterns";
@@ -111,6 +111,75 @@ function CanvasRenderer({ image }: { image: HTMLImageElement }) {
   const [selectedTextId, setSelectedTextId] = useState<string | null>(null);
   const [isDraggingMainImage, setIsDraggingMainImage] = useState(false);
   const [selectedBlurId, setSelectedBlurId] = useState<string | null>(null);
+
+  // 3D transform drag state — differentiates click (select) from drag (move)
+  const [is3DDragging, setIs3DDragging] = useState(false);
+  const [is3DPointerDown, setIs3DPointerDown] = useState(false);
+  const drag3DStartRef = useRef<{
+    clientX: number; clientY: number;
+    tX: number; tY: number;
+    moved: boolean;
+  } | null>(null);
+
+  const handle3DDragDown = useCallback((e: React.PointerEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const p3d = useImageStore.getState().perspective3D;
+    drag3DStartRef.current = {
+      clientX: e.clientX,
+      clientY: e.clientY,
+      tX: p3d.translateX,
+      tY: p3d.translateY,
+      moved: false,
+    };
+    setIs3DPointerDown(true);
+    // Select the image on click/drag start
+    setIsMainImageSelected(true);
+    setSelectedOverlayId(null);
+    setSelectedTextId(null);
+  }, []);
+
+  useEffect(() => {
+    if (!is3DPointerDown) return;
+
+    const DRAG_THRESHOLD = 3;
+
+    const handleMove = (e: PointerEvent) => {
+      const s = drag3DStartRef.current;
+      if (!s) return;
+
+      const dx = e.clientX - s.clientX;
+      const dy = e.clientY - s.clientY;
+
+      // Only start actual drag after threshold — clicks pass through
+      if (!s.moved && Math.sqrt(dx * dx + dy * dy) < DRAG_THRESHOLD) return;
+      s.moved = true;
+      setIs3DDragging(true);
+
+      const sensitivity = 0.15;
+      const newTX = Math.max(-30, Math.min(30, s.tX + dx * sensitivity));
+      const newTY = Math.max(-30, Math.min(30, s.tY + dy * sensitivity));
+
+      useImageStore.getState().setPerspective3D({
+        translateX: Math.round(newTX * 10) / 10,
+        translateY: Math.round(newTY * 10) / 10,
+      });
+    };
+
+    const handleUp = () => {
+      setIs3DDragging(false);
+      setIs3DPointerDown(false);
+      drag3DStartRef.current = null;
+    };
+
+    window.addEventListener('pointermove', handleMove);
+    window.addEventListener('pointerup', handleUp);
+
+    return () => {
+      window.removeEventListener('pointermove', handleMove);
+      window.removeEventListener('pointerup', handleUp);
+    };
+  }, [is3DPointerDown]);
 
   const containerWidth = responsiveDimensions.width;
   const containerHeight = responsiveDimensions.height;
@@ -409,6 +478,23 @@ function CanvasRenderer({ image }: { image: HTMLImageElement }) {
           imageOpacity={imageOpacity}
           imageFilters={imageFilters}
         />
+
+        {/* 3D Drag Layer - allows dragging image when 3D transforms are active */}
+        {has3DTransform && (
+          <div
+            onPointerDown={handle3DDragDown}
+            style={{
+              position: 'absolute',
+              left: 0,
+              top: 0,
+              width: `${canvasW}px`,
+              height: `${canvasH}px`,
+              zIndex: 16,
+              cursor: is3DDragging ? 'grabbing' : 'grab',
+              touchAction: 'none',
+            }}
+          />
+        )}
 
         {/* Back Image Overlays - rendered behind the main image */}
         {backOverlays.length > 0 && (

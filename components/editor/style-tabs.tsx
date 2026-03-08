@@ -63,47 +63,41 @@ export function StyleTabs() {
               Rounded
             </Button>
           </div>
-          <div className="p-3 rounded-lg bg-muted/50 border border-border/50">
-            <Slider
-              value={[borderRadius]}
-              onValueChange={(value) => setBorderRadius(value[0])}
-              min={0}
-              max={100}
-              step={1}
-              label="Radius"
-              valueDisplay={`${borderRadius}px`}
-            />
-          </div>
+          <Slider
+            value={[borderRadius]}
+            onValueChange={(value) => setBorderRadius(value[0])}
+            min={0}
+            max={100}
+            step={1}
+            label="Radius"
+            valueDisplay={`${borderRadius}px`}
+          />
         </div>
 
         <div className="space-y-3">
-          <div className="p-3 rounded-lg bg-muted/50 border border-border/50">
-            <Slider
-              value={[imageScale]}
-              onValueChange={(value) => setImageScale(value[0])}
-              min={10}
-              max={200}
-              step={1}
-              label="Image Size"
-              valueDisplay={`${imageScale}%`}
-            />
-          </div>
+          <Slider
+            value={[imageScale]}
+            onValueChange={(value) => setImageScale(value[0])}
+            min={10}
+            max={200}
+            step={1}
+            label="Image Size"
+            valueDisplay={`${imageScale}%`}
+          />
           <p className="text-xs text-muted-foreground">
             Adjust the size of the image (10% - 200%)
           </p>
         </div>
 
-        <div className="p-3 rounded-lg bg-muted/50 border border-border/50">
-          <Slider
-            value={[imageOpacity]}
-            onValueChange={(value) => setImageOpacity(value[0])}
-            min={0}
-            max={1}
-            step={0.01}
-            label="Image Opacity"
-            valueDisplay={`${Math.round(imageOpacity * 100)}%`}
-          />
-        </div>
+        <Slider
+          value={[imageOpacity]}
+          onValueChange={(value) => setImageOpacity(value[0])}
+          min={0}
+          max={1}
+          step={0.01}
+          label="Opacity"
+          valueDisplay={`${Math.round(imageOpacity * 100)}%`}
+        />
 
         <BorderControls />
 

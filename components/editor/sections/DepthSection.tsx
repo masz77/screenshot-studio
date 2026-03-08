@@ -487,28 +487,24 @@ function OverlayProperties({
 
   return (
     <div className="space-y-3">
-      {/* Size */}
-      <div className="space-y-1.5">
-        <span className="text-xs font-medium text-muted-foreground">Size</span>
+      {/* Sliders */}
+      <div className="space-y-2">
         <Slider
           value={[overlay.size]}
           onValueChange={(v) => onUpdate({ size: v[0] })}
           min={20}
           max={600}
           step={1}
+          label="Size"
           valueDisplay={`${overlay.size}px`}
         />
-      </div>
-
-      {/* Rotation */}
-      <div className="space-y-1.5">
-        <span className="text-xs font-medium text-muted-foreground">Rotation</span>
         <Slider
           value={[overlay.rotation]}
           onValueChange={(v) => onUpdate({ rotation: v[0] })}
           min={-180}
           max={180}
           step={1}
+          label="Rotation"
           valueDisplay={`${overlay.rotation}°`}
         />
         <div className="flex gap-1.5">
@@ -531,30 +527,22 @@ function OverlayProperties({
             <RotateRight01Icon size={13} /> +90
           </button>
         </div>
-      </div>
-
-      {/* Opacity */}
-      <div className="space-y-1.5">
-        <span className="text-xs font-medium text-muted-foreground">Opacity</span>
         <Slider
           value={[overlay.opacity]}
           onValueChange={(v) => onUpdate({ opacity: v[0] })}
           min={0}
           max={1}
           step={0.01}
+          label="Opacity"
           valueDisplay={`${Math.round(overlay.opacity * 100)}%`}
         />
-      </div>
-
-      {/* Blur */}
-      <div className="space-y-1.5">
-        <span className="text-xs font-medium text-muted-foreground">Blur</span>
         <Slider
           value={[overlay.blur ?? 0]}
           onValueChange={(v) => onUpdate({ blur: v[0] })}
           min={0}
           max={20}
           step={0.5}
+          label="Blur"
           valueDisplay={`${overlay.blur ?? 0}px`}
         />
       </div>

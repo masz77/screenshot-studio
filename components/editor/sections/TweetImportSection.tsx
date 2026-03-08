@@ -5,7 +5,7 @@ import { useImageStore } from '@/lib/store';
 import { SectionWrapper } from './SectionWrapper';
 import { cn } from '@/lib/utils';
 import { domToCanvas } from 'modern-screenshot';
-import { Loading03Icon } from 'hugeicons-react';
+import { Loading03Icon, Cancel01Icon, LinkSquare02Icon } from 'hugeicons-react';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -319,7 +319,6 @@ export function TweetImportSection() {
     (e: React.ClipboardEvent<HTMLInputElement>) => {
       const pasted = e.clipboardData.getData('text');
       if (parseTweetId(pasted)) {
-        // Let React update the input value first, then fetch
         setTimeout(() => fetchTweet(pasted), 0);
       }
     },
@@ -332,7 +331,6 @@ export function TweetImportSection() {
     setStatus('capturing');
 
     try {
-      // Wait for all images to be loaded
       const images = captureRef.current.querySelectorAll('img');
       await Promise.all(
         Array.from(images).map(
@@ -359,12 +357,9 @@ export function TweetImportSection() {
       if (blob) {
         const url = URL.createObjectURL(blob);
         setUploadedImageUrl(url, 'tweet-screenshot.png');
-        // Reset opacity and scale so the tweet renders at full visibility
         setImageOpacity(1);
         setImageScale(100);
-        // Set border radius to 24 for a polished rounded look on the canvas
         setBorderRadius(24);
-        // Reset form immediately
         setTweetData(null);
         setUrlInput('');
         setStatus('idle');
@@ -378,9 +373,10 @@ export function TweetImportSection() {
 
   return (
     <SectionWrapper title="Import Tweet" defaultOpen={false}>
-      <div className="space-y-2.5">
-        {/* URL input */}
-        <div className="flex gap-1.5">
+      <div className="space-y-3">
+        {/* URL input — integrated field with icon and button */}
+        <div className="relative">
+          <LinkSquare02Icon size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground/50" />
           <input
             type="text"
             value={urlInput}
@@ -393,70 +389,73 @@ export function TweetImportSection() {
               if (e.key === 'Enter') fetchTweet(urlInput);
             }}
             placeholder="Paste tweet URL or ID..."
-            className="flex-1 h-8 px-2.5 rounded-lg border border-border bg-muted text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/40"
+            className="w-full h-9 pl-8 pr-16 rounded-lg border border-border/50 bg-muted/50 text-xs text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/40 transition-colors"
           />
+          {urlInput && (
+            <button
+              onClick={() => { setUrlInput(''); setError(null); setTweetData(null); setStatus('idle'); }}
+              className="absolute right-[52px] top-1/2 -translate-y-1/2 p-0.5 text-muted-foreground/40 hover:text-muted-foreground transition-colors"
+            >
+              <Cancel01Icon size={12} />
+            </button>
+          )}
           <button
             onClick={() => fetchTweet(urlInput)}
             disabled={status === 'loading' || !urlInput.trim()}
-            className="h-8 px-3 rounded-lg bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 disabled:opacity-50 transition-colors whitespace-nowrap"
+            className="absolute right-1.5 top-1/2 -translate-y-1/2 h-6 px-2.5 rounded-md bg-primary text-primary-foreground text-[10px] font-semibold hover:bg-primary/90 disabled:opacity-40 transition-colors"
           >
             {status === 'loading' ? (
-              <Loading03Icon size={14} className="animate-spin" />
+              <Loading03Icon size={12} className="animate-spin" />
             ) : (
               'Fetch'
             )}
           </button>
         </div>
 
-        {error && <p className="text-[11px] text-destructive">{error}</p>}
+        {error && <p className="text-[10px] text-destructive">{error}</p>}
 
         {/* Loading skeleton */}
         {status === 'loading' && (
-          <div className="rounded-xl border border-border/50 bg-muted/50 p-4 animate-pulse">
-            <div className="flex gap-3 items-center">
-              <div className="w-10 h-10 rounded-full bg-border/50" />
-              <div className="flex-1 space-y-1.5">
-                <div className="h-3 w-24 rounded bg-border/50" />
-                <div className="h-2.5 w-16 rounded bg-border/50" />
+          <div className="rounded-lg border border-border/30 bg-muted/30 p-3 animate-pulse">
+            <div className="flex gap-2.5 items-center">
+              <div className="w-8 h-8 rounded-full bg-border/40" />
+              <div className="flex-1 space-y-1">
+                <div className="h-2.5 w-20 rounded bg-border/40" />
+                <div className="h-2 w-14 rounded bg-border/40" />
               </div>
             </div>
-            <div className="mt-3 space-y-1.5">
-              <div className="h-2.5 w-full rounded bg-border/50" />
-              <div className="h-2.5 w-3/4 rounded bg-border/50" />
+            <div className="mt-2.5 space-y-1">
+              <div className="h-2 w-full rounded bg-border/40" />
+              <div className="h-2 w-2/3 rounded bg-border/40" />
             </div>
           </div>
         )}
 
         {/* Tweet loaded */}
         {tweetData && status !== 'loading' && (
-          <div className="space-y-2">
+          <div className="space-y-2.5">
             {/* Theme toggle */}
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-                Preview
-              </span>
-              <div className="flex gap-0.5 p-0.5 rounded-md bg-muted border border-border/30">
-                {(['light', 'dark'] as const).map((t) => (
-                  <button
-                    key={t}
-                    onClick={() => setTweetTheme(t)}
-                    className={cn(
-                      'px-2 py-0.5 rounded text-[10px] font-medium transition-all',
-                      tweetTheme === t
-                        ? 'bg-background text-foreground shadow-sm'
-                        : 'text-muted-foreground hover:text-foreground'
-                    )}
-                  >
-                    {t.charAt(0).toUpperCase() + t.slice(1)}
-                  </button>
-                ))}
-              </div>
+            <div className="flex p-0.5 bg-muted/80 dark:bg-muted/50 rounded-md border border-border/20 w-fit">
+              {(['light', 'dark'] as const).map((t) => (
+                <button
+                  key={t}
+                  onClick={() => setTweetTheme(t)}
+                  className={cn(
+                    'px-3 py-1 rounded text-[10px] font-medium transition-all',
+                    tweetTheme === t
+                      ? 'bg-background dark:bg-accent text-foreground shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground'
+                  )}
+                >
+                  {t === 'light' ? 'Light' : 'Dark'}
+                </button>
+              ))}
             </div>
 
             {/* Capture area */}
             <div
               ref={captureRef}
-              className="overflow-hidden rounded-xl"
+              className="overflow-hidden rounded-lg border border-border/30"
               style={{ backgroundColor: tweetTheme === 'dark' ? '#000000' : '#ffffff' }}
             >
               <TweetCard tweet={tweetData} theme={tweetTheme} />
@@ -466,11 +465,11 @@ export function TweetImportSection() {
             <button
               onClick={handleAddToCanvas}
               disabled={status === 'capturing'}
-              className="w-full h-9 rounded-lg text-xs font-medium bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors flex items-center justify-center gap-1.5"
+              className="w-full h-8 rounded-lg text-[11px] font-semibold bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors flex items-center justify-center gap-1.5"
             >
               {status === 'capturing' ? (
                 <>
-                  <Loading03Icon size={14} className="animate-spin" />
+                  <Loading03Icon size={12} className="animate-spin" />
                   Adding...
                 </>
               ) : (
@@ -482,8 +481,8 @@ export function TweetImportSection() {
 
         {/* Hint when idle */}
         {status === 'idle' && !tweetData && !error && (
-          <p className="text-[10px] text-muted-foreground/60 leading-relaxed">
-            Paste any X/Twitter post URL to capture it as a screenshot with your chosen theme.
+          <p className="text-[10px] text-muted-foreground/50 leading-relaxed">
+            Paste any X/Twitter post URL to capture it as a screenshot.
           </p>
         )}
       </div>

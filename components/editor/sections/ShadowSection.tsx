@@ -31,87 +31,65 @@ export function ShadowSection() {
 
   return (
     <SectionWrapper title="Shadow" defaultOpen={true}>
-      {/* Blur */}
-      <div className="flex items-center gap-4">
-        <span className="text-sm text-muted-foreground w-14 shrink-0">Blur</span>
+      <div className="space-y-2">
         <Slider
           value={[imageShadow.blur]}
           onValueChange={(value) => setImageShadow({ blur: value[0], enabled: value[0] > 0 || imageShadow.offsetX !== 0 || imageShadow.offsetY !== 0 })}
           min={0}
           max={100}
           step={1}
-          className="flex-1"
+          label="Blur"
+          valueDisplay={imageShadow.blur}
         />
-        <span className="text-sm text-muted-foreground w-10 text-right tabular-nums">{imageShadow.blur}</span>
-      </div>
-
-      {/* Offset X */}
-      <div className="flex items-center gap-4">
-        <span className="text-sm text-muted-foreground w-14 shrink-0">X</span>
         <Slider
           value={[imageShadow.offsetX]}
           onValueChange={(value) => setImageShadow({ offsetX: value[0] })}
           min={-50}
           max={50}
           step={1}
-          className="flex-1"
+          label="X"
+          valueDisplay={imageShadow.offsetX}
         />
-        <span className="text-sm text-muted-foreground w-10 text-right tabular-nums">{imageShadow.offsetX}</span>
-      </div>
-
-      {/* Offset Y */}
-      <div className="flex items-center gap-4">
-        <span className="text-sm text-muted-foreground w-14 shrink-0">Y</span>
         <Slider
           value={[imageShadow.offsetY]}
           onValueChange={(value) => setImageShadow({ offsetY: value[0] })}
           min={-50}
           max={50}
           step={1}
-          className="flex-1"
+          label="Y"
+          valueDisplay={imageShadow.offsetY}
         />
-        <span className="text-sm text-muted-foreground w-10 text-right tabular-nums">{imageShadow.offsetY}</span>
-      </div>
-
-      {/* Spread */}
-      <div className="flex items-center gap-4">
-        <span className="text-sm text-muted-foreground w-14 shrink-0">Spread</span>
         <Slider
           value={[imageShadow.spread]}
           onValueChange={(value) => setImageShadow({ spread: value[0] })}
           min={0}
           max={50}
           step={1}
-          className="flex-1"
+          label="Spread"
+          valueDisplay={imageShadow.spread}
         />
-        <span className="text-sm text-muted-foreground w-10 text-right tabular-nums">{imageShadow.spread}</span>
-      </div>
-
-      {/* Opacity */}
-      <div className="flex items-center gap-4">
-        <span className="text-sm text-muted-foreground w-14 shrink-0">Opacity</span>
         <Slider
           value={[Math.round((imageShadow.opacity ?? 0.5) * 100)]}
           onValueChange={(value) => setImageShadow({ opacity: value[0] / 100 })}
           min={0}
           max={100}
           step={1}
-          className="flex-1"
+          label="Opacity"
+          valueDisplay={`${Math.round((imageShadow.opacity ?? 0.5) * 100)}%`}
         />
-        <span className="text-sm text-muted-foreground w-10 text-right tabular-nums">{Math.round((imageShadow.opacity ?? 0.5) * 100)}%</span>
-      </div>
 
-      {/* Color */}
-      <div className="flex items-center gap-4">
-        <span className="text-sm text-muted-foreground w-14 shrink-0">Color</span>
-        <div className="flex items-center gap-3">
-          <input
-            type="color"
-            value={getColorHex()}
-            onChange={(e) => handleColorChange(e.target.value)}
-            className="w-9 h-9 rounded-lg border border-border/60 cursor-pointer bg-transparent"
-          />
-          <span className="text-sm text-muted-foreground font-mono">{getColorHex()}</span>
+        {/* Color */}
+        <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-secondary dark:bg-background">
+          <span className="text-xs text-muted-foreground shrink-0">Color</span>
+          <div className="flex items-center gap-2 ml-auto">
+            <input
+              type="color"
+              value={getColorHex()}
+              onChange={(e) => handleColorChange(e.target.value)}
+              className="w-7 h-7 rounded-md border border-border/40 cursor-pointer bg-transparent"
+            />
+            <span className="text-xs text-muted-foreground font-mono">{getColorHex()}</span>
+          </div>
         </div>
       </div>
     </SectionWrapper>

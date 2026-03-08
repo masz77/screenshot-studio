@@ -25,15 +25,15 @@ export function SettingsSection() {
 
   const [filterTarget, setFilterTarget] = React.useState<FilterTarget>('foreground');
 
-  const foregroundFilters: { key: keyof ImageFilters; label: string; min: number; max: number; defaultValue: number }[] = [
-    { key: 'brightness', label: 'Brightness', min: 0, max: 200, defaultValue: 100 },
-    { key: 'contrast', label: 'Contrast', min: 0, max: 200, defaultValue: 100 },
-    { key: 'saturate', label: 'Saturation', min: 0, max: 200, defaultValue: 100 },
-    { key: 'grayscale', label: 'Grayscale', min: 0, max: 100, defaultValue: 0 },
-    { key: 'sepia', label: 'Sepia', min: 0, max: 100, defaultValue: 0 },
-    { key: 'hueRotate', label: 'Hue', min: 0, max: 360, defaultValue: 0 },
-    { key: 'blur', label: 'Blur', min: 0, max: 20, defaultValue: 0 },
-    { key: 'invert', label: 'Invert', min: 0, max: 100, defaultValue: 0 },
+  const foregroundFilters: { key: keyof ImageFilters; label: string; min: number; max: number; defaultValue: number; suffix: string }[] = [
+    { key: 'brightness', label: 'Brightness', min: 0, max: 200, defaultValue: 100, suffix: '' },
+    { key: 'contrast', label: 'Contrast', min: 0, max: 200, defaultValue: 100, suffix: '' },
+    { key: 'saturate', label: 'Saturation', min: 0, max: 200, defaultValue: 100, suffix: '' },
+    { key: 'grayscale', label: 'Grayscale', min: 0, max: 100, defaultValue: 0, suffix: '' },
+    { key: 'sepia', label: 'Sepia', min: 0, max: 100, defaultValue: 0, suffix: '' },
+    { key: 'hueRotate', label: 'Hue', min: 0, max: 360, defaultValue: 0, suffix: '°' },
+    { key: 'blur', label: 'Blur', min: 0, max: 20, defaultValue: 0, suffix: 'px' },
+    { key: 'invert', label: 'Invert', min: 0, max: 100, defaultValue: 0, suffix: '' },
   ];
 
   const isFiltersModified = Object.entries(imageFilters).some(([key, value]) => {
@@ -52,10 +52,9 @@ export function SettingsSection() {
     <>
       {/* Filters Section */}
       <SectionWrapper title="Filters" defaultOpen={true}>
-        <div className="space-y-4">
+        <div className="space-y-3">
           {/* Foreground/Background Toggle - Segmented Control */}
           <div className="relative flex p-0.5 bg-muted dark:bg-muted/80 rounded-lg border border-border/30">
-            {/* Sliding background indicator */}
             <div
               className={cn(
                 'absolute top-0.5 bottom-0.5 w-[calc(50%-4px)] bg-background dark:bg-accent rounded-md shadow-sm transition-all duration-200 ease-out',
@@ -88,22 +87,18 @@ export function SettingsSection() {
 
           {/* Foreground Filters */}
           {filterTarget === 'foreground' && (
-            <div className="space-y-3">
+            <div className="space-y-2">
               {foregroundFilters.map((filter) => (
-                <div key={filter.key} className="flex items-center gap-4">
-                  <span className="text-sm text-muted-foreground w-20 shrink-0">{filter.label}</span>
-                  <Slider
-                    value={[imageFilters[filter.key]]}
-                    onValueChange={(value) => setImageFilter(filter.key, value[0])}
-                    min={filter.min}
-                    max={filter.max}
-                    step={1}
-                    className="flex-1"
-                  />
-                  <span className="text-sm text-muted-foreground w-10 text-right tabular-nums">
-                    {imageFilters[filter.key]}{filter.key === 'hueRotate' ? '°' : filter.key === 'blur' ? 'px' : ''}
-                  </span>
-                </div>
+                <Slider
+                  key={filter.key}
+                  value={[imageFilters[filter.key]]}
+                  onValueChange={(value) => setImageFilter(filter.key, value[0])}
+                  min={filter.min}
+                  max={filter.max}
+                  step={1}
+                  label={filter.label}
+                  valueDisplay={`${imageFilters[filter.key]}${filter.suffix}`}
+                />
               ))}
 
               {/* Reset Filters Button */}
@@ -123,31 +118,25 @@ export function SettingsSection() {
 
           {/* Background Filters */}
           {filterTarget === 'background' && (
-            <div className="space-y-3">
-              <div className="flex items-center gap-4">
-                <span className="text-sm text-muted-foreground w-20 shrink-0">Blur</span>
-                <Slider
-                  value={[backgroundBlur]}
-                  onValueChange={(value) => setBackgroundBlur(value[0])}
-                  min={0}
-                  max={50}
-                  step={1}
-                  className="flex-1"
-                />
-                <span className="text-sm text-muted-foreground w-10 text-right tabular-nums">{backgroundBlur}px</span>
-              </div>
-              <div className="flex items-center gap-4">
-                <span className="text-sm text-muted-foreground w-20 shrink-0">Noise</span>
-                <Slider
-                  value={[backgroundNoise]}
-                  onValueChange={(value) => setBackgroundNoise(value[0])}
-                  min={0}
-                  max={100}
-                  step={1}
-                  className="flex-1"
-                />
-                <span className="text-sm text-muted-foreground w-10 text-right tabular-nums">{backgroundNoise}%</span>
-              </div>
+            <div className="space-y-2">
+              <Slider
+                value={[backgroundBlur]}
+                onValueChange={(value) => setBackgroundBlur(value[0])}
+                min={0}
+                max={50}
+                step={1}
+                label="Blur"
+                valueDisplay={`${backgroundBlur}px`}
+              />
+              <Slider
+                value={[backgroundNoise]}
+                onValueChange={(value) => setBackgroundNoise(value[0])}
+                min={0}
+                max={100}
+                step={1}
+                label="Noise"
+                valueDisplay={`${backgroundNoise}%`}
+              />
 
               {/* Reset Background Filters Button */}
               {isBackgroundFiltersModified && (
@@ -168,18 +157,15 @@ export function SettingsSection() {
 
       {/* Canvas Section */}
       <SectionWrapper title="Canvas" defaultOpen={true}>
-        <div className="flex items-center gap-4">
-          <span className="text-sm text-muted-foreground w-20 shrink-0">Radius</span>
-          <Slider
-            value={[backgroundBorderRadius]}
-            onValueChange={(value) => setBackgroundBorderRadius(value[0])}
-            min={0}
-            max={100}
-            step={1}
-            className="flex-1"
-          />
-          <span className="text-sm text-muted-foreground w-10 text-right tabular-nums">{backgroundBorderRadius}px</span>
-        </div>
+        <Slider
+          value={[backgroundBorderRadius]}
+          onValueChange={(value) => setBackgroundBorderRadius(value[0])}
+          min={0}
+          max={100}
+          step={1}
+          label="Radius"
+          valueDisplay={`${backgroundBorderRadius}px`}
+        />
       </SectionWrapper>
     </>
   );

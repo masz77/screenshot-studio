@@ -35,29 +35,30 @@ interface ThemeOption {
   id: string;
   label: string;
   style: Record<string, React.CSSProperties>;
+  dark: boolean;
 }
 
 const CODE_THEMES: ThemeOption[] = [
-  { id: 'dracula', label: 'Dracula', style: dracula },
-  { id: 'monokai', label: 'Monokai', style: monokai },
-  { id: 'okaidia', label: 'Okaidia', style: monokaiSublime },
-  { id: 'darcula', label: 'Darcula', style: darcula },
-  { id: 'androidstudio', label: 'Android Studio', style: androidstudio },
-  { id: 'atomone', label: 'Atom One', style: atomOneDark },
-  { id: 'githubDark', label: 'GitHub Dark', style: githubGist },
-  { id: 'githubLight', label: 'GitHub Light', style: github },
-  { id: 'a11yDark', label: 'A11y Dark', style: a11yDark },
-  { id: 'nord', label: 'Nord', style: nord },
-  { id: 'tomorrowNightBlue', label: 'Tomorrow Blue', style: tomorrowNightBlue },
-  { id: 'vscodeDark', label: 'VS Code Dark', style: vs2015 },
-  { id: 'gruvboxDark', label: 'Gruvbox Dark', style: gruvboxDark },
-  { id: 'consoleDark', label: 'Console Dark', style: nnfxDark },
-  { id: 'consoleLight', label: 'Console Light', style: vs },
-  { id: 'xcodeDark', label: 'Xcode Dark', style: xcode },
-  { id: 'xcodeLight', label: 'Xcode Light', style: xcode },
-  { id: 'stackDark', label: 'Stack Dark', style: stackoverflowDark },
-  { id: 'stackLight', label: 'Stack Light', style: stackoverflowLight },
-  { id: 'tomorrowNight', label: 'Tomorrow Night', style: tomorrowNight },
+  { id: 'dracula', label: 'Dracula', style: dracula, dark: true },
+  { id: 'monokai', label: 'Monokai', style: monokai, dark: true },
+  { id: 'okaidia', label: 'Okaidia', style: monokaiSublime, dark: true },
+  { id: 'darcula', label: 'Darcula', style: darcula, dark: true },
+  { id: 'androidstudio', label: 'Android Studio', style: androidstudio, dark: true },
+  { id: 'atomone', label: 'Atom One', style: atomOneDark, dark: true },
+  { id: 'githubDark', label: 'GitHub Dark', style: githubGist, dark: true },
+  { id: 'githubLight', label: 'GitHub Light', style: github, dark: false },
+  { id: 'a11yDark', label: 'A11y Dark', style: a11yDark, dark: true },
+  { id: 'nord', label: 'Nord', style: nord, dark: true },
+  { id: 'tomorrowNightBlue', label: 'Tomorrow Blue', style: tomorrowNightBlue, dark: true },
+  { id: 'vscodeDark', label: 'VS Code Dark', style: vs2015, dark: true },
+  { id: 'gruvboxDark', label: 'Gruvbox Dark', style: gruvboxDark, dark: true },
+  { id: 'consoleDark', label: 'Console Dark', style: nnfxDark, dark: true },
+  { id: 'consoleLight', label: 'Console Light', style: vs, dark: false },
+  { id: 'xcodeDark', label: 'Xcode Dark', style: xcode, dark: true },
+  { id: 'xcodeLight', label: 'Xcode Light', style: xcode, dark: false },
+  { id: 'stackDark', label: 'Stack Dark', style: stackoverflowDark, dark: true },
+  { id: 'stackLight', label: 'Stack Light', style: stackoverflowLight, dark: false },
+  { id: 'tomorrowNight', label: 'Tomorrow Night', style: tomorrowNight, dark: true },
 ];
 
 const LANGUAGES = [
@@ -104,6 +105,81 @@ const DEFAULT_CODE = `function greet(name) {
 }
 
 console.log(greet('World'))`;
+
+// ── Toggle Switch ─────────────────────────────────────────────────────────────
+
+function Toggle({
+  checked,
+  onChange,
+  label,
+}: {
+  checked: boolean;
+  onChange: (v: boolean) => void;
+  label: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => onChange(!checked)}
+      className="flex items-center gap-1.5 group"
+    >
+      <div
+        className={cn(
+          'relative w-7 h-4 rounded-full transition-colors duration-200',
+          checked ? 'bg-primary' : 'bg-border'
+        )}
+      >
+        <div
+          className={cn(
+            'absolute top-0.5 w-3 h-3 rounded-full bg-white shadow-sm transition-transform duration-200',
+            checked ? 'translate-x-3.5' : 'translate-x-0.5'
+          )}
+        />
+      </div>
+      <span className="text-[10px] text-muted-foreground group-hover:text-foreground transition-colors">
+        {label}
+      </span>
+    </button>
+  );
+}
+
+// ── Styled Select ─────────────────────────────────────────────────────────────
+
+function StyledSelect({
+  value,
+  onChange,
+  options,
+  className,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  options: { id: string; label: string }[];
+  className?: string;
+}) {
+  return (
+    <div className={cn('relative', className)}>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="appearance-none w-full h-7 pl-2 pr-6 rounded-md border border-border/50 bg-muted/50 text-[11px] text-foreground outline-none focus:border-primary/40 transition-colors cursor-pointer"
+      >
+        {options.map((opt) => (
+          <option key={opt.id} value={opt.id}>
+            {opt.label}
+          </option>
+        ))}
+      </select>
+      <svg
+        className="absolute right-1.5 top-1/2 -translate-y-1/2 text-muted-foreground/50 pointer-events-none"
+        width="10"
+        height="10"
+        viewBox="0 0 10 10"
+      >
+        <path d="M2.5 4L5 6.5L7.5 4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    </div>
+  );
+}
 
 // ── Component ────────────────────────────────────────────────────────────────
 
@@ -157,10 +233,8 @@ export function CodeSnippetSection() {
       if (blob) {
         const url = URL.createObjectURL(blob);
         setUploadedImageUrl(url, 'code-snippet.png');
-        // Reset opacity and scale so snippet renders at full visibility
         setImageOpacity(1);
         setImageScale(100);
-        // Set border radius to 24 for a polished rounded look on the canvas
         setCanvasBorderRadius(24);
         setStatus('idle');
       } else {
@@ -170,149 +244,80 @@ export function CodeSnippetSection() {
       console.error('Code capture failed:', e);
       setStatus('idle');
     }
-  }, [setUploadedImageUrl, setImageOpacity, setImageScale, setCanvasBorderRadius, status]);
-
-  const selectClass =
-    'h-7 px-2 rounded-md border border-border bg-muted text-[11px] text-foreground outline-none';
+  }, [setUploadedImageUrl, setImageOpacity, setImageScale, setCanvasBorderRadius, status, themeBg]);
 
   return (
     <SectionWrapper title="Code Snippet" defaultOpen={false}>
-      <div className="space-y-2.5">
+      <div className="space-y-3">
         {/* Row 1: Theme + Language */}
-        <div className="grid grid-cols-2 gap-2">
-          <div>
-            <label className="text-[10px] text-muted-foreground mb-0.5 block">
-              Theme
-            </label>
-            <select
-              value={themeId}
-              onChange={(e) => setThemeId(e.target.value)}
-              className={cn(selectClass, 'w-full')}
-            >
-              {CODE_THEMES.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.label}
-                </option>
-              ))}
-            </select>
+        <div className="grid grid-cols-2 gap-1.5">
+          <StyledSelect
+            value={themeId}
+            onChange={setThemeId}
+            options={CODE_THEMES}
+          />
+          <StyledSelect
+            value={language}
+            onChange={setLanguage}
+            options={LANGUAGES}
+          />
+        </div>
+
+        {/* Row 2: Font */}
+        <StyledSelect
+          value={fontId}
+          onChange={setFontId}
+          options={FONTS}
+        />
+
+        {/* Row 3: Size + Round */}
+        <div className="grid grid-cols-2 gap-1.5">
+          <div className="relative">
+            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[9px] text-muted-foreground/60 font-medium">Size</span>
+            <input
+              type="number"
+              value={fontSize}
+              onChange={(e) =>
+                setFontSize(Math.max(10, Math.min(28, Number(e.target.value))))
+              }
+              min={10}
+              max={28}
+              className="w-full h-7 pl-9 pr-2 rounded-md border border-border/50 bg-muted/50 text-[11px] text-foreground tabular-nums outline-none focus:border-primary/40 transition-colors text-right"
+            />
           </div>
-          <div>
-            <label className="text-[10px] text-muted-foreground mb-0.5 block">
-              Language
-            </label>
-            <select
-              value={language}
-              onChange={(e) => setLanguage(e.target.value)}
-              className={cn(selectClass, 'w-full')}
-            >
-              {LANGUAGES.map((l) => (
-                <option key={l.id} value={l.id}>
-                  {l.label}
-                </option>
-              ))}
-            </select>
+          <div className="relative">
+            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[9px] text-muted-foreground/60 font-medium">Round</span>
+            <input
+              type="number"
+              value={borderRadius}
+              onChange={(e) =>
+                setBorderRadius(Math.max(0, Math.min(32, Number(e.target.value))))
+              }
+              min={0}
+              max={32}
+              className="w-full h-7 pl-12 pr-2 rounded-md border border-border/50 bg-muted/50 text-[11px] text-foreground tabular-nums outline-none focus:border-primary/40 transition-colors text-right"
+            />
           </div>
         </div>
 
-        {/* Row 2: Font + Size + Radius */}
-        <div className="grid grid-cols-2 gap-2">
-          <div>
-            <label className="text-[10px] text-muted-foreground mb-0.5 block">
-              Font
-            </label>
-            <select
-              value={fontId}
-              onChange={(e) => setFontId(e.target.value)}
-              className={cn(selectClass, 'w-full')}
-            >
-              {FONTS.map((f) => (
-                <option key={f.id} value={f.id}>
-                  {f.label}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="grid grid-cols-2 gap-1.5">
-            <div>
-              <label className="text-[10px] text-muted-foreground mb-0.5 block">
-                Size
-              </label>
-              <input
-                type="number"
-                value={fontSize}
-                onChange={(e) =>
-                  setFontSize(Math.max(10, Math.min(28, Number(e.target.value))))
-                }
-                min={10}
-                max={28}
-                className={cn(selectClass, 'w-full tabular-nums')}
-              />
-            </div>
-            <div>
-              <label className="text-[10px] text-muted-foreground mb-0.5 block">
-                Round
-              </label>
-              <input
-                type="number"
-                value={borderRadius}
-                onChange={(e) =>
-                  setBorderRadius(
-                    Math.max(0, Math.min(32, Number(e.target.value)))
-                  )
-                }
-                min={0}
-                max={32}
-                className={cn(selectClass, 'w-full tabular-nums')}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Row 3: Toggles */}
+        {/* Row 4: Toggles */}
         <div className="flex items-center gap-4">
-          <label className="flex items-center gap-1.5 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={showLineNumbers}
-              onChange={(e) => setShowLineNumbers(e.target.checked)}
-              className="accent-primary w-3 h-3"
-            />
-            <span className="text-[10px] text-muted-foreground">
-              Line numbers
-            </span>
-          </label>
-          <label className="flex items-center gap-1.5 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={showTitleBar}
-              onChange={(e) => setShowTitleBar(e.target.checked)}
-              className="accent-primary w-3 h-3"
-            />
-            <span className="text-[10px] text-muted-foreground">
-              Window bar
-            </span>
-          </label>
+          <Toggle checked={showLineNumbers} onChange={setShowLineNumbers} label="Lines" />
+          <Toggle checked={showTitleBar} onChange={setShowTitleBar} label="Window" />
         </div>
 
         {/* Code textarea */}
         <textarea
           value={code}
           onChange={(e) => setCode(e.target.value)}
-          rows={6}
+          rows={5}
           spellCheck={false}
           placeholder="Paste your code here..."
-          className="w-full px-3 py-2 rounded-lg border border-border bg-muted text-xs text-foreground font-mono placeholder:text-muted-foreground resize-y focus:outline-none focus:ring-1 focus:ring-primary/40 leading-relaxed"
+          className="w-full px-3 py-2.5 rounded-lg border border-border/50 bg-muted/50 text-[11px] text-foreground font-mono placeholder:text-muted-foreground/50 resize-y focus:outline-none focus:border-primary/40 leading-relaxed transition-colors"
         />
 
-        {/* Live preview label */}
-        <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground block">
-          Preview
-        </span>
-
-        {/* Live inline preview — this IS the capture target */}
-        <div
-          className="rounded-lg overflow-hidden border border-border/40"
-        >
+        {/* Live inline preview */}
+        <div className="rounded-lg overflow-hidden border border-border/30">
           <div
             ref={captureRef}
             style={{
@@ -332,30 +337,9 @@ export function CodeSnippetSection() {
                   gap: '6px',
                 }}
               >
-                <div
-                  style={{
-                    width: 10,
-                    height: 10,
-                    borderRadius: '50%',
-                    backgroundColor: '#ff5f57',
-                  }}
-                />
-                <div
-                  style={{
-                    width: 10,
-                    height: 10,
-                    borderRadius: '50%',
-                    backgroundColor: '#febc2e',
-                  }}
-                />
-                <div
-                  style={{
-                    width: 10,
-                    height: 10,
-                    borderRadius: '50%',
-                    backgroundColor: '#28c840',
-                  }}
-                />
+                <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#ff5f57' }} />
+                <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#febc2e' }} />
+                <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#28c840' }} />
               </div>
             )}
 
@@ -389,11 +373,11 @@ export function CodeSnippetSection() {
         <button
           onClick={handleAddToCanvas}
           disabled={status === 'capturing' || !code.trim()}
-          className="w-full h-9 rounded-lg text-xs font-medium bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors flex items-center justify-center gap-1.5"
+          className="w-full h-8 rounded-lg text-[11px] font-semibold bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors flex items-center justify-center gap-1.5"
         >
           {status === 'capturing' ? (
             <>
-              <Loading03Icon size={14} className="animate-spin" />
+              <Loading03Icon size={12} className="animate-spin" />
               Adding...
             </>
           ) : (

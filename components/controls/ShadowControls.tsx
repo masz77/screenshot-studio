@@ -54,54 +54,43 @@ export function ShadowControls({ shadow, onShadowChange }: ShadowControlsProps) 
           </div>
         </div>
 
-        <div className="space-y-3">
-          <div className="p-3 rounded-lg bg-muted/50 border border-border/50">
-            <Slider
-              value={[shadow.blur]}
-              onValueChange={(value) => onShadowChange({ blur: value[0] })}
-              min={0}
-              max={50}
-              step={1}
-              label="Blur"
-              valueDisplay={`${shadow.blur}px`}
-            />
-          </div>
-
-          <div className="p-3 rounded-lg bg-muted/50 border border-border/50">
-            <Slider
-              value={[shadow.offsetX]}
-              onValueChange={(value) => onShadowChange({ offsetX: value[0] })}
-              min={-20}
-              max={20}
-              step={1}
-              label="Horizontal Offset"
-              valueDisplay={`${shadow.offsetX}px`}
-            />
-          </div>
-
-          <div className="p-3 rounded-lg bg-muted/50 border border-border/50">
-            <Slider
-              value={[shadow.offsetY]}
-              onValueChange={(value) => onShadowChange({ offsetY: value[0] })}
-              min={-20}
-              max={20}
-              step={1}
-              label="Vertical Offset"
-              valueDisplay={`${shadow.offsetY}px`}
-            />
-          </div>
-
-          <div className="p-3 rounded-lg bg-muted/50 border border-border/50">
-            <Slider
-              value={[shadow.spread]}
-              onValueChange={(value) => onShadowChange({ spread: value[0] })}
-              min={-10}
-              max={20}
-              step={1}
-              label="Spread"
-              valueDisplay={`${shadow.spread}px`}
-            />
-          </div>
+        <div className="space-y-2">
+          <Slider
+            value={[shadow.blur]}
+            onValueChange={(value) => onShadowChange({ blur: value[0] })}
+            min={0}
+            max={50}
+            step={1}
+            label="Blur"
+            valueDisplay={`${shadow.blur}px`}
+          />
+          <Slider
+            value={[shadow.offsetX]}
+            onValueChange={(value) => onShadowChange({ offsetX: value[0] })}
+            min={-20}
+            max={20}
+            step={1}
+            label="H Offset"
+            valueDisplay={`${shadow.offsetX}px`}
+          />
+          <Slider
+            value={[shadow.offsetY]}
+            onValueChange={(value) => onShadowChange({ offsetY: value[0] })}
+            min={-20}
+            max={20}
+            step={1}
+            label="V Offset"
+            valueDisplay={`${shadow.offsetY}px`}
+          />
+          <Slider
+            value={[shadow.spread]}
+            onValueChange={(value) => onShadowChange({ spread: value[0] })}
+            min={-10}
+            max={20}
+            step={1}
+            label="Spread"
+            valueDisplay={`${shadow.spread}px`}
+          />
         </div>
 
         <div className="space-y-4">

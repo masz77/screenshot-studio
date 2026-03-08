@@ -57,7 +57,6 @@ export function PositionSection() {
                   : 'bg-muted/50 border-border/50 hover:border-border hover:bg-muted'
               )}
             >
-              {/* Visual indicator dot */}
               <div
                 className={cn(
                   'w-1.5 h-1.5 rounded-full mx-auto',
@@ -69,48 +68,33 @@ export function PositionSection() {
         </div>
       </div>
 
-      {/* Translate X Slider */}
-      <div className="space-y-1.5">
-        <div className="flex justify-between text-xs text-muted-foreground">
-          <span>Horizontal</span>
-          <span>{perspective3D.translateX}%</span>
-        </div>
+      <div className="space-y-2">
         <Slider
           value={[perspective3D.translateX]}
           onValueChange={(value) => setPerspective3D({ translateX: value[0] })}
           min={-10}
           max={10}
           step={0.5}
+          label="Horizontal"
+          valueDisplay={`${perspective3D.translateX}%`}
         />
-      </div>
-
-      {/* Translate Y Slider */}
-      <div className="space-y-1.5">
-        <div className="flex justify-between text-xs text-muted-foreground">
-          <span>Vertical</span>
-          <span>{perspective3D.translateY}%</span>
-        </div>
         <Slider
           value={[perspective3D.translateY]}
           onValueChange={(value) => setPerspective3D({ translateY: value[0] })}
           min={-10}
           max={10}
           step={0.5}
+          label="Vertical"
+          valueDisplay={`${perspective3D.translateY}%`}
         />
-      </div>
-
-      {/* Rotation Slider */}
-      <div className="space-y-1.5">
-        <div className="flex justify-between text-xs text-muted-foreground">
-          <span>Rotation</span>
-          <span>{perspective3D.rotateZ}°</span>
-        </div>
         <Slider
           value={[perspective3D.rotateZ]}
           onValueChange={(value) => setPerspective3D({ rotateZ: value[0] })}
           min={-45}
           max={45}
           step={1}
+          label="Rotation"
+          valueDisplay={`${perspective3D.rotateZ}°`}
         />
       </div>
     </SectionWrapper>

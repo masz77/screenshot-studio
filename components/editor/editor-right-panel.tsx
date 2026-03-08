@@ -164,39 +164,26 @@ export function EditorRightPanel() {
                   </h4>
 
                   {/* Opacity */}
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center">
-                      <Label className="text-xs font-medium text-muted-foreground">
-                        Opacity
-                      </Label>
-                      <span className="text-xs text-muted-foreground font-medium">
-                        {Math.round(
-                          (backgroundConfig.opacity !== undefined
-                            ? backgroundConfig.opacity
-                            : 1) * 100
-                        )}
-                        %
-                      </span>
-                    </div>
-                    <Slider
-                      value={[
-                        backgroundConfig.opacity !== undefined
-                          ? backgroundConfig.opacity
-                          : 1,
-                      ]}
-                      onValueChange={(value) => setBackgroundOpacity(value[0])}
-                      min={0}
-                      max={1}
-                      step={0.01}
-                      className="w-full"
-                    />
-                  </div>
+                  <Slider
+                    value={[
+                      backgroundConfig.opacity !== undefined
+                        ? backgroundConfig.opacity
+                        : 1,
+                    ]}
+                    onValueChange={(value) => setBackgroundOpacity(value[0])}
+                    min={0}
+                    max={1}
+                    step={0.01}
+                    label="Opacity"
+                    valueDisplay={`${Math.round(
+                      (backgroundConfig.opacity !== undefined
+                        ? backgroundConfig.opacity
+                        : 1) * 100
+                    )}%`}
+                  />
 
                   {/* Border Radius */}
                   <div className="space-y-3">
-                    <Label className="text-xs font-medium text-muted-foreground">
-                      Border Radius
-                    </Label>
                     <div className="flex gap-2 mb-2">
                       <Button
                         variant={
@@ -227,14 +214,6 @@ export function EditorRightPanel() {
                         Rounded
                       </Button>
                     </div>
-                    <div className="flex justify-between items-center mb-1">
-                      <Label className="text-xs font-medium text-muted-foreground">
-                        Border Radius
-                      </Label>
-                      <span className="text-xs text-muted-foreground font-medium">
-                        {backgroundBorderRadius}px
-                      </span>
-                    </div>
                     <Slider
                       value={[backgroundBorderRadius]}
                       onValueChange={(value) =>
@@ -243,7 +222,8 @@ export function EditorRightPanel() {
                       min={0}
                       max={100}
                       step={1}
-                      className="w-full"
+                      label="Radius"
+                      valueDisplay={`${backgroundBorderRadius}px`}
                     />
                   </div>
 

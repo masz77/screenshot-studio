@@ -294,7 +294,7 @@ export function BackgroundSection() {
           title={CATEGORY_LABELS[category] || category}
           defaultOpen={true}
         >
-          <div className="grid grid-cols-5 gap-2">
+          <div className="grid grid-cols-4 gap-2">
             {(backgroundCategories[category] || []).map((imagePath: string, idx: number) => (
               <button
                 key={`${category}-${idx}`}
@@ -303,7 +303,7 @@ export function BackgroundSection() {
                   setBackgroundType('image');
                 }}
                 className={cn(
-                  'aspect-video rounded-lg overflow-hidden border-2 transition-all hover:scale-105 relative',
+                  'aspect-square rounded-lg overflow-hidden border-2 transition-all hover:scale-105 relative',
                   backgroundConfig.value === imagePath
                     ? 'border-primary ring-1 ring-primary/30'
                     : 'border-transparent hover:border-border/50'

@@ -13,3 +13,4 @@ export { ImageOverlaySection } from './ImageOverlaySection';
 export { DepthSection } from './DepthSection';
 export { TweetImportSection } from './TweetImportSection';
 export { CodeSnippetSection } from './CodeSnippetSection';
+export { PositionSection } from './PositionSection';
