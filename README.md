@@ -3,6 +3,15 @@
 <a href="https://vercel.com/oss">
   <img alt="Vercel OSS Program" src="https://vercel.com/oss/program-badge.svg" />
 </a>
+<br/>
+<br/>
+<a href="https://peerlist.io/code_kartik/project/screenshot-studio" target="_blank" rel="noreferrer">
+			<img
+			  src="https://dqy38fnwh4fqs.cloudfront.net/website/project-spotlight/project-week-rank-one-dark.svg"
+			  alt="Screenshot Studio"
+			  style="width: auto; height: 64px;"
+			/>
+</a>
 
 # Screenshot Studio
 
