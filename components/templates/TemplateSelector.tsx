@@ -39,7 +39,7 @@ export function TemplateSelector({
           <Card
             key={template.id}
             className={cn(
-              "cursor-pointer transition-all hover:shadow-md",
+              "cursor-pointer transition-all",
               selectedTemplateId === template.id && "ring-2 ring-primary"
             )}
             onClick={() => onSelectTemplate(template)}

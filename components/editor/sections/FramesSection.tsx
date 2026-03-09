@@ -47,7 +47,7 @@ export function FramesSection() {
   const showTitleInput = ['macos-light', 'macos-dark', 'windows-light', 'windows-dark'].includes(imageBorder.type);
 
   return (
-    <SectionWrapper title="Frames" defaultOpen={true}>
+    <SectionWrapper title="Window Frame" defaultOpen={true}>
       {/* Scrollable horizontal frame selector */}
       <div className="flex overflow-x-auto gap-3 pb-1 scrollbar-hide select-none">
         {frameOptions.map(({ value, label, image }) => (

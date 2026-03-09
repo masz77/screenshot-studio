@@ -310,7 +310,7 @@ export function Perspective3DControls() {
               style={getPerspectiveStyle(preset)}
             >
               <div
-                className="w-16 h-16 bg-background shadow-[0_4px_12px_rgba(0,0,0,0.25)]"
+                className="w-16 h-16 bg-background"
                 style={getTransformStyle(preset)}
               />
             </button>

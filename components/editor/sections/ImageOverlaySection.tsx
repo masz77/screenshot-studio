@@ -48,7 +48,7 @@ export function ImageOverlaySection() {
   const previewOverlays = imageOverlays.slice(-4);
 
   return (
-    <SectionWrapper title="Overlays" defaultOpen={true}>
+    <SectionWrapper title="Stickers" defaultOpen={true}>
       <div className="space-y-2">
         {/* Add Image button */}
         <input
@@ -82,7 +82,7 @@ export function ImageOverlaySection() {
             previewOverlays.map((overlay, i) => (
               <div
                 key={overlay.id}
-                className="absolute w-7 h-7 rounded-md bg-muted border border-border/40 overflow-hidden shadow-sm"
+                className="absolute w-7 h-7 rounded-md bg-muted border border-border/40 overflow-hidden"
                 style={{
                   top: `${(previewOverlays.length - 1 - i) * 3}px`,
                   left: `${i * 3}px`,

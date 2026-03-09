@@ -6,7 +6,7 @@ import { TextOverlayControls } from '@/components/text-overlay/text-overlay-cont
 
 export function TextSection() {
   return (
-    <SectionWrapper title="Text Overlay" defaultOpen={true}>
+    <SectionWrapper title="Add Text" defaultOpen={true}>
       <TextOverlayControls />
     </SectionWrapper>
   );

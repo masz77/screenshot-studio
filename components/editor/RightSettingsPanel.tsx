@@ -33,7 +33,7 @@ type RightTabType = 'transforms' | 'animate';
 
 const rightTabs: { id: RightTabType; icon: React.ReactNode; label: string }[] = [
   { id: 'transforms', icon: <RotateSquareIcon size={18} />, label: '3D' },
-  { id: 'animate', icon: <VideoReplayIcon size={18} />, label: 'Animate' },
+  { id: 'animate', icon: <VideoReplayIcon size={18} />, label: 'Motion' },
 ];
 
 type ControlMode = 'zoom' | 'tilt';
@@ -207,8 +207,8 @@ function TransformPreview({ mode }: { mode: ControlMode }) {
         className={cn(
           'absolute w-7 h-7 -translate-x-1/2 -translate-y-1/2 rounded-full pointer-events-none',
           'bg-foreground/70 backdrop-blur-sm border-2 border-background/50',
-          'shadow-md transition-all duration-150',
-          dragging && 'shadow-lg scale-110'
+          'transition-all duration-150',
+          dragging && 'scale-110'
         )}
         style={{
           left: `${Math.max(8, Math.min(92, handleX))}%`,
@@ -461,8 +461,8 @@ function AnimationControls() {
                         'relative w-full rounded-xl overflow-hidden transition-all duration-200 group/card',
                         'border-2',
                         isApplied
-                          ? 'border-primary shadow-lg shadow-primary/15 ring-1 ring-primary/20'
-                          : 'border-border/30 hover:border-border/60 hover:shadow-md'
+                          ? 'border-primary ring-1 ring-primary/20'
+                          : 'border-border/30 hover:border-border/60'
                       )}
                       style={{ aspectRatio: cssAspectRatio }}
                     >
@@ -567,7 +567,7 @@ export function RightSettingsPanel() {
       <div className="px-2.5 py-2.5 border-b border-border/30 shrink-0">
         <div className="relative flex p-0.5 bg-muted/80 dark:bg-muted/50 rounded-lg border border-border/20">
           <div
-            className="absolute top-0.5 bottom-0.5 bg-background dark:bg-accent rounded-md shadow-sm transition-all duration-250 ease-out"
+            className="absolute top-0.5 bottom-0.5 bg-background dark:bg-accent rounded-md transition-all duration-250 ease-out"
             style={{
               left: `calc(${activeIndex * (100 / rightTabs.length)}% + 2px)`,
               width: `calc(${100 / rightTabs.length}% - 4px)`,

@@ -26,10 +26,10 @@ export function StyleTabs() {
     <div className="space-y-6">
       <Tabs defaultValue="style" className="w-full">
         <TabsList className="w-full grid grid-cols-2 rounded-none bg-transparent h-12 p-1.5 gap-1.5">
-          <TabsTrigger value="style" className="data-[state=active]:bg-background data-[state=active]:shadow-lg data-[state=active]:shadow-black/20 rounded-md border-0 data-[state=active]:border-0 transition-all duration-200">
+          <TabsTrigger value="style" className="data-[state=active]:bg-background rounded-md border-0 data-[state=active]:border-0 transition-all duration-200">
             Style
           </TabsTrigger>
-          <TabsTrigger value="Transforms" className="data-[state=active]:bg-background data-[state=active]:shadow-lg data-[state=active]:shadow-black/20 rounded-md border-0 data-[state=active]:border-0 transition-all duration-200">
+          <TabsTrigger value="Transforms" className="data-[state=active]:bg-background rounded-md border-0 data-[state=active]:border-0 transition-all duration-200">
             Transforms
           </TabsTrigger>
         </TabsList>
@@ -44,7 +44,7 @@ export function StyleTabs() {
               onClick={() => setBorderRadius(0)}
               className={`flex-1 text-sm font-medium transition-all rounded-lg h-9 border ${
                 borderRadius === 0
-                  ? 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm border-primary'
+                  ? 'bg-primary hover:bg-primary/90 text-primary-foreground border-primary'
                   : 'border-border/50 hover:border-border hover:bg-accent text-foreground bg-background'
               }`}
             >
@@ -56,7 +56,7 @@ export function StyleTabs() {
               onClick={() => setBorderRadius(24)}
               className={`flex-1 text-sm font-medium transition-all rounded-lg h-9 border ${
                 borderRadius > 0
-                  ? 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm border-primary'
+                  ? 'bg-primary hover:bg-primary/90 text-primary-foreground border-primary'
                   : 'border-border/50 hover:border-border hover:bg-accent text-foreground bg-background'
               }`}
             >

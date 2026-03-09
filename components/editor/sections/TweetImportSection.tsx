@@ -372,7 +372,7 @@ export function TweetImportSection() {
   }, [setUploadedImageUrl, setImageOpacity, setImageScale, setBorderRadius, tweetTheme]);
 
   return (
-    <SectionWrapper title="Import Tweet" defaultOpen={false}>
+    <SectionWrapper title="Add Tweet" defaultOpen={false}>
       <div className="space-y-3">
         {/* URL input — integrated field with icon and button */}
         <div className="relative">
@@ -443,7 +443,7 @@ export function TweetImportSection() {
                   className={cn(
                     'px-3 py-1 rounded text-[10px] font-medium transition-all',
                     tweetTheme === t
-                      ? 'bg-background dark:bg-accent text-foreground shadow-sm'
+                      ? 'bg-background dark:bg-accent text-foreground'
                       : 'text-muted-foreground hover:text-foreground'
                   )}
                 >

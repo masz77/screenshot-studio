@@ -150,11 +150,11 @@ function PresetCard({
     <button
       onClick={onApply}
       className={cn(
-        'w-full rounded-lg border-2 transition-all overflow-hidden text-left',
+        'w-full rounded-lg border transition-all overflow-hidden text-left',
         'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
         isActive
-          ? 'border-primary shadow-lg shadow-primary/20'
-          : 'border-border hover:border-border/80 hover:shadow-md'
+          ? 'border-primary/50 ring-1 ring-primary/30'
+          : 'border-border/50 hover:border-border'
       )}
     >
       <div
@@ -269,9 +269,19 @@ function PresetCard({
         )}
       </div>
 
-      <div className="p-3 bg-background/95 backdrop-blur-sm border-t border-border/50">
-        <div className="text-sm font-medium text-foreground">{preset.name}</div>
-        <div className="text-xs text-muted-foreground mt-0.5">{preset.description}</div>
+      <div className={cn(
+        "p-3 backdrop-blur-sm border-t",
+        isActive
+          ? "bg-primary/5 border-primary/20"
+          : "bg-background/95 border-border/50"
+      )}>
+        <div className="flex items-center gap-2">
+          {isActive && (
+            <div className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
+          )}
+          <div className="text-sm font-medium text-foreground">{preset.name}</div>
+        </div>
+        <div className={cn("text-xs text-muted-foreground mt-0.5", isActive && "ml-3.5")}>{preset.description}</div>
       </div>
     </button>
   );

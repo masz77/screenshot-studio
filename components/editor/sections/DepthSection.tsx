@@ -84,6 +84,7 @@ export function DepthSection() {
     removeImageOverlay,
     reorderImageOverlay,
     updateTextOverlay,
+    removeTextOverlay,
     removeAnnotation,
     updateAnnotation,
     removeBlurRegion,
@@ -210,7 +211,7 @@ export function DepthSection() {
         removeImageOverlay(layer.id);
         break;
       case 'text-overlay':
-        // No removeTextOverlay in store, skip
+        removeTextOverlay(layer.id);
         break;
       case 'annotation':
         removeAnnotation(layer.id);
@@ -247,55 +248,7 @@ export function DepthSection() {
 
   return (
     <div className="space-y-2">
-      {/* ── Asset picker ── */}
-      <SectionWrapper title="Add Assets" defaultOpen={true}>
-        <div className="space-y-3">
-          {/* Upload button */}
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border-2 border-dashed border-border/60 hover:border-primary/40 hover:bg-primary/5 text-muted-foreground hover:text-primary transition-all duration-150"
-          >
-            <Upload04Icon size={16} />
-            <span className="text-xs font-medium">Upload Image</span>
-          </button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleFileUpload}
-            className="hidden"
-          />
-
-          {/* Asset grid */}
-          <div className="grid grid-cols-5 gap-1.5">
-            {activeAssets.map((assetPath) => {
-              const isLocal = assetPath.startsWith('/');
-              const url = isLocal ? assetPath : getOverlayUrl(assetPath);
-              const isSvg = assetPath.endsWith('.svg');
-              return (
-                <button
-                  key={assetPath}
-                  onClick={() => handleAddAsset(assetPath)}
-                  className="aspect-square rounded-lg border border-border/30 bg-muted/30 hover:bg-accent hover:border-border/60 transition-all duration-150 overflow-hidden p-1.5 group"
-                  title="Click to add"
-                >
-                  <img
-                    src={url}
-                    alt=""
-                    draggable={false}
-                    className={cn(
-                      'w-full h-full object-contain group-hover:scale-110 transition-transform duration-150',
-                      isSvg && 'dark:invert dark:opacity-80'
-                    )}
-                  />
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </SectionWrapper>
-
-      {/* ── Layer list ── */}
+      {/* ── Layer list (at the top) ── */}
       <SectionWrapper
         title="Layers"
         defaultOpen={true}
@@ -311,11 +264,11 @@ export function DepthSection() {
           <div className="flex flex-col items-center gap-2 py-6 text-center">
             <LayersLogoIcon size={28} className="text-muted-foreground/50" />
             <p className="text-xs text-muted-foreground">
-              No layers yet. Add assets above or use the Edit tab.
+              No layers yet. Add assets below or use the Edit tab.
             </p>
           </div>
         ) : (
-          <div className="space-y-1">
+          <div className="space-y-0.5">
             {/* Render in reverse so top of list = top of canvas */}
             {[...layers].reverse().map((layer) => {
               const isSelected = selectedLayerId === layer.id;
@@ -324,51 +277,120 @@ export function DepthSection() {
               return (
                 <div
                   key={layer.id}
-                  onClick={() => setSelectedLayerId(isSelected ? null : layer.id)}
                   className={cn(
-                    'flex items-center gap-2 px-2.5 py-2 rounded-lg cursor-pointer transition-all duration-150 group',
-                    isSelected
-                      ? 'bg-primary/10 border border-primary/25'
-                      : 'hover:bg-accent/60 border border-transparent'
+                    'rounded-lg transition-all duration-150',
+                    isSelected && 'bg-accent/50'
                   )}
                 >
-                  {/* Thumbnail / Icon */}
-                  <div className="w-8 h-8 rounded-md bg-muted/60 border border-border/30 flex items-center justify-center shrink-0 overflow-hidden">
-                    {layer.thumbnailSrc ? (
-                      <img
-                        src={layer.thumbnailSrc}
-                        alt=""
-                        draggable={false}
-                        className="w-full h-full object-contain"
-                      />
-                    ) : (
-                      <span className="text-muted-foreground/60">
-                        {getLayerIcon(layer.type)}
-                      </span>
+                  {/* Main row */}
+                  <div
+                    onClick={() => setSelectedLayerId(isSelected ? null : layer.id)}
+                    className={cn(
+                      'flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer transition-all duration-150 group',
+                      isSelected
+                        ? 'bg-primary/8'
+                        : 'hover:bg-accent/60'
                     )}
-                  </div>
-
-                  {/* Label */}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-foreground truncate">
-                      {layer.label}
-                    </p>
-                    <div className="flex items-center gap-1">
-                      <p className="text-[10px] text-muted-foreground capitalize">
-                        {layer.type.replace('-', ' ')}
-                      </p>
-                      {isImageOverlay && layer.layerPosition === 'back' && (
-                        <span className="text-[9px] px-1.5 py-0.5 rounded bg-accent text-muted-foreground leading-none">
-                          back
+                  >
+                    {/* Thumbnail / Icon */}
+                    <div className={cn(
+                      "w-9 h-9 rounded-lg flex items-center justify-center shrink-0 overflow-hidden",
+                      isSelected
+                        ? "bg-primary/10 border border-primary/20"
+                        : "bg-muted/60 border border-border/30"
+                    )}>
+                      {layer.thumbnailSrc ? (
+                        <img
+                          src={layer.thumbnailSrc}
+                          alt=""
+                          draggable={false}
+                          className="w-full h-full object-contain"
+                        />
+                      ) : (
+                        <span className={cn(
+                          isSelected ? "text-primary" : "text-muted-foreground/60"
+                        )}>
+                          {getLayerIcon(layer.type)}
                         </span>
                       )}
                     </div>
+
+                    {/* Label */}
+                    <div className="flex-1 min-w-0">
+                      <p className={cn(
+                        "text-xs font-medium truncate",
+                        isSelected ? "text-foreground" : "text-foreground/80"
+                      )}>
+                        {layer.label}
+                      </p>
+                      <div className="flex items-center gap-1.5 mt-0.5">
+                        <p className="text-[10px] text-muted-foreground capitalize">
+                          {layer.type === 'image-overlay' ? 'Image' : layer.type === 'text-overlay' ? 'Text' : layer.type === 'annotation' ? 'Drawing' : layer.type.replace('-', ' ')}
+                        </p>
+                        {isImageOverlay && layer.layerPosition === 'back' && (
+                          <span className="text-[9px] px-1 py-px rounded bg-muted text-muted-foreground leading-none border border-border/30">
+                            behind
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Quick controls — always visible for key actions */}
+                    <div className="flex items-center gap-0.5 shrink-0">
+                      {/* Visibility — always visible */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleToggleVisibility(layer);
+                        }}
+                        className={cn(
+                          'p-1.5 rounded-md transition-colors',
+                          layer.isVisible
+                            ? 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                            : 'text-muted-foreground/30 hover:text-foreground hover:bg-accent'
+                        )}
+                        title={layer.isVisible ? 'Hide layer' : 'Show layer'}
+                      >
+                        {layer.isVisible ? <ViewIcon size={14} /> : <ViewOffSlashIcon size={14} />}
+                      </button>
+
+                      {/* Delete — show on hover */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRemoveLayer(layer);
+                        }}
+                        className="p-1.5 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors opacity-0 group-hover:opacity-100"
+                        title="Remove layer"
+                      >
+                        <Delete02Icon size={13} />
+                      </button>
+                    </div>
                   </div>
 
-                  {/* Controls */}
-                  <div className="flex items-center gap-0.5 shrink-0">
-                    {/* Front/Back toggle (image overlays only) */}
-                    {isImageOverlay && (
+                  {/* Expanded controls when selected (image overlays) */}
+                  {isSelected && isImageOverlay && (
+                    <div className="flex items-center gap-1 px-2.5 pb-2 pt-0.5">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          reorderImageOverlay(layer.id, 'up');
+                        }}
+                        className="flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors border border-border/30"
+                        title="Move forward"
+                      >
+                        <ArrowUp01Icon size={12} />
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          reorderImageOverlay(layer.id, 'down');
+                        }}
+                        className="flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors border border-border/30"
+                        title="Move backward"
+                      >
+                        <ArrowDown01Icon size={12} />
+                      </button>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -376,73 +398,19 @@ export function DepthSection() {
                           updateImageOverlay(layer.id, { layer: newLayer });
                         }}
                         className={cn(
-                          'p-1 rounded transition-colors opacity-0 group-hover:opacity-100',
+                          'flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-medium transition-colors border',
                           layer.layerPosition === 'back'
-                            ? 'text-primary hover:bg-primary/10'
-                            : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                            ? 'text-primary border-primary/20 bg-primary/5 hover:bg-primary/10'
+                            : 'text-muted-foreground border-border/30 hover:text-foreground hover:bg-accent'
                         )}
-                        title={layer.layerPosition === 'back' ? 'Move to front of image' : 'Move behind image'}
+                        title={layer.layerPosition === 'back' ? 'Move to front' : 'Move behind image'}
                       >
                         {layer.layerPosition === 'back'
-                          ? <LayerBringForwardIcon size={13} />
-                          : <LayerSendBackwardIcon size={13} />}
+                          ? <><LayerBringForwardIcon size={12} /> Front</>
+                          : <><LayerSendBackwardIcon size={12} /> Back</>}
                       </button>
-                    )}
-                    {/* Reorder (image overlays only) */}
-                    {isImageOverlay && (
-                      <>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            reorderImageOverlay(layer.id, 'up');
-                          }}
-                          className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-accent transition-colors opacity-0 group-hover:opacity-100"
-                          title="Move up (forward)"
-                        >
-                          <ArrowUp01Icon size={13} />
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            reorderImageOverlay(layer.id, 'down');
-                          }}
-                          className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-accent transition-colors opacity-0 group-hover:opacity-100"
-                          title="Move down (backward)"
-                        >
-                          <ArrowDown01Icon size={13} />
-                        </button>
-                      </>
-                    )}
-
-                    {/* Visibility */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleToggleVisibility(layer);
-                      }}
-                      className={cn(
-                        'p-1 rounded transition-colors',
-                        layer.isVisible
-                          ? 'text-muted-foreground hover:text-foreground hover:bg-accent'
-                          : 'text-muted-foreground/40 hover:text-foreground hover:bg-accent'
-                      )}
-                      title={layer.isVisible ? 'Hide' : 'Show'}
-                    >
-                      {layer.isVisible ? <ViewIcon size={14} /> : <ViewOffSlashIcon size={14} />}
-                    </button>
-
-                    {/* Delete */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleRemoveLayer(layer);
-                      }}
-                      className="p-1 rounded text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors opacity-0 group-hover:opacity-100"
-                      title="Remove"
-                    >
-                      <Delete02Icon size={13} />
-                    </button>
-                  </div>
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -463,6 +431,54 @@ export function DepthSection() {
           />
         </SectionWrapper>
       )}
+
+      {/* ── Asset picker ── */}
+      <SectionWrapper title="3D Objects" defaultOpen={layers.length === 0}>
+        <div className="space-y-3">
+          {/* Upload button */}
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border-2 border-dashed border-border/60 hover:border-primary/40 hover:bg-primary/5 text-muted-foreground hover:text-primary transition-all duration-150"
+          >
+            <Upload04Icon size={16} />
+            <span className="text-xs font-medium">Upload Image</span>
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleFileUpload}
+            className="hidden"
+          />
+
+          {/* Asset grid */}
+          <div className="grid grid-cols-3 gap-2">
+            {activeAssets.map((assetPath) => {
+              const isLocal = assetPath.startsWith('/');
+              const url = isLocal ? assetPath : getOverlayUrl(assetPath);
+              const isSvg = assetPath.endsWith('.svg');
+              return (
+                <button
+                  key={assetPath}
+                  onClick={() => handleAddAsset(assetPath)}
+                  className="aspect-square rounded-xl border border-border/30 bg-muted/30 hover:bg-accent hover:border-border/60 transition-all duration-150 overflow-hidden p-2.5 group"
+                  title="Click to add"
+                >
+                  <img
+                    src={url}
+                    alt=""
+                    draggable={false}
+                    className={cn(
+                      'w-full h-full object-contain group-hover:scale-110 transition-transform duration-150',
+                      isSvg && 'dark:invert dark:opacity-80'
+                    )}
+                  />
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </SectionWrapper>
     </div>
   );
 }

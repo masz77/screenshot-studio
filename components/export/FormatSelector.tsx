@@ -31,7 +31,7 @@ export function FormatSelector({ format, onFormatChange }: FormatSelectorProps) 
                 'relative px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200',
                 'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50',
                 isSelected
-                  ? 'bg-background dark:bg-accent text-foreground shadow-sm'
+                  ? 'bg-background dark:bg-accent text-foreground'
                   : 'text-muted-foreground hover:text-foreground hover:bg-background/50 dark:hover:bg-accent/50'
               )}
             >

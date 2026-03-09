@@ -142,11 +142,11 @@ export function AnnotateSection() {
   const totalItems = annotations.length + blurRegions.length;
 
   return (
-    <SectionWrapper title="Annotate" defaultOpen={true}>
+    <SectionWrapper title="Draw & Markup" defaultOpen={true}>
       <div className="space-y-3">
 
-        {/* ── Tool strip ── */}
-        <div className="flex items-center gap-1 p-1 rounded-xl bg-muted/40">
+        {/* ── Tool grid ── */}
+        <div className="grid grid-cols-3 gap-1.5">
           {TOOLS.map((tool) => {
             const isActive = activeAnnotationTool === tool.id;
             return (
@@ -155,10 +155,10 @@ export function AnnotateSection() {
                 onClick={() => handleToolClick(tool.id)}
                 title={`${tool.label} — click, then draw on canvas`}
                 className={cn(
-                  'flex-1 flex flex-col items-center justify-center gap-0.5 py-2 rounded-lg text-[10px] font-medium transition-all duration-150',
+                  'flex flex-col items-center justify-center gap-1 py-2.5 rounded-xl text-[11px] font-medium transition-all duration-150',
                   isActive
-                    ? 'bg-primary text-primary-foreground shadow-sm'
-                    : 'text-muted-foreground hover:bg-accent hover:text-foreground'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-muted/40 text-muted-foreground hover:bg-accent hover:text-foreground'
                 )}
               >
                 {tool.svg}
@@ -225,6 +225,14 @@ export function AnnotateSection() {
                     }}
                   />
                 ))}
+                <div className="w-px h-5 bg-border/40 mx-0.5" />
+                <input
+                  type="color"
+                  value={currentColor}
+                  onChange={(e) => handleColorChange(e.target.value)}
+                  title="Pick any color"
+                  className="w-7 h-7 rounded-full cursor-pointer border border-border/50 appearance-none bg-transparent [&::-webkit-color-swatch-wrapper]:p-0 [&::-webkit-color-swatch]:rounded-full [&::-webkit-color-swatch]:border-0"
+                />
               </div>
             </div>
 

@@ -213,8 +213,8 @@ export function TransformsGallery() {
                         'relative w-full rounded-xl overflow-hidden transition-all duration-200 group/card',
                         'border-2',
                         isSelected
-                          ? 'border-primary shadow-lg shadow-primary/15 ring-1 ring-primary/20'
-                          : 'border-border/30 hover:border-border/60 hover:shadow-md'
+                          ? 'border-primary ring-1 ring-primary/20'
+                          : 'border-border/30 hover:border-border/60'
                       )}
                       style={{ aspectRatio: cssAspectRatio }}
                     >

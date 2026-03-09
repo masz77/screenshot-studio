@@ -131,7 +131,7 @@ function Toggle({
       >
         <div
           className={cn(
-            'absolute top-0.5 w-3 h-3 rounded-full bg-white shadow-sm transition-transform duration-200',
+            'absolute top-0.5 w-3 h-3 rounded-full bg-white transition-transform duration-200',
             checked ? 'translate-x-3.5' : 'translate-x-0.5'
           )}
         />
@@ -247,7 +247,7 @@ export function CodeSnippetSection() {
   }, [setUploadedImageUrl, setImageOpacity, setImageScale, setCanvasBorderRadius, status, themeBg]);
 
   return (
-    <SectionWrapper title="Code Snippet" defaultOpen={false}>
+    <SectionWrapper title="Add Code" defaultOpen={false}>
       <div className="space-y-3">
         {/* Row 1: Theme + Language */}
         <div className="grid grid-cols-2 gap-1.5">

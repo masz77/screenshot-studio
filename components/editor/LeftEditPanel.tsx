@@ -30,9 +30,9 @@ import { useImageStore } from '@/lib/store';
 type LeftTabType = 'edit' | 'background' | 'depth';
 
 const leftTabs: { id: LeftTabType; icon: React.ReactNode; label: string }[] = [
-  { id: 'edit', icon: <SlidersHorizontalIcon size={18} />, label: 'Edit' },
+  { id: 'edit', icon: <SlidersHorizontalIcon size={18} />, label: 'Design' },
   { id: 'background', icon: <ColorsIcon size={18} />, label: 'BG' },
-  { id: 'depth', icon: <LayersLogoIcon size={18} />, label: 'Depth' },
+  { id: 'depth', icon: <LayersLogoIcon size={18} />, label: 'Layers' },
 ];
 
 export function LeftEditPanel() {
@@ -98,7 +98,7 @@ export function LeftEditPanel() {
       <div className="px-2.5 py-2.5 border-b border-border/30 shrink-0">
         <div className="relative flex p-0.5 bg-muted/80 dark:bg-muted/50 rounded-lg border border-border/20">
           <div
-            className="absolute top-0.5 bottom-0.5 bg-background dark:bg-accent rounded-md shadow-sm transition-all duration-250 ease-out"
+            className="absolute top-0.5 bottom-0.5 bg-background dark:bg-accent rounded-md transition-all duration-250 ease-out"
             style={{
               left: `calc(${activeIndex * (100 / leftTabs.length)}% + 2px)`,
               width: `calc(${100 / leftTabs.length}% - 4px)`,

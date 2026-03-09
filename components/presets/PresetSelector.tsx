@@ -124,7 +124,7 @@ export function PresetSelector() {
           disabled={!uploadedImageUrl}
           variant="outline"
           size="sm"
-          className="w-full h-10 justify-center gap-2.5 rounded-lg bg-background hover:bg-accent text-foreground border border-border hover:border-border/80 shadow-sm hover:shadow-md transition-all duration-200 font-semibold text-sm px-3 overflow-hidden"
+          className="w-full h-10 justify-center gap-2.5 rounded-lg bg-background hover:bg-accent text-foreground border border-border hover:border-border/80 transition-all duration-200 font-semibold text-sm px-3 overflow-hidden"
         >
           <span className="truncate">Presets</span>
         </Button>

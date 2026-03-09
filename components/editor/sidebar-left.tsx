@@ -55,7 +55,7 @@ export function SidebarLeft({
               <Button
                 onClick={() => setExportDialogOpen(true)}
                 disabled={!uploadedImageUrl}
-                className="w-full h-10 justify-center gap-2.5 rounded-lg bg-background hover:bg-accent text-foreground border border-border hover:border-border/80 shadow-sm hover:shadow-md transition-all duration-200 font-semibold text-sm px-4 overflow-hidden"
+                className="w-full h-10 justify-center gap-2.5 rounded-lg bg-background hover:bg-accent text-foreground border border-border hover:border-border/80  transition-all duration-200 font-semibold text-sm px-4 overflow-hidden"
                 variant="outline"
                 size="sm"
               >
@@ -77,7 +77,7 @@ export function SidebarLeft({
           >
             <Button
               variant="outline"
-              className="w-full h-10 justify-center gap-2.5 rounded-lg bg-background hover:bg-accent text-foreground border border-border hover:border-border/80 shadow-sm hover:shadow-md transition-all duration-200 font-medium text-sm px-4 overflow-hidden"
+              className="w-full h-10 justify-center gap-2.5 rounded-lg bg-background hover:bg-accent text-foreground border border-border hover:border-border/80  transition-all duration-200 font-medium text-sm px-4 overflow-hidden"
             >
               <GithubIcon className="size-4 shrink-0" />
               <span className="truncate">Proudly Open Source</span>

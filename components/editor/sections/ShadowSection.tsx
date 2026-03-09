@@ -30,7 +30,7 @@ export function ShadowSection() {
   };
 
   return (
-    <SectionWrapper title="Shadow" defaultOpen={true}>
+    <SectionWrapper title="Drop Shadow" defaultOpen={true}>
       <div className="space-y-2">
         <Slider
           value={[imageShadow.blur]}

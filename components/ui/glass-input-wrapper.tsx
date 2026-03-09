@@ -61,12 +61,10 @@ function GlassInputWrapper({
         "backdrop-blur-md",
         // Subtle background for glass effect
         currentIntensity.bg,
-        // Shadow for depth
-        "shadow-sm",
         // Transition
         "transition-all duration-200",
         // Hover effect
-        "hover:shadow-md hover:border-border/50",
+        "hover:border-border/50",
         className
       )}
       {...props}

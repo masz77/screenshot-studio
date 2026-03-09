@@ -36,12 +36,12 @@ import { AnimationPresetGallery } from '@/components/timeline/AnimationPresetGal
 type TabType = 'settings' | 'edit' | 'background' | 'transforms' | 'animate' | 'depth';
 
 const tabs: { id: TabType; icon: React.ReactNode; label: string }[] = [
-  { id: 'edit', icon: <SlidersHorizontalIcon size={20} />, label: 'Edit' },
-  { id: 'depth', icon: <LayersLogoIcon size={20} />, label: 'Depth' },
+  { id: 'edit', icon: <SlidersHorizontalIcon size={20} />, label: 'Design' },
+  { id: 'depth', icon: <LayersLogoIcon size={20} />, label: 'Layers' },
   { id: 'background', icon: <ColorsIcon size={20} />, label: 'BG' },
-  { id: 'settings', icon: <Settings02Icon size={20} />, label: 'Settings' },
+  { id: 'settings', icon: <Settings02Icon size={20} />, label: 'Adjust' },
   { id: 'transforms', icon: <RotateSquareIcon size={20} />, label: '3D' },
-  { id: 'animate', icon: <VideoReplayIcon size={20} />, label: 'Animate' },
+  { id: 'animate', icon: <VideoReplayIcon size={20} />, label: 'Motion' },
 ];
 
 export function UnifiedRightPanel() {
@@ -112,7 +112,7 @@ export function UnifiedRightPanel() {
         <div className="relative flex p-1 bg-muted/80 dark:bg-muted/50 rounded-xl border border-border/20">
           {/* Sliding background indicator */}
           <div
-            className="absolute top-1 bottom-1 bg-background dark:bg-accent rounded-lg shadow-sm transition-all duration-250 ease-out"
+            className="absolute top-1 bottom-1 bg-background dark:bg-accent rounded-lg transition-all duration-250 ease-out"
             style={{
               left: `calc(${activeIndex * (100 / tabs.length)}% + 4px)`,
               width: `calc(${100 / tabs.length}% - 8px)`,

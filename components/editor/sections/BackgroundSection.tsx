@@ -169,29 +169,29 @@ export function BackgroundSection() {
   return (
     <>
       {/* Shadow Overlays */}
-      <SectionWrapper title="Shadows" defaultOpen={true}>
+      <SectionWrapper title="Light & Shadow" defaultOpen={true}>
         <div className="space-y-3">
-          <div className="grid grid-cols-5 gap-1.5">
+          <div className="grid grid-cols-3 gap-2">
             <button
               onClick={handleRemoveShadows}
               className={cn(
-                'aspect-[16/9] flex items-center justify-center text-[10px] rounded-lg border-2 transition-all',
+                'aspect-[16/9] flex items-center justify-center text-xs font-medium rounded-xl border transition-all',
                 !currentShadow
-                  ? 'border-primary text-foreground bg-card/50'
+                  ? 'border-primary/50 text-foreground bg-primary/5'
                   : 'border-dashed border-border/50 text-muted-foreground hover:border-border hover:bg-card/30'
               )}
             >
               None
             </button>
-            {OVERLAY_SHADOW_URLS.slice(0, 9).map((shadowUrl, index) => (
+            {OVERLAY_SHADOW_URLS.slice(0, 11).map((shadowUrl, index) => (
               <button
                 key={index}
                 onClick={() => handleAddShadow(shadowUrl)}
                 className={cn(
-                  'aspect-[16/9] rounded-lg overflow-hidden border-2 transition-all bg-secondary dark:bg-secondary',
+                  'aspect-[16/9] rounded-xl overflow-hidden border transition-all bg-secondary dark:bg-secondary',
                   currentShadow?.src === shadowUrl
-                    ? 'border-primary ring-1 ring-primary/30 scale-105'
-                    : 'border-border/40 hover:border-primary/60 hover:scale-105'
+                    ? 'border-primary/50 ring-1 ring-primary/30'
+                    : 'border-border/30 hover:border-border/60'
                 )}
               >
                 <img
@@ -207,21 +207,26 @@ export function BackgroundSection() {
       </SectionWrapper>
 
       {/* Custom BG */}
-      <SectionWrapper title="Custom BG" defaultOpen={true}>
+      <SectionWrapper title="Custom Background" defaultOpen={true}>
         <div className="grid grid-cols-3 gap-2">
           {/* Image Upload */}
           <div
             {...getBgRootProps()}
             className={cn(
-              'flex flex-col items-center justify-center gap-1.5 py-3 rounded-lg border cursor-pointer transition-all',
+              'flex flex-col items-center justify-center gap-2 py-4 rounded-xl border cursor-pointer transition-all',
               customBgType === 'image'
-                ? 'border-primary bg-primary/5'
-                : 'border-border/50 bg-card hover:bg-accent'
+                ? 'border-primary/50 bg-primary/5 ring-1 ring-primary/20'
+                : 'border-border/40 bg-muted/30 hover:bg-accent hover:border-border/60'
             )}
           >
             <input {...getBgInputProps()} />
-            <Image01Icon size={20} className="text-muted-foreground" />
-            <span className="text-xs text-muted-foreground">Image</span>
+            <div className={cn(
+              "w-8 h-8 rounded-lg flex items-center justify-center",
+              customBgType === 'image' ? "bg-primary/10" : "bg-muted"
+            )}>
+              <Image01Icon size={16} className={customBgType === 'image' ? "text-primary" : "text-muted-foreground"} />
+            </div>
+            <span className={cn("text-[11px] font-medium", customBgType === 'image' ? "text-foreground" : "text-muted-foreground")}>Image</span>
           </div>
 
           {/* Color Picker */}
@@ -233,10 +238,10 @@ export function BackgroundSection() {
               setBackgroundValue(newColor);
             }}
             className={cn(
-              'flex flex-col items-center justify-center gap-1.5 py-3 h-auto',
+              'flex flex-col items-center justify-center gap-2 py-4 h-auto rounded-xl',
               customBgType === 'color'
-                ? 'border-primary bg-primary/5'
-                : ''
+                ? 'border-primary/50 bg-primary/5 ring-1 ring-primary/20'
+                : 'border-border/40 bg-muted/30 hover:bg-accent hover:border-border/60'
             )}
           />
 
@@ -247,20 +252,24 @@ export function BackgroundSection() {
               setBackgroundValue('transparent');
             }}
             className={cn(
-              'flex flex-col items-center justify-center gap-1.5 py-3 rounded-lg border transition-all',
+              'flex flex-col items-center justify-center gap-2 py-4 rounded-xl border transition-all',
               customBgType === 'transparent'
-                ? 'border-primary bg-primary/5'
-                : 'border-border/50 bg-card hover:bg-accent'
+                ? 'border-primary/50 bg-primary/5 ring-1 ring-primary/20'
+                : 'border-border/40 bg-muted/30 hover:bg-accent hover:border-border/60'
             )}
           >
-            {/* Checkerboard pattern for transparent */}
-            <div
-              className="w-5 h-5 rounded-full border border-border/50"
-              style={{
-                background: 'repeating-conic-gradient(#808080 0% 25%, #fff 0% 50%) 50% / 8px 8px',
-              }}
-            />
-            <span className="text-xs text-muted-foreground">Transparent</span>
+            <div className={cn(
+              "w-8 h-8 rounded-lg flex items-center justify-center",
+              customBgType === 'transparent' ? "bg-primary/10" : "bg-muted"
+            )}>
+              <div
+                className="w-4 h-4 rounded-full border border-border/50"
+                style={{
+                  background: 'repeating-conic-gradient(#808080 0% 25%, #fff 0% 50%) 50% / 6px 6px',
+                }}
+              />
+            </div>
+            <span className={cn("text-[11px] font-medium", customBgType === 'transparent' ? "text-foreground" : "text-muted-foreground")}>Transparent</span>
           </button>
         </div>
         {bgUploadError && <p className="text-xs text-destructive mt-2">{bgUploadError}</p>}

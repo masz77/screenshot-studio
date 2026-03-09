@@ -51,13 +51,13 @@ export function SettingsSection() {
   return (
     <>
       {/* Filters Section */}
-      <SectionWrapper title="Filters" defaultOpen={true}>
+      <SectionWrapper title="Color Filters" defaultOpen={true}>
         <div className="space-y-3">
           {/* Foreground/Background Toggle - Segmented Control */}
           <div className="relative flex p-0.5 bg-muted dark:bg-muted/80 rounded-lg border border-border/30">
             <div
               className={cn(
-                'absolute top-0.5 bottom-0.5 w-[calc(50%-4px)] bg-background dark:bg-accent rounded-md shadow-sm transition-all duration-200 ease-out',
+                'absolute top-0.5 bottom-0.5 w-[calc(50%-4px)] bg-background dark:bg-accent rounded-md transition-all duration-200 ease-out',
                 filterTarget === 'foreground' ? 'left-0.5' : 'left-[calc(50%+2px)]'
               )}
             />

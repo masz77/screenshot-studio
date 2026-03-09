@@ -72,7 +72,7 @@ export function TransformsSection() {
               title={preset.name}
             >
               <div
-                className="w-9 h-9 bg-primary shadow-lg rounded-lg"
+                className="w-9 h-9 bg-primary rounded-lg"
                 style={getTransformStyle(preset)}
               />
             </button>

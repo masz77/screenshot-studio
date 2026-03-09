@@ -14,7 +14,7 @@ export function EditSection() {
   } = useImageStore();
 
   return (
-    <SectionWrapper title="Edit" defaultOpen={true}>
+    <SectionWrapper title="Image Style" defaultOpen={true}>
       <div className="space-y-2">
         <Slider
           value={[borderRadius]}

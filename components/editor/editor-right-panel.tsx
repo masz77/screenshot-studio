@@ -138,14 +138,14 @@ export function EditorRightPanel() {
               <TabsList className="w-full grid grid-cols-2 rounded-none bg-transparent h-12 p-1.5 gap-1.5 mb-4">
                 <TabsTrigger
                   value="presets"
-                  className="data-[state=active]:bg-background data-[state=active]:shadow-lg data-[state=active]:shadow-black/20 rounded-md border-0 data-[state=active]:border-0 transition-all duration-200 text-sm font-medium"
+                  className="data-[state=active]:bg-background rounded-md border-0 data-[state=active]:border-0 transition-all duration-200 text-sm font-medium"
                 >
                   <SparklesIcon className="size-4 mr-1.5" />
                   Presets
                 </TabsTrigger>
                 <TabsTrigger
                   value="settings"
-                  className="data-[state=active]:bg-background data-[state=active]:shadow-lg data-[state=active]:shadow-black/20 rounded-md border-0 data-[state=active]:border-0 transition-all duration-200 text-sm font-medium"
+                  className="data-[state=active]:bg-background rounded-md border-0 data-[state=active]:border-0 transition-all duration-200 text-sm font-medium"
                 >
                   <Settings02Icon className="size-4 mr-1.5" />
                   Settings
@@ -193,7 +193,7 @@ export function EditorRightPanel() {
                         onClick={() => setBackgroundBorderRadius(0)}
                         className={`flex-1 text-xs font-medium transition-all rounded-lg h-8 border ${
                           backgroundBorderRadius === 0
-                            ? "bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm border-primary"
+                            ? "bg-primary hover:bg-primary/90 text-primary-foreground border-primary"
                             : "border-border/50 hover:bg-accent text-foreground bg-background hover:border-border"
                         }`}
                       >
@@ -207,7 +207,7 @@ export function EditorRightPanel() {
                         onClick={() => setBackgroundBorderRadius(24)}
                         className={`flex-1 text-xs font-medium transition-all rounded-lg h-8 border ${
                           backgroundBorderRadius > 0
-                            ? "bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm border-primary"
+                            ? "bg-primary hover:bg-primary/90 text-primary-foreground border-primary"
                             : "border-border/50 hover:bg-accent text-foreground bg-background hover:border-border"
                         }`}
                       >
@@ -246,7 +246,7 @@ export function EditorRightPanel() {
                         onClick={() => setBackgroundType("image")}
                         className={`flex-1 text-xs font-medium transition-all rounded-lg h-8 border ${
                           backgroundConfig.type === "image"
-                            ? "bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm border-primary"
+                            ? "bg-primary hover:bg-primary/90 text-primary-foreground border-primary"
                             : "border-border/50 hover:bg-accent text-foreground bg-background hover:border-border"
                         }`}
                       >
@@ -273,7 +273,7 @@ export function EditorRightPanel() {
                         }}
                         className={`flex-1 text-xs font-medium transition-all rounded-lg h-8 border ${
                           backgroundConfig.type === "solid"
-                            ? "bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm border-primary"
+                            ? "bg-primary hover:bg-primary/90 text-primary-foreground border-primary"
                             : "border-border/50 hover:bg-accent text-foreground bg-background hover:border-border"
                         }`}
                       >
@@ -300,7 +300,7 @@ export function EditorRightPanel() {
                         }}
                         className={`flex-1 text-xs font-medium transition-all rounded-lg h-8 border ${
                           backgroundConfig.type === "gradient"
-                            ? "bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm border-primary"
+                            ? "bg-primary hover:bg-primary/90 text-primary-foreground border-primary"
                             : "border-border/50 hover:bg-accent text-foreground bg-background hover:border-border"
                         }`}
                       >
@@ -323,7 +323,7 @@ export function EditorRightPanel() {
                               onClick={() => setBackgroundValue(key)}
                               className={`h-16 rounded-lg border-2 transition-all ${
                                 backgroundConfig.value === key
-                                  ? "border-primary ring-2 ring-ring shadow-sm"
+                                  ? "border-primary ring-2 ring-ring"
                                   : "border-border hover:border-border/80"
                               }`}
                               style={{
@@ -351,7 +351,7 @@ export function EditorRightPanel() {
                               onClick={() => setBackgroundValue(key)}
                               className={`h-10 rounded-lg border-2 transition-all ${
                                 backgroundConfig.value === key
-                                  ? "border-primary ring-2 ring-ring shadow-sm"
+                                  ? "border-primary ring-2 ring-ring"
                                   : "border-border hover:border-border/80"
                               }`}
                               style={{
@@ -407,7 +407,7 @@ export function EditorRightPanel() {
                                     <Button
                                       variant="destructive"
                                       size="sm"
-                                      className="absolute top-2 right-2 flex items-center gap-1.5 bg-destructive hover:bg-destructive/90 text-destructive-foreground border-0 shadow-md px-3 py-1.5 h-auto"
+                                      className="absolute top-2 right-2 flex items-center gap-1.5 bg-destructive hover:bg-destructive/90 text-destructive-foreground border-0 px-3 py-1.5 h-auto"
                                       onClick={() => {
                                         // Reset to default gradient
                                         setBackgroundType("gradient");
@@ -484,7 +484,7 @@ export function EditorRightPanel() {
                                                 className={`relative aspect-video rounded-lg overflow-hidden border-2 transition-all ${
                                                   backgroundConfig.value ===
                                                   imagePath
-                                                    ? "border-primary ring-2 ring-ring shadow-sm"
+                                                    ? "border-primary ring-2 ring-ring"
                                                     : "border-border hover:border-border/80"
                                                 }`}
                                                 title={`${categoryDisplayName} ${

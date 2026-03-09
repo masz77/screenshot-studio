@@ -36,7 +36,7 @@ export function SegmentedControl({
     >
       <div
         className={cn(
-          'absolute bg-background dark:bg-accent shadow-sm transition-all duration-200 ease-out',
+          'absolute bg-background dark:bg-accent transition-all duration-200 ease-out',
           size === 'sm'
             ? 'top-[2px] bottom-[2px] rounded-[8px]'
             : 'top-0.5 bottom-0.5 rounded-[10px]'
