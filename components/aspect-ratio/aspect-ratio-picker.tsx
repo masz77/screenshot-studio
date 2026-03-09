@@ -97,23 +97,28 @@ function parseRatio(ratioStr: string) {
 }
 
 export const AspectRatioPicker = ({ onSelect }: AspectRatioPickerProps = {} as AspectRatioPickerProps) => {
-  const { selectedAspectRatio, setAspectRatio } = useImageStore();
+  const { selectedAspectRatio, setAspectRatio, customDimensions, setCustomDimensions } = useImageStore();
 
   const currentAR = aspectRatios.find((ar) => ar.id === selectedAspectRatio);
-  const currentDimensions = currentAR
-    ? getStandardDimensions(currentAR.width, currentAR.height)
-    : { width: 1920, height: 1080 };
+  const currentDimensions = selectedAspectRatio === 'custom' && customDimensions
+    ? customDimensions
+    : currentAR
+      ? getStandardDimensions(currentAR.width, currentAR.height)
+      : { width: 1920, height: 1080 };
 
   const [customW, setCustomW] = React.useState(currentDimensions.width.toString());
   const [customH, setCustomH] = React.useState(currentDimensions.height.toString());
 
   React.useEffect(() => {
-    if (currentAR) {
+    if (selectedAspectRatio === 'custom' && customDimensions) {
+      setCustomW(customDimensions.width.toString());
+      setCustomH(customDimensions.height.toString());
+    } else if (currentAR) {
       const dims = getStandardDimensions(currentAR.width, currentAR.height);
       setCustomW(dims.width.toString());
       setCustomH(dims.height.toString());
     }
-  }, [selectedAspectRatio, currentAR]);
+  }, [selectedAspectRatio, currentAR, customDimensions]);
 
   const handleSelect = (id: string) => {
     setAspectRatio(id);
@@ -128,17 +133,8 @@ export const AspectRatioPicker = ({ onSelect }: AspectRatioPickerProps = {} as A
     const w = parseInt(customW);
     const h = parseInt(customH);
     if (isNaN(w) || isNaN(h) || w <= 0 || h <= 0) return;
-    const targetRatio = w / h;
-    let bestMatch = aspectRatios[0];
-    let bestDiff = Infinity;
-    for (const ar of aspectRatios) {
-      const diff = Math.abs(ar.ratio - targetRatio);
-      if (diff < bestDiff) {
-        bestDiff = diff;
-        bestMatch = ar;
-      }
-    }
-    handleSelect(bestMatch.id);
+    setCustomDimensions(w, h);
+    onSelect?.();
   };
 
   return (

@@ -65,8 +65,9 @@ function TransformPreview({ mode }: { mode: ControlMode }) {
     borderRadius,
     imageShadow,
     imageScale,
+    canvasDimensions,
   } = useImageStore();
-  const { screenshot } = useEditorStore();
+  const { screenshot, setScreenshot } = useEditorStore();
   const cssAspectRatio = useCanvasAspectRatio();
 
   const containerRef = React.useRef<HTMLDivElement>(null);
@@ -74,8 +75,31 @@ function TransformPreview({ mode }: { mode: ControlMode }) {
 
   const previewImageUrl = uploadedImageUrl || screenshot?.src || null;
 
+  // Max offset the image can travel from center (in canvas pixels)
+  const maxOffsetX = canvasDimensions ? Math.max(1, canvasDimensions.canvasW / 2) : 1;
+  const maxOffsetY = canvasDimensions ? Math.max(1, canvasDimensions.canvasH / 2) : 1;
+
   // Store initial values at drag start
-  const startRef = React.useRef({ tX: 0, tY: 0, rX: 0, rY: 0 });
+  const startRef = React.useRef({ oX: 0, oY: 0, rX: 0, rY: 0 });
+
+  // Snap threshold in canvas pixels — percentage of max offset
+  const snapThresholdX = maxOffsetX * 0.08;
+  const snapThresholdY = maxOffsetY * 0.08;
+
+  const snapOffset = React.useCallback((rawX: number, rawY: number) => {
+    // Check each grid point (mapped to canvas pixel offsets)
+    for (const point of SNAP_POINTS) {
+      const pointOffsetX = (point.x / 15) * maxOffsetX;
+      const pointOffsetY = (point.y / 15) * maxOffsetY;
+      if (
+        Math.abs(rawX - pointOffsetX) < snapThresholdX &&
+        Math.abs(rawY - pointOffsetY) < snapThresholdY
+      ) {
+        return { x: Math.round(pointOffsetX), y: Math.round(pointOffsetY) };
+      }
+    }
+    return { x: Math.round(rawX), y: Math.round(rawY) };
+  }, [maxOffsetX, maxOffsetY, snapThresholdX, snapThresholdY]);
 
   const bind = useDrag(
     ({ first, active, movement: [mx, my] }) => {
@@ -84,8 +108,8 @@ function TransformPreview({ mode }: { mode: ControlMode }) {
 
       if (first) {
         startRef.current = {
-          tX: perspective3D.translateX,
-          tY: perspective3D.translateY,
+          oX: screenshot.offsetX,
+          oY: screenshot.offsetY,
           rX: perspective3D.rotateX,
           rY: perspective3D.rotateY,
         };
@@ -93,15 +117,15 @@ function TransformPreview({ mode }: { mode: ControlMode }) {
 
       setDragging(active);
 
-      // Convert pixel movement to value delta — high sensitivity for small preview
       const dxNorm = mx / rect.width;
       const dyNorm = my / rect.height;
 
       if (mode === 'zoom') {
-        const rawX = Math.max(-30, Math.min(30, startRef.current.tX + dxNorm * 60));
-        const rawY = Math.max(-30, Math.min(30, startRef.current.tY + dyNorm * 60));
-        const snapped = active ? snapToGrid(rawX, rawY) : { x: rawX, y: rawY };
-        setPerspective3D({ translateX: snapped.x, translateY: snapped.y });
+        // Map preview drag to 2D canvas offset with snap-to-grid
+        const rawX = startRef.current.oX + dxNorm * maxOffsetX * 2;
+        const rawY = startRef.current.oY + dyNorm * maxOffsetY * 2;
+        const snapped = snapOffset(rawX, rawY);
+        setScreenshot({ offsetX: snapped.x, offsetY: snapped.y });
       } else {
         setPerspective3D({
           rotateY: Math.max(-45, Math.min(45, startRef.current.rY + dxNorm * 90)),
@@ -114,23 +138,48 @@ function TransformPreview({ mode }: { mode: ControlMode }) {
 
   const backgroundStyle = getBackgroundCSS(backgroundConfig);
 
+  // Convert pixel offset to percentage for the preview image transform
+  const offsetXPct = canvasDimensions && canvasDimensions.canvasW > 0
+    ? (screenshot.offsetX / canvasDimensions.canvasW) * 100
+    : 0;
+  const offsetYPct = canvasDimensions && canvasDimensions.canvasH > 0
+    ? (screenshot.offsetY / canvasDimensions.canvasH) * 100
+    : 0;
+
   const transformStyle: React.CSSProperties = {
-    transform: `translate(${perspective3D.translateX}%, ${perspective3D.translateY}%) rotateX(${perspective3D.rotateX}deg) rotateY(${perspective3D.rotateY}deg) rotateZ(${perspective3D.rotateZ}deg) scale(${perspective3D.scale * (imageScale / 100)})`,
+    transform: `translate(${perspective3D.translateX + offsetXPct}%, ${perspective3D.translateY + offsetYPct}%) rotateX(${perspective3D.rotateX}deg) rotateY(${perspective3D.rotateY}deg) rotateZ(${perspective3D.rotateZ}deg) scale(${perspective3D.scale * (imageScale / 100)})`,
     transition: dragging ? 'none' : 'transform 150ms ease-out',
     transformOrigin: 'center center',
   };
 
+  // Handle position: zoom mode shows 2D offset, tilt mode shows rotation
   const handleX =
     mode === 'zoom'
-      ? 50 + (perspective3D.translateX / 30) * 50
+      ? 50 + (screenshot.offsetX / maxOffsetX) * 50
       : 50 + (perspective3D.rotateY / 45) * 50;
   const handleY =
     mode === 'zoom'
-      ? 50 + (perspective3D.translateY / 30) * 50
+      ? 50 + (screenshot.offsetY / maxOffsetY) * 50
       : 50 - (perspective3D.rotateX / 45) * 50;
 
   const previewBorderRadius = Math.round(backgroundBorderRadius * 0.15);
   const previewImageRadius = Math.round(Math.min(borderRadius, 20) * 0.3);
+
+  // Check if currently snapped to a grid point
+  const getSnappedPoint = () => {
+    for (const point of SNAP_POINTS) {
+      const pointOffsetX = (point.x / 15) * maxOffsetX;
+      const pointOffsetY = (point.y / 15) * maxOffsetY;
+      if (
+        Math.abs(screenshot.offsetX - pointOffsetX) < snapThresholdX &&
+        Math.abs(screenshot.offsetY - pointOffsetY) < snapThresholdY
+      ) {
+        return point;
+      }
+    }
+    return null;
+  };
+  const snappedPoint = getSnappedPoint();
 
   return (
     <div
@@ -151,21 +200,36 @@ function TransformPreview({ mode }: { mode: ControlMode }) {
         }}
       />
 
-      {/* Snap grid dots (zoom mode only) */}
+      {/* Snap grid overlay (zoom mode only) */}
       {mode === 'zoom' && (
         <div className="absolute inset-0 pointer-events-none">
+          {/* Center crosshair lines */}
+          <div className="absolute left-1/2 top-[12%] bottom-[12%] w-px bg-foreground/15" />
+          <div className="absolute top-1/2 left-[12%] right-[12%] h-px bg-foreground/15" />
+
+          {/* Grid lines — horizontal thirds */}
+          <div className="absolute left-[12%] right-[12%] top-[25%] h-px bg-foreground/8" />
+          <div className="absolute left-[12%] right-[12%] bottom-[25%] h-px bg-foreground/8" />
+          {/* Grid lines — vertical thirds */}
+          <div className="absolute top-[12%] bottom-[12%] left-[25%] w-px bg-foreground/8" />
+          <div className="absolute top-[12%] bottom-[12%] right-[25%] w-px bg-foreground/8" />
+
+          {/* 3x3 snap dots */}
           {SNAP_POINTS.map((point, i) => {
             const left = 50 + (point.x / 15) * 50;
             const top = 50 + (point.y / 15) * 50;
-            const isSnapped =
-              Math.abs(perspective3D.translateX - point.x) < 0.5 &&
-              Math.abs(perspective3D.translateY - point.y) < 0.5;
+            const isCenter = point.x === 0 && point.y === 0;
+            const isSnapped = snappedPoint === point;
             return (
               <div
                 key={i}
                 className={cn(
-                  'absolute w-1.5 h-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full transition-all duration-150',
-                  isSnapped ? 'bg-primary/80 scale-150' : 'bg-foreground/20'
+                  'absolute -translate-x-1/2 -translate-y-1/2 rounded-full transition-all duration-150',
+                  isSnapped
+                    ? 'w-2.5 h-2.5 bg-primary ring-2 ring-primary/30'
+                    : isCenter
+                      ? 'w-2.5 h-2.5 bg-foreground/40 ring-1 ring-foreground/10'
+                      : 'w-2 h-2 bg-foreground/30'
                 )}
                 style={{ left: `${left}%`, top: `${top}%` }}
               />
@@ -208,7 +272,8 @@ function TransformPreview({ mode }: { mode: ControlMode }) {
           'absolute w-7 h-7 -translate-x-1/2 -translate-y-1/2 rounded-full pointer-events-none',
           'bg-foreground/70 backdrop-blur-sm border-2 border-background/50',
           'transition-all duration-150',
-          dragging && 'scale-110'
+          dragging && 'scale-110',
+          snappedPoint && 'ring-2 ring-primary/50'
         )}
         style={{
           left: `${Math.max(8, Math.min(92, handleX))}%`,

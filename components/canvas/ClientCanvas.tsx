@@ -380,6 +380,12 @@ function CanvasRenderer({ image }: { image: HTMLImageElement }) {
     groupCenterY,
   } = dimensions;
 
+  // Store canvas dimensions so editor panels can calculate position presets
+  const setCanvasDimensions = useImageStore((s) => s.setCanvasDimensions);
+  useEffect(() => {
+    setCanvasDimensions({ canvasW, canvasH, framedW, framedH });
+  }, [canvasW, canvasH, framedW, framedH, setCanvasDimensions]);
+
   const showFrame = frame.enabled && frame.type !== "none";
 
   const has3DTransform =

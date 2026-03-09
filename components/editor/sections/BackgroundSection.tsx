@@ -213,7 +213,7 @@ export function BackgroundSection() {
           <div
             {...getBgRootProps()}
             className={cn(
-              'flex flex-col items-center justify-center gap-2 py-4 rounded-xl border cursor-pointer transition-all',
+              'flex flex-col items-center justify-center gap-1.5 py-2.5 rounded-xl border cursor-pointer transition-all',
               customBgType === 'image'
                 ? 'border-primary/50 bg-primary/5 ring-1 ring-primary/20'
                 : 'border-border/40 bg-muted/30 hover:bg-accent hover:border-border/60'
@@ -221,12 +221,12 @@ export function BackgroundSection() {
           >
             <input {...getBgInputProps()} />
             <div className={cn(
-              "w-8 h-8 rounded-lg flex items-center justify-center",
+              "w-7 h-7 rounded-lg flex items-center justify-center",
               customBgType === 'image' ? "bg-primary/10" : "bg-muted"
             )}>
-              <Image01Icon size={16} className={customBgType === 'image' ? "text-primary" : "text-muted-foreground"} />
+              <Image01Icon size={14} className={customBgType === 'image' ? "text-primary" : "text-muted-foreground"} />
             </div>
-            <span className={cn("text-[11px] font-medium", customBgType === 'image' ? "text-foreground" : "text-muted-foreground")}>Image</span>
+            <span className={cn("text-[10px] font-medium", customBgType === 'image' ? "text-foreground" : "text-muted-foreground")}>Image</span>
           </div>
 
           {/* Color Picker */}
@@ -238,7 +238,7 @@ export function BackgroundSection() {
               setBackgroundValue(newColor);
             }}
             className={cn(
-              'flex flex-col items-center justify-center gap-2 py-4 h-auto rounded-xl',
+              'flex flex-col items-center justify-center gap-1.5 py-2.5 h-auto rounded-xl',
               customBgType === 'color'
                 ? 'border-primary/50 bg-primary/5 ring-1 ring-primary/20'
                 : 'border-border/40 bg-muted/30 hover:bg-accent hover:border-border/60'
@@ -252,24 +252,24 @@ export function BackgroundSection() {
               setBackgroundValue('transparent');
             }}
             className={cn(
-              'flex flex-col items-center justify-center gap-2 py-4 rounded-xl border transition-all',
+              'flex flex-col items-center justify-center gap-1.5 py-2.5 rounded-xl border transition-all',
               customBgType === 'transparent'
                 ? 'border-primary/50 bg-primary/5 ring-1 ring-primary/20'
                 : 'border-border/40 bg-muted/30 hover:bg-accent hover:border-border/60'
             )}
           >
             <div className={cn(
-              "w-8 h-8 rounded-lg flex items-center justify-center",
+              "w-7 h-7 rounded-lg flex items-center justify-center",
               customBgType === 'transparent' ? "bg-primary/10" : "bg-muted"
             )}>
               <div
-                className="w-4 h-4 rounded-full border border-border/50"
+                className="w-3.5 h-3.5 rounded-full border border-border/50"
                 style={{
                   background: 'repeating-conic-gradient(#808080 0% 25%, #fff 0% 50%) 50% / 6px 6px',
                 }}
               />
             </div>
-            <span className={cn("text-[11px] font-medium", customBgType === 'transparent' ? "text-foreground" : "text-muted-foreground")}>Transparent</span>
+            <span className={cn("text-[10px] font-medium", customBgType === 'transparent' ? "text-foreground" : "text-muted-foreground")}>Transparent</span>
           </button>
         </div>
         {bgUploadError && <p className="text-xs text-destructive mt-2">{bgUploadError}</p>}

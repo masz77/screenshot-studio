@@ -199,17 +199,17 @@ export function ColorPicker({ color, onChange, className }: ColorPickerProps) {
       <PopoverTrigger asChild>
         <button
           className={cn(
-            'flex flex-col items-center justify-center gap-2 py-4 rounded-xl border border-border/40 bg-muted/30 hover:bg-accent hover:border-border/60 transition-all',
+            'flex flex-col items-center justify-center gap-1.5 py-2.5 rounded-xl border border-border/40 bg-muted/30 hover:bg-accent hover:border-border/60 transition-all',
             className
           )}
         >
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-muted">
+          <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-muted">
             <div
-              className="w-4 h-4 rounded-full border border-white/20"
+              className="w-3.5 h-3.5 rounded-full border border-white/20"
               style={{ backgroundColor: currentHex }}
             />
           </div>
-          <span className="text-[11px] font-medium text-muted-foreground">{currentHex}</span>
+          <span className="text-[10px] font-medium text-muted-foreground">{currentHex}</span>
         </button>
       </PopoverTrigger>
       <PopoverContent

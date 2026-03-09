@@ -310,6 +310,8 @@ export function useAutosaveDraft() {
             editorMode: 'screenshot',
             browserUrl: '',
             browserHeaderSize: 100,
+            canvasDimensions: null,
+            customDimensions: null,
           };
 
           await saveDraft(editorState, imageState);

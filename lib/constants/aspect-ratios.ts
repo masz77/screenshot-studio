@@ -261,6 +261,18 @@ export const aspectRatios: AspectRatio[] = [
     description: 'iPad Pro 12.9" landscape screenshot',
     useCase: 'App Store Screenshots',
   },
+
+  // Custom - placeholder entry, actual dimensions come from store
+  {
+    id: 'custom',
+    name: 'Custom',
+    ratio: 16 / 9,
+    width: 16,
+    height: 9,
+    category: 'Custom',
+    description: 'Custom dimensions',
+    useCase: 'Custom',
+  },
 ];
 
 export type AspectRatioKey = (typeof aspectRatios)[number]['id'];

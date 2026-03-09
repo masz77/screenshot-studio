@@ -534,6 +534,7 @@ export interface ImageState {
   borderRadius: number;
   backgroundBorderRadius: number;
   selectedAspectRatio: AspectRatioKey;
+  customDimensions: { width: number; height: number } | null;
   backgroundConfig: BackgroundConfig;
   backgroundBlur: number;
   backgroundNoise: number;
@@ -568,6 +569,7 @@ export interface ImageState {
   setBorderRadius: (radius: number) => void;
   setBackgroundBorderRadius: (radius: number) => void;
   setAspectRatio: (aspectRatio: AspectRatioKey) => void;
+  setCustomDimensions: (width: number, height: number) => void;
   setBackgroundConfig: (config: BackgroundConfig) => void;
   setBackgroundType: (type: BackgroundType) => void;
   setBackgroundValue: (value: string) => void;
@@ -678,6 +680,8 @@ export interface ImageState {
   setBrowserUrl: (url: string) => void;
   browserHeaderSize: number;
   setBrowserHeaderSize: (size: number) => void;
+  canvasDimensions: { canvasW: number; canvasH: number; framedW: number; framedH: number } | null;
+  setCanvasDimensions: (dims: { canvasW: number; canvasH: number; framedW: number; framedH: number }) => void;
 }
 
 export const useImageStore = create<ImageState>()(
@@ -705,6 +709,7 @@ export const useImageStore = create<ImageState>()(
     borderRadius: 10,
     backgroundBorderRadius: 10,
     selectedAspectRatio: "4_3",
+    customDimensions: null,
     backgroundConfig: {
       type: "image",
       value: "backgrounds/raycast/red_distortion_4.webp",
@@ -979,6 +984,11 @@ export const useImageStore = create<ImageState>()(
     setAspectRatio: (aspectRatio: AspectRatioKey) => {
       trackAspectRatioChange(aspectRatio);
       set({ selectedAspectRatio: aspectRatio });
+    },
+
+    setCustomDimensions: (width: number, height: number) => {
+      trackAspectRatioChange('custom');
+      set({ selectedAspectRatio: 'custom', customDimensions: { width, height } });
     },
 
     setBackgroundConfig: (config: BackgroundConfig) => {
@@ -1809,6 +1819,10 @@ export const useImageStore = create<ImageState>()(
     browserHeaderSize: 100,
     setBrowserHeaderSize: (size) => {
       set({ browserHeaderSize: size });
+    },
+    canvasDimensions: null,
+    setCanvasDimensions: (dims) => {
+      set({ canvasDimensions: dims });
     },
   }))
 );

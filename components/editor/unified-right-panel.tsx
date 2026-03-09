@@ -26,6 +26,7 @@ import {
   DepthSection,
   TweetImportSection,
   CodeSnippetSection,
+  ImagePositionSection,
 } from './sections';
 import { cn } from '@/lib/utils';
 import { useImageStore } from '@/lib/store';
@@ -134,6 +135,7 @@ export function UnifiedRightPanel() {
                   <BorderSection />
                 </>
               )}
+              <ImagePositionSection />
               <ShadowSection />
               <TweetImportSection />
               <CodeSnippetSection />

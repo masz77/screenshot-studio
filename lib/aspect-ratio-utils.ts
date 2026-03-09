@@ -7,6 +7,7 @@
 
 import { aspectRatios, type AspectRatio } from '@/lib/constants/aspect-ratios';
 import { ASPECT_RATIO_PRESETS, type AspectRatioPreset } from '@/lib/constants';
+import { useImageStore } from '@/lib/store';
 
 /**
  * Standard pixel dimensions mapping for aspect ratios
@@ -83,12 +84,28 @@ export function getStandardDimensions(
  * @returns AspectRatioPreset with proper dimensions
  */
 export function getAspectRatioPreset(aspectRatioId: string): AspectRatioPreset | null {
+  // Handle custom dimensions from the store
+  if (aspectRatioId === 'custom') {
+    const customDimensions = useImageStore.getState().customDimensions;
+    if (customDimensions) {
+      return {
+        id: 'custom',
+        name: 'Custom',
+        category: 'Custom',
+        width: customDimensions.width,
+        height: customDimensions.height,
+        ratio: `${customDimensions.width}:${customDimensions.height}`,
+        description: 'Custom dimensions',
+      };
+    }
+  }
+
   const aspectRatio = aspectRatios.find((ar) => ar.id === aspectRatioId);
-  
+
   if (!aspectRatio) {
     return null;
   }
-  
+
   // Check for special dimensions first (for formats that share ratios but have different dimensions)
   if (SPECIAL_DIMENSIONS[aspectRatioId]) {
     const specialDimensions = SPECIAL_DIMENSIONS[aspectRatioId];
