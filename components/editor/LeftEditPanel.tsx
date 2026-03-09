@@ -12,8 +12,8 @@ import {
   LayersLogoIcon,
 } from 'hugeicons-react';
 import {
-  EditSection,
-  FramesSection,
+  StyleSection,
+  BorderSection,
   ShadowSection,
   BackgroundSection,
   DepthSection,
@@ -138,8 +138,8 @@ export function LeftEditPanel() {
               <ImageOverlaySection />
               <AnnotateSection />
               <TextSection />
-              <EditSection />
-              <FramesSection />
+              <StyleSection />
+              <BorderSection />
               <ShadowSection />
               <SettingsSection />
             </div>

@@ -261,6 +261,8 @@ export function useAutosaveDraft() {
             imageScale,
             imageBorder,
             imageShadow,
+            imageStylePreset: 'default',
+            shadowPreset: 'soft',
             perspective3D,
             imageFilters: {
               brightness: 100,

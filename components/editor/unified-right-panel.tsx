@@ -16,8 +16,8 @@ import {
 } from 'hugeicons-react';
 import {
   SettingsSection,
-  EditSection,
-  FramesSection,
+  StyleSection,
+  BorderSection,
   ShadowSection,
   BackgroundSection,
   TextSection,
@@ -158,8 +158,8 @@ export function UnifiedRightPanel() {
               <ImageOverlaySection />
               <AnnotateSection />
               <TextSection />
-              <EditSection />
-              <FramesSection />
+              <StyleSection />
+              <BorderSection />
               <ShadowSection />
             </div>
           )}

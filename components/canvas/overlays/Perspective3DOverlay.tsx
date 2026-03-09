@@ -153,6 +153,7 @@ export function Perspective3DOverlay({
   const isMacFrame = frame.type === 'macos-light' || frame.type === 'macos-dark';
   const isWinFrame = frame.type === 'windows-light' || frame.type === 'windows-dark';
   const isArcFrame = frame.type === 'arc-light' || frame.type === 'arc-dark';
+  const isStyleFrame = ['glass-light', 'glass-dark', 'outline-light', 'border-light', 'border-dark'].includes(frame.type);
 
   // Get frame container background color
   const getFrameBackground = () => {
@@ -161,6 +162,16 @@ export function Perspective3DOverlay({
     }
     if (isWinFrame) {
       return isDark ? '#2d2d2d' : '#f3f3f3';
+    }
+    if (isStyleFrame) {
+      const styleMap: Record<string, string> = {
+        'glass-light': `rgba(255, 255, 255, ${frame.opacity ?? 0.25})`,
+        'glass-dark': `rgba(0, 0, 0, ${frame.opacity ?? 0.3})`,
+        'outline-light': `rgba(255, 255, 255, ${frame.opacity ?? 0.35})`,
+        'border-light': 'rgb(255, 255, 255)',
+        'border-dark': 'rgb(26, 26, 26)',
+      };
+      return styleMap[frame.type] || 'transparent';
     }
     return 'transparent';
   };
@@ -216,8 +227,8 @@ export function Perspective3DOverlay({
             position: 'relative',
             width: '100%',
             height: '100%',
-            backgroundColor: (isMacFrame || isWinFrame) ? getFrameBackground() : 'transparent',
-            borderRadius: (isMacFrame || isWinFrame || isArcFrame) ? `${screenshot.radius}px` : undefined,
+            backgroundColor: (isMacFrame || isWinFrame || isStyleFrame) ? getFrameBackground() : 'transparent',
+            borderRadius: (isMacFrame || isWinFrame || isArcFrame || isStyleFrame) ? `${isStyleFrame ? (screenshot.radius > 0 ? screenshot.radius + windowPadding : 0) : screenshot.radius}px` : undefined,
             overflow: 'hidden',
           }}
         >

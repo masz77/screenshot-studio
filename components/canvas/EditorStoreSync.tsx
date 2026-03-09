@@ -95,7 +95,8 @@ export function EditorStoreSync() {
       editorStore.frame.width !== frame.width ||
       editorStore.frame.color !== frame.color ||
       editorStore.frame.padding !== frame.padding ||
-      editorStore.frame.title !== frame.title
+      editorStore.frame.title !== frame.title ||
+      editorStore.frame.opacity !== frame.opacity
     ) {
       editorStore.setFrame({
         enabled: frame.enabled,
@@ -104,6 +105,7 @@ export function EditorStoreSync() {
         color: frame.color,
         padding: frame.padding,
         title: frame.title,
+        opacity: frame.opacity,
       })
     }
 

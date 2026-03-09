@@ -6,7 +6,7 @@ import { type ImageFilters, useImageStore } from '@/lib/store';
 
 export interface FrameConfig {
   enabled: boolean;
-  type: 'none' | 'arc-light' | 'arc-dark' | 'macos-light' | 'macos-dark' | 'windows-light' | 'windows-dark' | 'photograph';
+  type: 'none' | 'arc-light' | 'arc-dark' | 'macos-light' | 'macos-dark' | 'windows-light' | 'windows-dark' | 'photograph' | 'glass-light' | 'glass-dark' | 'outline-light' | 'border-light' | 'border-dark';
   width: number;
   color: string;
   padding?: number;
@@ -128,6 +128,42 @@ function buildDropShadowFilter(shadow: ShadowConfig): string | undefined {
 }
 
 /**
+ * Builds a CSS box-shadow string for style frames.
+ * Unlike drop-shadow, box-shadow follows border-radius and ignores content transparency,
+ * so it wraps the entire frame+image uniformly.
+ */
+function buildBoxShadow(shadow: ShadowConfig): string | undefined {
+  if (!shadow.enabled) return undefined;
+
+  const { softness, spread, color, intensity, offsetX, offsetY } = shadow;
+
+  let r = 0, g = 0, b = 0;
+  const colorMatch = color.match(/rgba?\(([^)]+)\)/);
+
+  if (colorMatch) {
+    const parts = colorMatch[1].split(',').map(s => s.trim());
+    r = parseInt(parts[0]) || 0;
+    g = parseInt(parts[1]) || 0;
+    b = parseInt(parts[2]) || 0;
+  } else if (color.startsWith('#')) {
+    const hex = color.replace('#', '');
+    r = parseInt(hex.slice(0, 2), 16) || 0;
+    g = parseInt(hex.slice(2, 4), 16) || 0;
+    b = parseInt(hex.slice(4, 6), 16) || 0;
+  }
+
+  const x = offsetX ?? 0;
+  const y = offsetY ?? 0;
+  const blur = softness + (spread || 0);
+  const opacity = Math.min(1, Math.max(0, intensity));
+
+  return [
+    `${x}px ${y}px ${blur}px rgba(${r}, ${g}, ${b}, ${opacity})`,
+    `0px 0px ${blur * 0.5}px rgba(${r}, ${g}, ${b}, ${opacity * 0.2})`,
+  ].join(', ');
+}
+
+/**
  * HTML/CSS-based main image layer that replaces Konva MainImageLayer.
  * Renders the main image with frames, shadows, and filters.
  */
@@ -165,7 +201,10 @@ export function HTMLMainImageLayer({
   const rotateStartRef = useRef<{ centerX: number; centerY: number; startAngle: number; startRotation: number } | null>(null);
 
   const imageFilter = useMemo(() => buildImageFilter(imageFilters), [imageFilters]);
-  const shadowFilter = useMemo(() => buildDropShadowFilter(shadow), [shadow]);
+  const isStyleFrame = ['glass-light', 'glass-dark', 'outline-light', 'border-light', 'border-dark'].includes(frame.type);
+  // Style frames use box-shadow on the frame container; others use drop-shadow filter on the outer div
+  const shadowFilter = useMemo(() => isStyleFrame ? undefined : buildDropShadowFilter(shadow), [shadow, isStyleFrame]);
+  const frameBoxShadow = useMemo(() => isStyleFrame ? buildBoxShadow(shadow) : undefined, [shadow, isStyleFrame]);
 
   const isDark = frame.type.includes('dark');
   const isArcFrame = frame.type === 'arc-light' || frame.type === 'arc-dark';
@@ -492,6 +531,25 @@ export function HTMLMainImageLayer({
       };
     }
 
+    if (isStyleFrame) {
+      const styleConfig: Record<string, { bg: string }> = {
+        'glass-light': { bg: `rgba(255, 255, 255, ${frame.opacity ?? 0.25})` },
+        'glass-dark': { bg: `rgba(0, 0, 0, ${frame.opacity ?? 0.7})` },
+        'outline-light': { bg: `rgba(255, 255, 255, ${frame.opacity ?? 0.35})` },
+        'border-light': { bg: 'rgb(255, 255, 255)' },
+        'border-dark': { bg: 'rgb(26, 26, 26)' },
+      };
+      const config = styleConfig[frame.type] || styleConfig['glass-light'];
+      // Outer radius = inner radius + padding so curves are concentric (0 when no rounding)
+      const outerRadius = screenshot.radius > 0 ? screenshot.radius + windowPadding : 0;
+      return {
+        ...baseStyle,
+        backgroundColor: config.bg,
+        borderRadius: `${outerRadius}px`,
+        boxShadow: frameBoxShadow,
+      };
+    }
+
     // No frame
     return {
       ...baseStyle,
@@ -544,6 +602,17 @@ export function HTMLMainImageLayer({
         left: '8px',
         width: `calc(100% - 16px)`,
         height: `calc(100% - 32px)`,
+        borderRadius: `${screenshot.radius}px`,
+      };
+    }
+
+    if (isStyleFrame) {
+      return {
+        ...baseStyle,
+        left: `${windowPadding}px`,
+        top: `${windowPadding}px`,
+        width: `${imageScaledW}px`,
+        height: `${imageScaledH}px`,
         borderRadius: `${screenshot.radius}px`,
       };
     }

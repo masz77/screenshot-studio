@@ -103,6 +103,9 @@ export interface AnnotationShape {
   isVisible: boolean;
 }
 
+export type ImageStylePreset = 'default' | 'glass-light' | 'glass-dark' | 'outline' | 'border-light' | 'border-dark';
+export type ShadowPreset = 'none' | 'hug' | 'soft' | 'strong';
+
 export interface ImageBorder {
   enabled: boolean;
   width: number;
@@ -115,7 +118,12 @@ export interface ImageBorder {
     | "macos-dark"
     | "windows-light"
     | "windows-dark"
-    | "photograph";
+    | "photograph"
+    | "glass-light"
+    | "glass-dark"
+    | "outline-light"
+    | "border-light"
+    | "border-dark";
   padding?: number;
   title?: string;
   opacity?: number;
@@ -230,7 +238,12 @@ export interface EditorState {
       | "macos-dark"
       | "windows-light"
       | "windows-dark"
-      | "photograph";
+      | "photograph"
+      | "glass-light"
+      | "glass-dark"
+      | "outline-light"
+      | "border-light"
+      | "border-dark";
     width: number;
     color: string;
     padding?: number;
@@ -531,6 +544,8 @@ export interface ImageState {
   imageScale: number;
   imageBorder: ImageBorder;
   imageShadow: ImageShadow;
+  imageStylePreset: ImageStylePreset;
+  shadowPreset: ShadowPreset;
   perspective3D: {
     perspective: number;
     rotateX: number;
@@ -575,6 +590,8 @@ export interface ImageState {
   setImageScale: (scale: number) => void;
   setImageBorder: (border: ImageBorder | Partial<ImageBorder>) => void;
   setImageShadow: (shadow: ImageShadow | Partial<ImageShadow>) => void;
+  setImageStylePreset: (preset: ImageStylePreset) => void;
+  setShadowPreset: (preset: ShadowPreset) => void;
   setPerspective3D: (perspective: Partial<ImageState["perspective3D"]>) => void;
   setImageFilter: (key: keyof ImageFilters, value: number) => void;
   resetImageFilters: () => void;
@@ -709,6 +726,8 @@ export const useImageStore = create<ImageState>()(
       color: "rgba(0, 0, 0, 0.6)",
       opacity: 0.5,
     },
+    imageStylePreset: 'default' as ImageStylePreset,
+    shadowPreset: 'soft' as ShadowPreset,
     perspective3D: {
       perspective: 200, // em units, converted to px
       rotateX: 0,
@@ -792,6 +811,8 @@ export const useImageStore = create<ImageState>()(
           padding: 20,
           title: "",
         },
+        imageStylePreset: 'default' as ImageStylePreset,
+        shadowPreset: 'soft' as ShadowPreset,
         // Reset 3D perspective
         perspective3D: {
           perspective: 200,
@@ -889,6 +910,8 @@ export const useImageStore = create<ImageState>()(
           padding: 20,
           title: "",
         },
+        imageStylePreset: 'default' as ImageStylePreset,
+        shadowPreset: 'soft' as ShadowPreset,
         // Reset 3D perspective
         perspective3D: {
           perspective: 200,
@@ -1167,6 +1190,36 @@ export const useImageStore = create<ImageState>()(
         },
       });
     },
+
+    setImageStylePreset: (preset: ImageStylePreset) => {
+      const borderMap: Record<ImageStylePreset, Partial<ImageBorder>> = {
+        'default': { enabled: false, type: 'none' },
+        'glass-light': { enabled: true, type: 'glass-light', opacity: 0.25, padding: 1 },
+        'glass-dark': { enabled: true, type: 'glass-dark', opacity: 0.7, padding: 1 },
+        'outline': { enabled: true, type: 'outline-light', opacity: 0.35, padding: 0.5 },
+        'border-light': { enabled: true, type: 'border-light', padding: 1 },
+        'border-dark': { enabled: true, type: 'border-dark', padding: 1 },
+      };
+      const currentBorder = get().imageBorder;
+      set({
+        imageStylePreset: preset,
+        imageBorder: { ...currentBorder, ...borderMap[preset] },
+      });
+    },
+
+    setShadowPreset: (preset: ShadowPreset) => {
+      const shadowMap: Record<ShadowPreset, ImageShadow> = {
+        'none': { enabled: false, blur: 0, offsetX: 0, offsetY: 0, spread: 0, color: 'rgba(0,0,0,0.6)', opacity: 0 },
+        'hug': { enabled: true, blur: 10, offsetX: 0, offsetY: 2, spread: 0, color: 'rgba(0,0,0,0.6)', opacity: 0.25 },
+        'soft': { enabled: true, blur: 30, offsetX: 0, offsetY: 12, spread: 5, color: 'rgba(0,0,0,0.6)', opacity: 0.5 },
+        'strong': { enabled: true, blur: 60, offsetX: 0, offsetY: 24, spread: 10, color: 'rgba(0,0,0,0.6)', opacity: 0.8 },
+      };
+      set({
+        shadowPreset: preset,
+        imageShadow: shadowMap[preset],
+      });
+    },
+
     setPerspective3D: (perspective: Partial<ImageState["perspective3D"]>) => {
       const currentPerspective = get().perspective3D;
       set({
@@ -1233,6 +1286,8 @@ export const useImageStore = create<ImageState>()(
           padding: 20,
           title: "",
         },
+        imageStylePreset: 'default' as ImageStylePreset,
+        shadowPreset: 'soft' as ShadowPreset,
         perspective3D: {
           perspective: 200,
           rotateX: 0,

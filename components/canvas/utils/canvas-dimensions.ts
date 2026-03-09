@@ -94,12 +94,21 @@ export function calculateCanvasDimensions(
   const isMacosFrame = frame.type === 'macos-light' || frame.type === 'macos-dark';
   const isWindowsFrame = frame.type === 'windows-light' || frame.type === 'windows-dark';
   const isPhotograph = frame.type === 'photograph';
+  const isStyleFrame = ['glass-light', 'glass-dark', 'outline-light', 'border-light', 'border-dark'].includes(frame.type);
 
   // No frameOffset - borders are applied directly to image elements
   const frameOffset = 0;
 
+  // Calculate style frame padding from store value (percentage of image width)
+  let stylePadding = 0;
+  if (showFrame && isStyleFrame) {
+    const paddingPct = (frame.padding ?? 2) / 100;
+    stylePadding = Math.round(imageScaledW * paddingPct);
+  }
+
   // Polaroid needs padding for the white border (8px sides/top)
-  const windowPadding = showFrame && isPhotograph ? 8 : 0;
+  // Style frames use their own calculated padding
+  const windowPadding = showFrame && isPhotograph ? 8 : (showFrame && isStyleFrame ? stylePadding : 0);
 
   // Header/footer height:
   // - macOS: 22px title bar
