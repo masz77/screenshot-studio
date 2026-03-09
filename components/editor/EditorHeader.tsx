@@ -34,6 +34,7 @@ import { ImageExportProgressView } from '@/components/canvas/dialogs/ImageProgre
 import { FormatSelector, QualityPresetSelector, ScaleSlider } from '@/components/export';
 import { cn } from '@/lib/utils';
 import { GitHubStarButton } from '@/components/ui/github-star-button';
+import { FeedbackWidget } from '@/components/FeedbackWidget';
 
 export function EditorHeader() {
   const { screenshot } = useEditorStore();
@@ -307,6 +308,7 @@ export function EditorHeader() {
           )}
 
           <div className="flex items-center gap-1 ml-1">
+            <FeedbackWidget />
             <GitHubStarButton compact />
             <a
               href="https://x.com/code_kartik"
