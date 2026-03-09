@@ -42,7 +42,7 @@ export function BorderSection() {
   return (
     <SectionWrapper title="Border" defaultOpen={true}>
       <div className="space-y-3">
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-3 gap-2 p-1">
           {borderPresets.map(({ value, label }) => {
             const isSelected = borderRadius === value;
             return (

@@ -138,7 +138,7 @@ export function AnnotateSection() {
       <div className="space-y-3">
 
         {/* ── Tool grid ── */}
-        <div className="grid grid-cols-3 gap-1.5">
+        <div className="grid grid-cols-3 gap-1.5 p-1">
           {TOOLS.map((tool) => {
             const isActive = activeAnnotationTool === tool.id;
             return (

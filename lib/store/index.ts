@@ -670,6 +670,14 @@ export interface ImageState {
   activeRightPanelTab: 'settings' | 'edit' | 'background' | 'transforms' | 'animate' | 'depth';
   setActiveRightPanelTab: (tab: 'settings' | 'edit' | 'background' | 'transforms' | 'animate' | 'depth') => void;
   reorderImageOverlay: (id: string, direction: 'up' | 'down' | 'top' | 'bottom') => void;
+  showTemplates: boolean;
+  setShowTemplates: (show: boolean) => void;
+  editorMode: 'screenshot' | 'browser';
+  setEditorMode: (mode: 'screenshot' | 'browser') => void;
+  browserUrl: string;
+  setBrowserUrl: (url: string) => void;
+  browserHeaderSize: number;
+  setBrowserHeaderSize: (size: number) => void;
 }
 
 export const useImageStore = create<ImageState>()(
@@ -1750,6 +1758,57 @@ export const useImageStore = create<ImageState>()(
     activeRightPanelTab: 'edit',
     setActiveRightPanelTab: (tab) => {
       set({ activeRightPanelTab: tab });
+    },
+    showTemplates: false,
+    setShowTemplates: (show) => {
+      set({ showTemplates: show });
+    },
+    editorMode: 'screenshot',
+    setEditorMode: (mode) => {
+      const currentBorder = get().imageBorder;
+      if (mode === 'browser') {
+        // Apply default browser frame (Chrome Dark) if no browser frame is active
+        const isBrowserFrame = ['macos-light', 'macos-dark', 'windows-light', 'windows-dark'].includes(currentBorder.type);
+        if (!isBrowserFrame) {
+          set({
+            editorMode: mode,
+            imageBorder: {
+              ...currentBorder,
+              enabled: true,
+              type: 'windows-dark',
+              title: get().browserUrl || '',
+            },
+          });
+          return;
+        }
+      } else {
+        // Switching back to screenshot: disable browser frame
+        const isBrowserFrame = ['macos-light', 'macos-dark', 'windows-light', 'windows-dark'].includes(currentBorder.type);
+        if (isBrowserFrame) {
+          set({
+            editorMode: mode,
+            imageBorder: {
+              ...currentBorder,
+              enabled: false,
+              type: 'none',
+            },
+          });
+          return;
+        }
+      }
+      set({ editorMode: mode });
+    },
+    browserUrl: '',
+    setBrowserUrl: (url) => {
+      const currentBorder = get().imageBorder;
+      set({
+        browserUrl: url,
+        imageBorder: { ...currentBorder, title: url },
+      });
+    },
+    browserHeaderSize: 100,
+    setBrowserHeaderSize: (size) => {
+      set({ browserHeaderSize: size });
     },
   }))
 );

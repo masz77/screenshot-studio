@@ -3,6 +3,7 @@
 import { useRef, useState, useCallback, useMemo, useEffect } from 'react';
 import { type ShadowConfig } from '../utils/shadow-utils';
 import { type ImageFilters, useImageStore } from '@/lib/store';
+import { SafariToolbar, ChromeToolbar } from '../frames/BrowserToolbar';
 
 export interface FrameConfig {
   enabled: boolean;
@@ -378,12 +379,14 @@ export function HTMLMainImageLayer({
   const left = centerX - framedW / 2;
   const top = centerY - framedH / 2;
 
+  const browserRadius = screenshot.radius;
+
   // Image border radius based on frame type
   const getImageBorderRadius = () => {
     if (isMacFrame || isWinFrame) {
       // For frames with title bar, only round bottom corners
       // Use slightly smaller radius to fit inside the container
-      const innerRadius = Math.max(0, screenshot.radius - windowPadding);
+      const innerRadius = Math.max(0, browserRadius - windowPadding);
       return `0 0 ${innerRadius}px ${innerRadius}px`;
     }
     return `${screenshot.radius}px`;
@@ -397,96 +400,14 @@ export function HTMLMainImageLayer({
     ? `rgba(255, 255, 255, ${arcOpacity})`
     : `rgba(0, 0, 0, ${arcOpacity})`;
 
-  // Render macOS title bar
+  // Safari toolbar — uses shared component
   const renderMacOSTitleBar = () => (
-    <div
-      style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        height: '22px',
-        background: isDark ? 'rgb(40, 40, 43)' : '#e8e8e8',
-        borderRadius: `${screenshot.radius}px ${screenshot.radius}px 0 0`,
-        display: 'flex',
-        alignItems: 'center',
-        padding: '0 12px',
-        zIndex: 2,
-      }}
-    >
-      {/* Traffic lights */}
-      <div style={{ display: 'flex', gap: '5px', zIndex: 2 }}>
-        <span style={{ height: '6px', width: '6px', borderRadius: '50%', backgroundColor: 'rgb(255, 95, 87)' }} />
-        <span style={{ height: '6px', width: '6px', borderRadius: '50%', backgroundColor: 'rgb(254, 188, 46)' }} />
-        <span style={{ height: '6px', width: '6px', borderRadius: '50%', backgroundColor: 'rgb(40, 201, 65)' }} />
-      </div>
-      {/* Title */}
-      <div
-        style={{
-          position: 'absolute',
-          width: '100%',
-          left: 0,
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          pointerEvents: 'none',
-          zIndex: 1,
-        }}
-      >
-        <span
-          style={{
-            color: isDark ? 'rgb(159, 159, 159)' : '#4d4d4d',
-            fontSize: '10px',
-            fontWeight: 500,
-            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-            letterSpacing: '-0.2px',
-          }}
-        >
-          {frame.title || 'file'}
-        </span>
-      </div>
-    </div>
+    <SafariToolbar windowHeader={windowHeader} isDark={isDark} title={frame.title} />
   );
 
-  // Render Windows title bar
+  // Chrome toolbar — uses shared component
   const renderWindowsTitleBar = () => (
-    <div
-      style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        height: '28px',
-        backgroundColor: isDark ? '#2d2d2d' : '#f3f3f3',
-        borderRadius: `${screenshot.radius}px ${screenshot.radius}px 0 0`,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '0 8px 0 16px',
-        zIndex: 2,
-      }}
-    >
-      <div style={{ color: isDark ? '#ffffff' : '#1a1a1a', fontSize: '13px' }}>
-        {frame.title || ''}
-      </div>
-      <div style={{ display: 'flex', gap: '0' }}>
-        {/* Minimize */}
-        <div style={{ width: '46px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ width: '12px', height: '1px', backgroundColor: isDark ? '#ffffff' : '#1a1a1a' }} />
-        </div>
-        {/* Maximize */}
-        <div style={{ width: '46px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ width: '12px', height: '12px', border: `1px solid ${isDark ? '#ffffff' : '#1a1a1a'}`, boxSizing: 'border-box' }} />
-        </div>
-        {/* Close */}
-        <div style={{ width: '46px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ position: 'relative', width: '12px', height: '12px' }}>
-            <div style={{ position: 'absolute', width: '16px', height: '1px', backgroundColor: isDark ? '#ffffff' : '#1a1a1a', transform: 'rotate(45deg)', top: '5px', left: '-2px' }} />
-            <div style={{ position: 'absolute', width: '16px', height: '1px', backgroundColor: isDark ? '#ffffff' : '#1a1a1a', transform: 'rotate(-45deg)', top: '5px', left: '-2px' }} />
-          </div>
-        </div>
-      </div>
-    </div>
+    <ChromeToolbar windowHeader={windowHeader} isDark={isDark} title={frame.title} />
   );
 
   // Get frame container styles based on frame type
@@ -509,16 +430,16 @@ export function HTMLMainImageLayer({
     if (isMacFrame) {
       return {
         ...baseStyle,
-        backgroundColor: isDark ? 'rgb(40, 40, 43)' : '#e8e8e8',
-        borderRadius: `${screenshot.radius}px`,
+        backgroundColor: isDark ? '#3A3A3C' : '#F6F6F6',
+        borderRadius: `${browserRadius}px`,
       };
     }
 
     if (isWinFrame) {
       return {
         ...baseStyle,
-        backgroundColor: isDark ? '#2d2d2d' : '#f3f3f3',
-        borderRadius: `${screenshot.radius}px`,
+        backgroundColor: isDark ? '#292A2D' : '#FFFFFF',
+        borderRadius: `${browserRadius}px`,
       };
     }
 

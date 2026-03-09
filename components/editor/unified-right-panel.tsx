@@ -10,13 +10,12 @@ import {
   RotateSquareIcon,
   VideoReplayIcon,
   Cancel01Icon,
-  ArrowRight01Icon,
-  RefreshIcon,
   LayersLogoIcon,
 } from 'hugeicons-react';
 import {
   SettingsSection,
   StyleSection,
+  BrowserMockupSection,
   BorderSection,
   ShadowSection,
   BackgroundSection,
@@ -45,12 +44,10 @@ const tabs: { id: TabType; icon: React.ReactNode; label: string }[] = [
 ];
 
 export function UnifiedRightPanel() {
-  const { activeRightPanelTab, setActiveRightPanelTab, uploadedImageUrl, resetCanvasSettings } = useImageStore();
+  const { activeRightPanelTab, setActiveRightPanelTab, showTemplates: templatesOpen, setShowTemplates: setTemplatesOpen, editorMode } = useImageStore();
   const activeTab = activeRightPanelTab;
   const setActiveTab = setActiveRightPanelTab;
-  const activeIndex = tabs.findIndex((t) => t.id === activeTab);
 
-  const [templatesOpen, setTemplatesOpen] = React.useState(false);
   const [contentKey, setContentKey] = React.useState(activeTab);
   const [transitioning, setTransitioning] = React.useState(false);
 
@@ -74,65 +71,41 @@ export function UnifiedRightPanel() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [templatesOpen]);
+  }, [templatesOpen, setTemplatesOpen]);
 
   return (
     <div className="w-full h-full bg-card flex flex-col overflow-hidden md:w-[460px] border-r border-border/40 relative">
-      {/* Templates + Reset */}
-      <div className="px-3 pt-3 shrink-0 space-y-2">
-        <div className="flex gap-2">
-          {/* Templates */}
-          <button
-            onClick={() => setTemplatesOpen(true)}
-            className="flex-1 flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-muted/80 dark:bg-muted/50 border border-border/20 hover:bg-accent transition-colors duration-150 group"
-          >
-            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary">
-              <MagicWand01Icon size={18} />
-            </div>
-            <span className="text-sm font-medium text-foreground">Templates</span>
-            <ArrowRight01Icon
-              size={16}
-              className="ml-auto text-muted-foreground group-hover:text-foreground transition-colors duration-150"
-            />
-          </button>
-          {uploadedImageUrl && (
-            <button
-              onClick={resetCanvasSettings}
-              className="flex items-center justify-center w-11 rounded-xl bg-muted/80 dark:bg-muted/50 border border-border/20 hover:bg-accent transition-colors duration-150 text-muted-foreground hover:text-foreground"
-              title="Reset to defaults"
-            >
-              <RefreshIcon size={18} />
-            </button>
-          )}
-        </div>
-      </div>
-
       {/* Tab Navigation */}
       <div className="px-3 py-3 border-b border-border/30 shrink-0">
-        <div className="relative flex p-1 bg-muted/80 dark:bg-muted/50 rounded-xl border border-border/20">
-          {/* Sliding background indicator */}
-          <div
-            className="absolute top-1 bottom-1 bg-background dark:bg-accent rounded-lg transition-all duration-250 ease-out"
-            style={{
-              left: `calc(${activeIndex * (100 / tabs.length)}% + 4px)`,
-              width: `calc(${100 / tabs.length}% - 8px)`,
-            }}
-          />
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={cn(
-                'relative z-10 flex-1 flex flex-col items-center gap-1 py-2.5 px-2 rounded-lg transition-colors duration-150',
-                activeTab === tab.id
-                  ? 'text-foreground'
-                  : 'text-muted-foreground hover:text-foreground'
-              )}
-            >
-              {tab.icon}
-              <span className="text-[10px] font-medium">{tab.label}</span>
-            </button>
-          ))}
+        <div className="flex gap-1 p-1 bg-muted/80 dark:bg-muted/50 rounded-xl border border-border/20">
+          {tabs.map((tab) => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={cn(
+                  'flex items-center justify-center py-2.5 px-3 rounded-lg',
+                  'transition-all duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)]',
+                  isActive
+                    ? 'bg-background dark:bg-accent text-foreground flex-[1.8] shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground flex-1'
+                )}
+              >
+                <span className="shrink-0">{tab.icon}</span>
+                <span
+                  className={cn(
+                    'text-xs font-medium whitespace-nowrap overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)]',
+                    isActive
+                      ? 'max-w-[80px] opacity-100 ml-2'
+                      : 'max-w-0 opacity-0 ml-0'
+                  )}
+                >
+                  {tab.label}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -153,14 +126,20 @@ export function UnifiedRightPanel() {
 
           {contentKey === 'edit' && (
             <div className="space-y-2">
+              {editorMode === 'browser' ? (
+                <BrowserMockupSection />
+              ) : (
+                <>
+                  <StyleSection />
+                  <BorderSection />
+                </>
+              )}
+              <ShadowSection />
               <TweetImportSection />
               <CodeSnippetSection />
               <ImageOverlaySection />
               <AnnotateSection />
               <TextSection />
-              <StyleSection />
-              <BorderSection />
-              <ShadowSection />
             </div>
           )}
 

@@ -544,8 +544,15 @@ function AnimationControls() {
 // ─── Main Panel ─────────────────────────────────────────────────────────────
 
 export function RightSettingsPanel() {
+  const { activeRightPanelTab } = useImageStore();
   const [activeTab, setActiveTab] = React.useState<RightTabType>('transforms');
-  const activeIndex = rightTabs.findIndex((t) => t.id === activeTab);
+
+  // Sync with store — when timeline or other components set the right panel tab to animate/transforms
+  React.useEffect(() => {
+    if (activeRightPanelTab === 'animate' || activeRightPanelTab === 'transforms') {
+      setActiveTab(activeRightPanelTab);
+    }
+  }, [activeRightPanelTab]);
 
   const [contentKey, setContentKey] = React.useState<RightTabType>(activeTab);
   const [transitioning, setTransitioning] = React.useState(false);
@@ -565,29 +572,35 @@ export function RightSettingsPanel() {
     <div className="w-[240px] h-full bg-card flex flex-col overflow-hidden border-l border-border/40 shrink-0">
       {/* Tab Navigation */}
       <div className="px-2.5 py-2.5 border-b border-border/30 shrink-0">
-        <div className="relative flex p-0.5 bg-muted/80 dark:bg-muted/50 rounded-lg border border-border/20">
-          <div
-            className="absolute top-0.5 bottom-0.5 bg-background dark:bg-accent rounded-md transition-all duration-250 ease-out"
-            style={{
-              left: `calc(${activeIndex * (100 / rightTabs.length)}% + 2px)`,
-              width: `calc(${100 / rightTabs.length}% - 4px)`,
-            }}
-          />
-          {rightTabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={cn(
-                'relative z-10 flex-1 flex items-center justify-center gap-1.5 py-2 px-1.5 rounded-md transition-colors duration-150',
-                activeTab === tab.id
-                  ? 'text-foreground'
-                  : 'text-muted-foreground hover:text-foreground'
-              )}
-            >
-              {tab.icon}
-              <span className="text-[11px] font-medium">{tab.label}</span>
-            </button>
-          ))}
+        <div className="flex gap-1 p-0.5 bg-muted/80 dark:bg-muted/50 rounded-lg border border-border/20">
+          {rightTabs.map((tab) => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={cn(
+                  'flex items-center justify-center py-2 px-2 rounded-md',
+                  'transition-all duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)]',
+                  isActive
+                    ? 'bg-background dark:bg-accent text-foreground flex-[1.8] shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground flex-1'
+                )}
+              >
+                <span className="shrink-0">{tab.icon}</span>
+                <span
+                  className={cn(
+                    'text-[11px] font-medium whitespace-nowrap overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)]',
+                    isActive
+                      ? 'max-w-[60px] opacity-100 ml-1.5'
+                      : 'max-w-0 opacity-0 ml-0'
+                  )}
+                >
+                  {tab.label}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </div>
 

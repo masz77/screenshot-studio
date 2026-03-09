@@ -34,7 +34,8 @@ export function calculateCanvasDimensions(
     type: string;
     width: number;
     padding?: number;
-  }
+  },
+  browserHeaderSize?: number
 ): CanvasDimensions {
   const imageAspect = image.naturalWidth / image.naturalHeight;
   const canvasAspect = containerWidth / containerHeight;
@@ -111,10 +112,12 @@ export function calculateCanvasDimensions(
   const windowPadding = showFrame && isPhotograph ? 8 : (showFrame && isStyleFrame ? stylePadding : 0);
 
   // Header/footer height:
-  // - macOS: 22px title bar
-  // - Windows: 28px title bar
+  // - Safari (macOS): 22px toolbar
+  // - Chrome (Windows): 36px (tab bar + address bar)
   // - Polaroid: 16px extra bottom (24px total bottom - 8px already in windowPadding)
-  const windowHeader = showFrame && isMacosFrame ? 22 : (showFrame && isWindowsFrame ? 28 : (showFrame && isPhotograph ? 16 : 0));
+  const defaultHeader = isMacosFrame ? 22 : (isWindowsFrame ? 36 : 0);
+  const browserHeader = (isMacosFrame || isWindowsFrame) && browserHeaderSize != null ? Math.round(defaultHeader * (browserHeaderSize / 100)) : defaultHeader;
+  const windowHeader = showFrame && isMacosFrame ? browserHeader : (showFrame && isWindowsFrame ? browserHeader : (showFrame && isPhotograph ? 16 : 0));
 
   const eclipseBorder = 0;
 

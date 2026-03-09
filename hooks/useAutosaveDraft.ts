@@ -306,6 +306,10 @@ export function useAutosaveDraft() {
             annotationDefaults: { strokeColor: '#ef4444', strokeWidth: 6, fillColor: 'transparent' },
             blurRegions: [],
             activeRightPanelTab: 'edit',
+            showTemplates: false,
+            editorMode: 'screenshot',
+            browserUrl: '',
+            browserHeaderSize: 100,
           };
 
           await saveDraft(editorState, imageState);

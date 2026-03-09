@@ -9,7 +9,6 @@ import {
   Download04Icon,
   Copy01Icon,
   AspectRatioIcon,
-  VideoReplayIcon,
   Add01Icon,
   Video01Icon,
   Delete02Icon,
@@ -17,6 +16,8 @@ import {
   ArrowTurnForwardIcon,
   ArrowDown01Icon,
   Download01Icon,
+  RefreshIcon,
+  MagicWand01Icon,
 } from 'hugeicons-react';
 import { useEditorStore, useImageStore } from '@/lib/store';
 import { useExport } from '@/hooks/useExport';
@@ -36,7 +37,7 @@ import { GitHubStarButton } from '@/components/ui/github-star-button';
 
 export function EditorHeader() {
   const { screenshot } = useEditorStore();
-  const { selectedAspectRatio, showTimeline, toggleTimeline, slides, uploadedImageUrl, clearImage, timeline, animationClips } = useImageStore();
+  const { selectedAspectRatio, slides, uploadedImageUrl, clearImage, timeline, animationClips, resetCanvasSettings, setShowTemplates } = useImageStore();
   const [aspectRatioOpen, setAspectRatioOpen] = React.useState(false);
   const [exportOpen, setExportOpen] = React.useState(false);
   const [exportSlideshowOpen, setExportSlideshowOpen] = React.useState(false);
@@ -112,6 +113,30 @@ export function EditorHeader() {
             />
           </Link>
 
+          <button
+            onClick={() => setShowTemplates(true)}
+            className="flex items-center gap-2 px-2.5 h-8 rounded-lg bg-muted/80 dark:bg-muted/50 border border-border/20 hover:bg-accent transition-colors duration-150 group"
+          >
+            <div className="flex items-center justify-center w-5 h-5 rounded bg-primary/10 text-primary">
+              <MagicWand01Icon size={12} />
+            </div>
+            <span className="text-xs font-medium text-foreground">Templates</span>
+          </button>
+
+          {uploadedImageUrl && (
+            <button
+              onClick={resetCanvasSettings}
+              className={cn(
+                'flex items-center justify-center w-8 h-8 rounded-lg',
+                'text-muted-foreground transition-all duration-150',
+                'hover:bg-accent hover:text-foreground active:scale-95'
+              )}
+              title="Reset to defaults"
+            >
+              <RefreshIcon size={16} />
+            </button>
+          )}
+
           {hasImage && (
             <div className="flex items-center gap-1 ml-1">
               <button
@@ -164,22 +189,6 @@ export function EditorHeader() {
               <AspectRatioPicker onSelect={() => setAspectRatioOpen(false)} />
             </PopoverContent>
           </Popover>
-
-          <Button
-            onClick={toggleTimeline}
-            disabled={!hasImage}
-            variant="ghost"
-            size="sm"
-            className={cn(
-              'h-8 gap-1.5 rounded-lg px-2.5 text-xs',
-              showTimeline
-                ? 'bg-primary/15 text-primary hover:bg-primary/20'
-                : 'text-muted-foreground hover:text-foreground'
-            )}
-          >
-            <VideoReplayIcon size={15} />
-            <span>Animate</span>
-          </Button>
 
           {/* Slide controls */}
           {slides.length > 0 && (

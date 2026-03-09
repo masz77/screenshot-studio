@@ -452,7 +452,7 @@ export function DepthSection() {
           />
 
           {/* Asset grid */}
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-3 gap-2 p-1">
             {activeAssets.map((assetPath) => {
               const isLocal = assetPath.startsWith('/');
               const url = isLocal ? assetPath : getOverlayUrl(assetPath);

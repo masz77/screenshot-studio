@@ -92,7 +92,7 @@ export function StyleSection() {
   return (
     <SectionWrapper title="Style" defaultOpen={true}>
       <div className="space-y-3">
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-3 gap-2 p-1">
           {stylePresets.map(({ value, label }) => {
             const isSelected = imageStylePreset === value;
             return (

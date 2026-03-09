@@ -70,6 +70,7 @@ function CanvasRenderer({ image }: { image: HTMLImageElement }) {
     addBlurRegion,
     updateBlurRegion,
     removeBlurRegion,
+    browserHeaderSize,
   } = useImageStore();
 
   // Split overlays into front (default) and back (behind main image)
@@ -360,7 +361,8 @@ function CanvasRenderer({ image }: { image: HTMLImageElement }) {
     viewportSize,
     canvas,
     screenshot,
-    frame
+    frame,
+    browserHeaderSize
   );
 
   const {

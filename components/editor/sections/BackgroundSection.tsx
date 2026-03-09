@@ -171,7 +171,7 @@ export function BackgroundSection() {
       {/* Shadow Overlays */}
       <SectionWrapper title="Light & Shadow" defaultOpen={true}>
         <div className="space-y-3">
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-3 gap-2 p-1">
             <button
               onClick={handleRemoveShadows}
               className={cn(
@@ -208,7 +208,7 @@ export function BackgroundSection() {
 
       {/* Custom BG */}
       <SectionWrapper title="Custom Background" defaultOpen={true}>
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-3 gap-2 p-1">
           {/* Image Upload */}
           <div
             {...getBgRootProps()}
@@ -303,7 +303,7 @@ export function BackgroundSection() {
           title={CATEGORY_LABELS[category] || category}
           defaultOpen={true}
         >
-          <div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-4 gap-2 p-1">
             {(backgroundCategories[category] || []).map((imagePath: string, idx: number) => (
               <button
                 key={`${category}-${idx}`}

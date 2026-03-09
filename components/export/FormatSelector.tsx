@@ -1,5 +1,6 @@
 /**
- * Format selector component for export options
+ * Format selector with expanding pill animation.
+ * Selected tab expands to show full label; unselected tabs show short label.
  */
 
 import { cn } from '@/lib/utils';
@@ -10,17 +11,17 @@ interface FormatSelectorProps {
   onFormatChange: (format: ExportFormat) => void;
 }
 
-const FORMATS: { value: ExportFormat; label: string; description: string }[] = [
-  { value: 'jpeg', label: 'JPG', description: 'Smaller files, great for sharing' },
-  { value: 'png', label: 'PNG', description: 'Lossless, supports transparency' },
-  { value: 'webp', label: 'WebP', description: 'Best compression, small & sharp' },
+const FORMATS: { value: ExportFormat; short: string; full: string; description: string }[] = [
+  { value: 'jpeg', short: 'JPG', full: 'JPEG', description: 'Smaller files, great for sharing' },
+  { value: 'png', short: 'PNG', full: 'PNG', description: 'Lossless, supports transparency' },
+  { value: 'webp', short: 'WebP', full: 'WebP', description: 'Best compression, small & sharp' },
 ];
 
 export function FormatSelector({ format, onFormatChange }: FormatSelectorProps) {
   return (
     <div className="space-y-3">
       <label className="text-sm font-medium text-foreground">Format</label>
-      <div className="grid grid-cols-3 gap-2 p-1 bg-muted dark:bg-card/50 rounded-xl">
+      <div className="flex gap-1.5 p-1 bg-muted dark:bg-card/50 rounded-xl">
         {FORMATS.map((f) => {
           const isSelected = f.value === format;
           return (
@@ -28,14 +29,20 @@ export function FormatSelector({ format, onFormatChange }: FormatSelectorProps) 
               key={f.value}
               onClick={() => onFormatChange(f.value)}
               className={cn(
-                'relative px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200',
+                'relative flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-sm font-medium',
+                'transition-all duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)]',
                 'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50',
                 isSelected
-                  ? 'bg-background dark:bg-accent text-foreground'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-background/50 dark:hover:bg-accent/50'
+                  ? 'bg-background dark:bg-accent text-foreground flex-[1.8] shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground flex-1'
               )}
             >
-              {f.label}
+              <span className={cn(
+                'transition-all duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)]',
+                isSelected ? 'text-sm' : 'text-xs'
+              )}>
+                {isSelected ? f.full : f.short}
+              </span>
             </button>
           );
         })}
@@ -46,4 +53,3 @@ export function FormatSelector({ format, onFormatChange }: FormatSelectorProps) 
     </div>
   );
 }
-

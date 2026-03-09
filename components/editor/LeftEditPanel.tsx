@@ -7,9 +7,10 @@ import {
   ColorsIcon,
   MagicWand01Icon,
   Cancel01Icon,
-  ArrowRight01Icon,
-  RefreshIcon,
   LayersLogoIcon,
+  Image01Icon,
+  Globe02Icon,
+  ArrowDown01Icon,
 } from 'hugeicons-react';
 import {
   StyleSection,
@@ -23,6 +24,7 @@ import {
   AnnotateSection,
   TextSection,
   SettingsSection,
+  BrowserMockupSection,
 } from './sections';
 import { cn } from '@/lib/utils';
 import { useImageStore } from '@/lib/store';
@@ -35,12 +37,68 @@ const leftTabs: { id: LeftTabType; icon: React.ReactNode; label: string }[] = [
   { id: 'depth', icon: <LayersLogoIcon size={18} />, label: 'Layers' },
 ];
 
-export function LeftEditPanel() {
-  const { uploadedImageUrl, resetCanvasSettings } = useImageStore();
-  const [activeTab, setActiveTab] = React.useState<LeftTabType>('edit');
-  const activeIndex = leftTabs.findIndex((t) => t.id === activeTab);
+function ModeDropdown() {
+  const { editorMode, setEditorMode } = useImageStore();
+  const [open, setOpen] = React.useState(false);
+  const ref = React.useRef<HTMLDivElement>(null);
 
-  const [templatesOpen, setTemplatesOpen] = React.useState(false);
+  React.useEffect(() => {
+    if (!open) return;
+    const handleClick = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [open]);
+
+  const modes = [
+    { id: 'screenshot' as const, label: 'Screenshot', icon: <Image01Icon size={14} /> },
+    { id: 'browser' as const, label: 'Browser', icon: <Globe02Icon size={14} /> },
+  ];
+
+  const current = modes.find(m => m.id === editorMode) || modes[0];
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center gap-2.5 px-3 h-10 rounded-lg bg-muted/80 dark:bg-muted/50 border border-border/20 hover:bg-accent transition-colors"
+      >
+        <span className="text-muted-foreground">{current.icon}</span>
+        <span className="flex-1 text-left text-sm text-foreground">{current.label}</span>
+        <ArrowDown01Icon size={14} className={cn('text-muted-foreground transition-transform', open && 'rotate-180')} />
+      </button>
+
+      {open && (
+        <div className="absolute top-full left-0 right-0 mt-1 z-50 bg-popover border border-border rounded-lg shadow-lg overflow-hidden">
+          {modes.map((mode) => (
+            <button
+              key={mode.id}
+              onClick={() => { setEditorMode(mode.id); setOpen(false); }}
+              className={cn(
+                'w-full flex items-center gap-2.5 px-3 py-2.5 text-sm transition-colors',
+                editorMode === mode.id
+                  ? 'bg-accent text-foreground'
+                  : 'text-muted-foreground hover:bg-accent/50 hover:text-foreground'
+              )}
+            >
+              {mode.icon}
+              <span>{mode.label}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function LeftEditPanel() {
+  const { showTemplates: templatesOpen, setShowTemplates: setTemplatesOpen, editorMode } = useImageStore();
+  const [activeTab, setActiveTab] = React.useState<LeftTabType>('edit');
+
   const [contentKey, setContentKey] = React.useState<LeftTabType>(activeTab);
   const [transitioning, setTransitioning] = React.useState(false);
 
@@ -62,63 +120,46 @@ export function LeftEditPanel() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [templatesOpen]);
+  }, [templatesOpen, setTemplatesOpen]);
 
   return (
     <div className="w-[240px] h-full bg-card flex flex-col overflow-hidden border-r border-border/40 relative shrink-0">
-      {/* Templates + Reset */}
-      <div className="px-2.5 pt-2.5 shrink-0 space-y-2">
-        <div className="flex gap-1.5">
-          <button
-            onClick={() => setTemplatesOpen(true)}
-            className="flex-1 flex items-center gap-2 px-2.5 py-2 rounded-lg bg-muted/80 dark:bg-muted/50 border border-border/20 hover:bg-accent transition-colors duration-150 group"
-          >
-            <div className="flex items-center justify-center w-6 h-6 rounded-md bg-primary/10 text-primary">
-              <MagicWand01Icon size={14} />
-            </div>
-            <span className="text-xs font-medium text-foreground">Templates</span>
-            <ArrowRight01Icon
-              size={14}
-              className="ml-auto text-muted-foreground group-hover:text-foreground transition-colors duration-150"
-            />
-          </button>
-          {uploadedImageUrl && (
-            <button
-              onClick={resetCanvasSettings}
-              className="flex items-center justify-center w-9 rounded-lg bg-muted/80 dark:bg-muted/50 border border-border/20 hover:bg-accent transition-colors duration-150 text-muted-foreground hover:text-foreground"
-              title="Reset to defaults"
-            >
-              <RefreshIcon size={14} />
-            </button>
-          )}
-        </div>
+      {/* Mode Dropdown */}
+      <div className="px-2.5 pt-2.5 pb-1 shrink-0">
+        <ModeDropdown />
       </div>
 
       {/* Tab Navigation */}
       <div className="px-2.5 py-2.5 border-b border-border/30 shrink-0">
-        <div className="relative flex p-0.5 bg-muted/80 dark:bg-muted/50 rounded-lg border border-border/20">
-          <div
-            className="absolute top-0.5 bottom-0.5 bg-background dark:bg-accent rounded-md transition-all duration-250 ease-out"
-            style={{
-              left: `calc(${activeIndex * (100 / leftTabs.length)}% + 2px)`,
-              width: `calc(${100 / leftTabs.length}% - 4px)`,
-            }}
-          />
-          {leftTabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={cn(
-                'relative z-10 flex-1 flex items-center justify-center gap-1.5 py-2 px-1.5 rounded-md transition-colors duration-150',
-                activeTab === tab.id
-                  ? 'text-foreground'
-                  : 'text-muted-foreground hover:text-foreground'
-              )}
-            >
-              {tab.icon}
-              <span className="text-[11px] font-medium">{tab.label}</span>
-            </button>
-          ))}
+        <div className="flex gap-1 p-0.5 bg-muted/80 dark:bg-muted/50 rounded-lg border border-border/20">
+          {leftTabs.map((tab) => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={cn(
+                  'flex items-center justify-center py-2 px-2 rounded-md',
+                  'transition-all duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)]',
+                  isActive
+                    ? 'bg-background dark:bg-accent text-foreground flex-[1.8] shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground flex-1'
+                )}
+              >
+                <span className="shrink-0">{tab.icon}</span>
+                <span
+                  className={cn(
+                    'text-[11px] font-medium whitespace-nowrap overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)]',
+                    isActive
+                      ? 'max-w-[60px] opacity-100 ml-1.5'
+                      : 'max-w-0 opacity-0 ml-0'
+                  )}
+                >
+                  {tab.label}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -133,14 +174,20 @@ export function LeftEditPanel() {
         >
           {contentKey === 'edit' && (
             <div className="space-y-1">
+              {editorMode === 'browser' ? (
+                <BrowserMockupSection />
+              ) : (
+                <>
+                  <StyleSection />
+                  <BorderSection />
+                </>
+              )}
+              <ShadowSection />
               <TweetImportSection />
               <CodeSnippetSection />
               <ImageOverlaySection />
               <AnnotateSection />
               <TextSection />
-              <StyleSection />
-              <BorderSection />
-              <ShadowSection />
               <SettingsSection />
             </div>
           )}

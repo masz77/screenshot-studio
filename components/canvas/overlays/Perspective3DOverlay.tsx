@@ -155,13 +155,15 @@ export function Perspective3DOverlay({
   const isArcFrame = frame.type === 'arc-light' || frame.type === 'arc-dark';
   const isStyleFrame = ['glass-light', 'glass-dark', 'outline-light', 'border-light', 'border-dark'].includes(frame.type);
 
+  const browserRadius = screenshot.radius;
+
   // Get frame container background color
   const getFrameBackground = () => {
     if (isMacFrame) {
-      return isDark ? 'rgb(40, 40, 43)' : '#e8e8e8';
+      return isDark ? '#3A3A3C' : '#F6F6F6';
     }
     if (isWinFrame) {
-      return isDark ? '#2d2d2d' : '#f3f3f3';
+      return isDark ? '#292A2D' : '#FFFFFF';
     }
     if (isStyleFrame) {
       const styleMap: Record<string, string> = {
@@ -179,7 +181,7 @@ export function Perspective3DOverlay({
   // Calculate image border radius
   const getImageBorderRadius = () => {
     if (isMacFrame || isWinFrame) {
-      const innerRadius = Math.max(0, screenshot.radius - windowPadding);
+      const innerRadius = Math.max(0, browserRadius - windowPadding);
       return `0 0 ${innerRadius}px ${innerRadius}px`;
     }
     return `${screenshot.radius}px`;
@@ -228,7 +230,7 @@ export function Perspective3DOverlay({
             width: '100%',
             height: '100%',
             backgroundColor: (isMacFrame || isWinFrame || isStyleFrame) ? getFrameBackground() : 'transparent',
-            borderRadius: (isMacFrame || isWinFrame || isArcFrame || isStyleFrame) ? `${isStyleFrame ? (screenshot.radius > 0 ? screenshot.radius + windowPadding : 0) : screenshot.radius}px` : undefined,
+            borderRadius: (isMacFrame || isWinFrame || isArcFrame || isStyleFrame) ? `${isStyleFrame ? (screenshot.radius > 0 ? screenshot.radius + windowPadding : 0) : browserRadius}px` : undefined,
             overflow: 'hidden',
           }}
         >
@@ -243,7 +245,7 @@ export function Perspective3DOverlay({
             eclipseBorder={eclipseBorder}
             imageScaledW={imageScaledW}
             imageScaledH={imageScaledH}
-            screenshotRadius={screenshot.radius}
+            screenshotRadius={browserRadius}
           />
 
           <img

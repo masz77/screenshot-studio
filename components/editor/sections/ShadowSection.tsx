@@ -40,7 +40,7 @@ export function ShadowSection() {
 
   return (
     <SectionWrapper title="Shadow" defaultOpen={true}>
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-2 gap-2 p-1">
         {shadowPresets.map(({ value, label, shadow }) => {
           const isSelected = shadowPreset === value;
           return (

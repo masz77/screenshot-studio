@@ -266,7 +266,7 @@ export function CodeSnippetSection() {
         />
 
         {/* Compact controls row: Theme + Language */}
-        <div className="grid grid-cols-2 gap-1.5">
+        <div className="grid grid-cols-2 gap-1.5 p-1">
           <StyledSelect
             value={themeId}
             onChange={setThemeId}

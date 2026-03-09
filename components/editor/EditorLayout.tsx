@@ -17,11 +17,13 @@ import { MobileBanner } from "./MobileBanner";
 import { TimelineEditor } from "@/components/timeline";
 import { useImageStore } from "@/lib/store";
 import { trackEditorOpen } from "@/lib/analytics";
+import { VideoReplayIcon } from "hugeicons-react";
+import { cn } from "@/lib/utils";
 
 function EditorMain() {
   const isMobile = useIsMobile();
   const [mobileSheetOpen, setMobileSheetOpen] = React.useState(false);
-  const { uploadedImageUrl, slides, showTimeline } = useImageStore();
+  const { uploadedImageUrl, slides, showTimeline, toggleTimeline } = useImageStore();
 
   // enable autosave
   useAutosaveDraft();
@@ -66,10 +68,30 @@ function EditorMain() {
 
         {/* Center Canvas */}
         <div className="flex-1 flex flex-col overflow-hidden bg-background relative">
-          <div className="flex-1 flex items-center justify-center overflow-y-auto overflow-x-hidden">
+          <div className="flex-1 flex items-center justify-center overflow-y-auto overflow-x-hidden relative">
             <EditorContent>
               <EditorCanvas />
             </EditorContent>
+
+            {/* Floating Animate Button - bottom center of canvas */}
+            {hasContent && !showTimeline && !isMobile && (
+              <button
+                onClick={toggleTimeline}
+                className={cn(
+                  'absolute bottom-4 left-1/2 -translate-x-1/2 z-20',
+                  'flex items-center gap-2 px-5 py-2.5 rounded-full',
+                  'bg-card/90 backdrop-blur-md border border-border/50',
+                  'text-muted-foreground hover:text-foreground',
+                  'shadow-lg hover:shadow-xl',
+                  'transition-all duration-200 ease-out',
+                  'hover:bg-card hover:border-border',
+                  'group'
+                )}
+              >
+                <VideoReplayIcon size={16} className="text-primary group-hover:text-primary" />
+                <span className="text-sm font-medium">Animate</span>
+              </button>
+            )}
           </div>
 
           {/* Timeline Editor - shown when content exists and timeline is enabled */}

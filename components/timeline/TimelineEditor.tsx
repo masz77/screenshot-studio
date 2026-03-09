@@ -5,13 +5,12 @@ import { useImageStore } from '@/lib/store';
 import { TimelineControls } from './TimelineControls';
 import { useTimelinePlayback } from './hooks/useTimelinePlayback';
 import { cn } from '@/lib/utils';
-import { ANIMATION_PRESETS } from '@/lib/animation/presets';
-import { Delete02Icon, ViewIcon, VideoReplayIcon, Image01Icon, Cancel01Icon, Add01Icon } from 'hugeicons-react';
+import { VideoReplayIcon, Image01Icon, Cancel01Icon, Add01Icon } from 'hugeicons-react';
 import type { AnimationClip } from '@/types/animation';
 
-const TIMELINE_HEIGHT = 180;
-const TRACK_LABEL_WIDTH = 100;
-const PIXELS_PER_SECOND = 125;
+const TIMELINE_HEIGHT = 210;
+const TRACK_LABEL_WIDTH = 120;
+const PIXELS_PER_SECOND = 105;
 
 function formatTime(ms: number): string {
   const totalSeconds = Math.floor(ms / 1000);
@@ -23,15 +22,10 @@ function formatTime(ms: number): string {
   return `0:${seconds.toString().padStart(2, '0')}`;
 }
 
-// Time ruler component - clickable to seek
-function TimeRuler({ duration, width }: { duration: number; width: number }) {
+/* ─── Time Track ─────────────────────────────────────────────── */
+function TimeTrack({ duration, width }: { duration: number; width: number }) {
   const { setPlayhead, stopPlayback } = useImageStore();
   const durationSeconds = Math.ceil(duration / 1000);
-  const ticks: { time: number; label: string }[] = [];
-
-  for (let i = 0; i <= durationSeconds; i++) {
-    ticks.push({ time: i * 1000, label: formatTime(i * 1000) });
-  }
 
   const handleClick = (e: React.MouseEvent) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -43,20 +37,34 @@ function TimeRuler({ duration, width }: { duration: number; width: number }) {
 
   return (
     <div
-      className="relative h-6 bg-background border-b border-border/40 cursor-pointer hover:bg-card"
+      className="relative h-6 cursor-pointer select-none"
       style={{ width }}
       onClick={handleClick}
     >
-      {ticks.map(({ time, label }) => {
-        const left = (time / duration) * width;
+      {Array.from({ length: durationSeconds + 1 }, (_, i) => {
+        const leftPercent = (i / durationSeconds) * 100;
+        const tickWidth = 100 / durationSeconds;
         return (
           <div
-            key={time}
-            className="absolute top-0 flex flex-col items-center pointer-events-none"
-            style={{ left }}
+            key={i}
+            className="absolute top-0 h-full"
+            style={{ left: `${leftPercent}%`, width: `${tickWidth}%` }}
           >
-            <span className="text-[10px] text-muted-foreground font-mono mt-0.5">{label}</span>
-            <div className="w-px h-2 bg-border mt-0.5" />
+            {/* Major tick: label + dot */}
+            <div className="flex flex-col items-start h-full">
+              <span className="text-[9px] text-muted-foreground/60 font-mono leading-none ml-1 mt-1">
+                {formatTime(i * 1000)}
+              </span>
+              <div className="w-1 h-1 rounded-full bg-muted-foreground/30 ml-[1px] mt-auto mb-1" />
+            </div>
+
+            {/* Minor tick: half-second dot */}
+            {i < durationSeconds && (
+              <div
+                className="absolute bottom-1 w-1 h-1 rounded-full bg-muted-foreground/15"
+                style={{ left: '50%' }}
+              />
+            )}
           </div>
         );
       })}
@@ -64,8 +72,8 @@ function TimeRuler({ duration, width }: { duration: number; width: number }) {
   );
 }
 
-// Playhead component - simple vertical red line
-function Playhead({ position, height }: { position: number; height: number }) {
+/* ─── Playhead Ticker ────────────────────────────────────────── */
+function PlayheadTicker({ position, height, timeLabel }: { position: number; height: number; timeLabel: string }) {
   const { setPlayhead, timeline, stopPlayback } = useImageStore();
   const [isDragging, setIsDragging] = React.useState(false);
 
@@ -95,18 +103,22 @@ function Playhead({ position, height }: { position: number; height: number }) {
   return (
     <div
       className="absolute top-0 z-30 cursor-ew-resize pointer-events-auto"
-      style={{ left: position, height: height + 24, transform: 'translateX(-50%)' }}
+      style={{ left: position, height, transform: 'translateX(-50%)' }}
       onMouseDown={() => setIsDragging(true)}
     >
-      {/* Wider clickable area (12px) containing the visible 2px red line */}
-      <div className="w-3 h-full flex items-center justify-center hover:bg-red-500/10 transition-colors">
-        <div className="w-[2px] h-full bg-red-500" />
+      <div className="relative flex flex-col items-center h-full">
+        {/* Orb with time label */}
+        <div className="flex items-center justify-center px-1.5 py-0.5 rounded-full bg-primary text-primary-foreground shrink-0 shadow-md min-w-[32px]">
+          <span className="text-[9px] font-semibold tabular-nums leading-none">{timeLabel}</span>
+        </div>
+        {/* Needle */}
+        <div className="w-[1.5px] flex-1 bg-primary" />
       </div>
     </div>
   );
 }
 
-// Resizable animation clip
+/* ─── Resizable Animation Clip ───────────────────────────────── */
 function ResizableAnimationClip({
   clip,
   timelineWidth,
@@ -167,164 +179,93 @@ function ResizableAnimationClip({
   return (
     <div
       className={cn(
-        'absolute top-1 bottom-1 rounded cursor-grab transition-shadow group',
-        'bg-primary/80',
-        isSelected ? 'ring-2 ring-foreground shadow-lg' : 'hover:ring-1 hover:ring-foreground/50'
+        'absolute top-1 bottom-1 rounded-lg cursor-grab transition-shadow group',
+        'bg-primary/15 border border-primary/30',
+        isSelected ? 'ring-1 ring-primary/60 shadow-md bg-primary/25' : 'hover:bg-primary/20 hover:border-primary/40'
       )}
       style={{ left: `${leftPercent}%`, width: `${widthPercent}%` }}
       onMouseDown={(e) => startDrag('move', e)}
     >
       {/* Left resize handle */}
       <div
-        className="absolute left-0 top-0 bottom-0 w-2 cursor-ew-resize hover:bg-foreground/20 rounded-l"
+        className="absolute left-0 top-0 bottom-0 w-2 cursor-ew-resize rounded-l-lg hover:bg-primary/20"
         onMouseDown={(e) => startDrag('left', e)}
       />
 
       {/* Right resize handle */}
       <div
-        className="absolute right-0 top-0 bottom-0 w-2 cursor-ew-resize hover:bg-foreground/20 rounded-r"
+        className="absolute right-0 top-0 bottom-0 w-2 cursor-ew-resize rounded-r-lg hover:bg-primary/20"
         onMouseDown={(e) => startDrag('right', e)}
       />
 
       {/* Content */}
       <div className="flex items-center gap-1.5 px-3 h-full overflow-hidden pointer-events-none">
-        <VideoReplayIcon size={14} className="text-primary-foreground/80 shrink-0" />
-        <span className="text-[11px] text-primary-foreground font-medium truncate">{clip.name}</span>
+        <VideoReplayIcon size={12} className="text-primary shrink-0" />
+        <span className="text-[10px] text-primary font-medium truncate">{clip.name}</span>
       </div>
 
-      {/* Delete button - visible on hover */}
+      {/* Delete on hover */}
       <button
-        className="absolute top-1 right-1 w-5 h-5 bg-red-500/90 rounded flex items-center justify-center hover:bg-red-600 shadow-lg z-10 pointer-events-auto opacity-0 group-hover:opacity-100 transition-opacity"
+        className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-destructive rounded-full flex items-center justify-center hover:bg-destructive/90 shadow-sm z-10 pointer-events-auto opacity-0 group-hover:opacity-100 transition-opacity"
         onMouseDown={(e) => e.stopPropagation()}
         onClick={(e) => {
           e.stopPropagation();
           removeAnimationClip(clip.id);
         }}
       >
-        <Delete02Icon size={12} className="text-destructive-foreground" />
+        <Cancel01Icon size={8} className="text-destructive-foreground" />
       </button>
     </div>
   );
 }
 
-// Media track with slides
-function MediaTrack({ width }: { width: number }) {
-  const { slides, uploadedImageUrl, imageName, timeline, removeSlide, setActiveSlide, activeSlideId, setPlayhead, stopPlayback } = useImageStore();
-  const durationSeconds = timeline.duration / 1000;
-
-  const mediaItems = slides.length > 0 ? slides : uploadedImageUrl ? [{
-    id: 'main',
-    src: uploadedImageUrl,
-    name: imageName || 'Image',
-    duration: durationSeconds, // Already in seconds for display
-  }] : [];
-
-  // For visual display, each media item gets equal portion of the timeline
-  // Individual slide durations are used for video export, not visual display
-  const itemDurationMs = timeline.duration / Math.max(1, mediaItems.length);
-
-  return (
-    <div className="flex h-14 border-b border-border/40">
-      <div
-        className="shrink-0 flex items-center gap-2 px-3 bg-card border-r border-border/40"
-        style={{ width: TRACK_LABEL_WIDTH }}
-      >
-        <Image01Icon size={14} className="text-muted-foreground" />
-        <span className="text-[10px] text-muted-foreground font-medium">Media</span>
-      </div>
-
-      <div
-        className="relative flex-1 bg-accent timeline-track-area overflow-hidden"
-        style={{ width: width - TRACK_LABEL_WIDTH }}
-      >
-        <div className="absolute inset-1 flex gap-0.5 rounded overflow-hidden">
-          {mediaItems.map((item, index) => {
-            // Each item gets equal width in the timeline
-            const itemWidthPercent = 100 / mediaItems.length;
-            const itemDurationSeconds = itemDurationMs / 1000;
-            return (
-              <div
-                key={item.id}
-                className={cn(
-                  'relative h-full bg-cover bg-center border border-border rounded cursor-pointer transition-all',
-                  activeSlideId === item.id && 'ring-2 ring-primary'
-                )}
-                style={{
-                  width: `${itemWidthPercent}%`,
-                  backgroundImage: `url(${item.src})`,
-                }}
-                onClick={() => item.id !== 'main' && setActiveSlide(item.id)}
-              >
-                {/* Remove button */}
-                {slides.length > 1 && item.id !== 'main' && (
-                  <button
-                    className="absolute -top-1 -right-1 w-4 h-4 bg-background/80 rounded-full flex items-center justify-center hover:bg-destructive z-10"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      removeSlide(item.id);
-                    }}
-                  >
-                    <Cancel01Icon size={10} className="text-foreground" />
-                  </button>
-                )}
-
-                {/* Info overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent flex items-end pointer-events-none">
-                  <div className="flex items-center gap-1 p-1.5 text-foreground/80">
-                    <ViewIcon size={10} />
-                    <span className="text-[8px]">{itemDurationSeconds.toFixed(1)}s</span>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Slide count label */}
-        <div className="absolute top-1 right-2 px-1.5 py-0.5 bg-background/50 rounded text-[9px] text-muted-foreground pointer-events-none">
-          {mediaItems.length > 1 ? `${mediaItems.length} slides` : imageName || 'Image'} · {durationSeconds.toFixed(1)}s
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Animation track with add button on hover
+/* ─── Animation Track ────────────────────────────────────────── */
 function AnimationTrack({ width, onAddAnimation }: { width: number; onAddAnimation?: () => void }) {
   const { timeline, animationClips } = useImageStore();
   const [selectedClipId, setSelectedClipId] = React.useState<string | null>(null);
   const [isHovered, setIsHovered] = React.useState(false);
+  const trackWidth = width - TRACK_LABEL_WIDTH;
 
   return (
-    <div className="flex h-10 border-b border-border/40">
+    <div className="flex h-12">
+      {/* Track label */}
       <div
-        className="shrink-0 flex items-center gap-2 px-3 bg-card border-r border-border/40"
+        className="shrink-0 flex items-center gap-2.5 px-3 border-r border-border/20"
         style={{ width: TRACK_LABEL_WIDTH }}
       >
-        <VideoReplayIcon size={14} className="text-primary" />
-        <span className="text-[10px] text-muted-foreground font-medium">Animation</span>
+        {/* Animation icon (dotted line icon from shots.so) */}
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-4 h-4 text-muted-foreground shrink-0">
+          <g fill="currentColor">
+            <path d="M7.905 20.573a.616.616 0 0 1-1.23 0 .614.614 0 0 1 1.23 0m-.931-1.683a.617.617 0 0 1-.616.615.61.61 0 0 1-.611-.615c0-.335.269-.615.611-.615.335 0 .616.28.616.615m-.94-1.691a.61.61 0 0 1-.615.615.616.616 0 0 1-.612-.615c0-.335.281-.615.612-.615.342 0 .615.28.615.615m-.936-1.675a.62.62 0 0 1-.615.615.615.615 0 0 1 0-1.23c.334 0 .615.28.615.615m-.932-1.691a.62.62 0 0 1-.612.615.616.616 0 0 1-.615-.615c0-.335.273-.615.615-.615a.62.62 0 0 1 .612.615m-.94-1.683a.615.615 0 0 1-.611.615A.62.62 0 0 1 2 12.15c0-.335.28-.615.615-.615.339 0 .611.28.611.615m.94-1.683a.62.62 0 0 1-.612.615.616.616 0 0 1-.615-.615c0-.335.273-.615.615-.615a.62.62 0 0 1 .612.615m.932-1.691a.62.62 0 0 1-.615.615.615.615 0 0 1 0-1.23c.334 0 .615.28.615.615m.936-1.675a.616.616 0 0 1-.615.615.62.62 0 0 1-.612-.615c0-.343.281-.615.612-.615.342 0 .615.272.615.615m.94-1.691a.62.62 0 0 1-.615.615.613.613 0 0 1-.612-.615c0-.343.269-.615.612-.615.334 0 .615.272.615.615m.931-1.683a.614.614 0 1 1-1.232-.004.614.614 0 0 1 1.232.004" />
+            <path d="M12.612 3.323l-4.89 8.489a.7.7 0 0 0-.109.338c0 .086.031.194.113.338l4.886 8.49c-.217.228-.437.326-.714.326-.465 0-.763-.265-1.156-.93l-4.135-7.168c-.228-.404-.341-.719-.341-1.056s.106-.652.337-1.056l4.139-7.169c.393-.664.691-.925 1.156-.925.276 0 .496.096.714.323" />
+            <path d="M16.376 21.304c.457 0 .755-.265 1.148-.93l4.135-7.168c.231-.404.341-.719.341-1.056s-.11-.652-.341-1.056l-4.135-7.169C17.131 3.261 16.833 3 16.376 3c-.462 0-.764.261-1.153.925l-4.139 7.169c-.231.404-.34.719-.34 1.056s.113.652.344 1.056l4.135 7.168c.389.665.691.93 1.153.93m-.138-1.794-4.027-7.022c-.082-.144-.117-.237-.117-.338s.031-.194.109-.338l4.035-7.022a.149.149 0 0 1 .267 0l4.031 7.022c.082.144.117.237.117.338s-.035.194-.117.338l-4.031 7.022c-.061.114-.206.114-.267 0" />
+          </g>
+        </svg>
+        <span className="text-[11px] text-muted-foreground font-medium">Animations</span>
       </div>
 
+      {/* Track content */}
       <div
-        className="relative flex-1 bg-background timeline-track-area"
-        style={{ width: width - TRACK_LABEL_WIDTH }}
+        className="relative shrink-0 timeline-track-area"
+        style={{ width: trackWidth }}
         onClick={() => setSelectedClipId(null)}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
+        {/* Clips */}
         {animationClips.map((clip) => (
           <ResizableAnimationClip
             key={clip.id}
             clip={clip}
-            timelineWidth={width - TRACK_LABEL_WIDTH}
+            timelineWidth={trackWidth}
             duration={timeline.duration}
             isSelected={selectedClipId === clip.id}
             onSelect={() => setSelectedClipId(clip.id)}
           />
         ))}
 
-        {/* Add animation button - shows on hover when no clips or when hovering empty space */}
-        {animationClips.length === 0 ? (
+        {/* Empty state */}
+        {animationClips.length === 0 && (
           <div className="absolute inset-0 flex items-center justify-center">
             {isHovered ? (
               <button
@@ -332,37 +273,188 @@ function AnimationTrack({ width, onAddAnimation }: { width: number; onAddAnimati
                   e.stopPropagation();
                   onAddAnimation?.();
                 }}
-                className="flex items-center justify-center w-12 h-7 rounded-lg bg-accent hover:bg-accent/80 transition-colors"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-accent hover:bg-accent/80 transition-colors"
               >
-                <Add01Icon size={18} className="text-muted-foreground" />
+                <Add01Icon size={14} className="text-foreground" />
+                <span className="text-xs text-foreground font-medium">Add Animation</span>
               </button>
             ) : (
-              <span className="text-[10px] text-muted-foreground/50 italic">
+              <span className="text-xs text-muted-foreground/40 font-medium">
                 Hover here to add Animation
               </span>
             )}
           </div>
-        ) : (
-          /* Show add button at the end of clips when hovering */
-          isHovered && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onAddAnimation?.();
-              }}
-              className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center justify-center w-8 h-6 rounded bg-accent hover:bg-accent/80 transition-colors"
-            >
-              <Add01Icon size={14} className="text-muted-foreground" />
-            </button>
-          )
+        )}
+
+        {/* Add button at end when clips exist */}
+        {animationClips.length > 0 && isHovered && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onAddAnimation?.();
+            }}
+            className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center justify-center w-7 h-7 rounded-full bg-accent hover:bg-accent/80 transition-colors"
+          >
+            <Add01Icon size={14} className="text-foreground" />
+          </button>
         )}
       </div>
     </div>
   );
 }
 
+/* ─── Video / Media Track ────────────────────────────────────── */
+function VideoTrack({ width }: { width: number }) {
+  const { slides, uploadedImageUrl, imageName, timeline, removeSlide, setActiveSlide, activeSlideId } = useImageStore();
+  const durationSeconds = timeline.duration / 1000;
+  const trackWidth = width - TRACK_LABEL_WIDTH;
+
+  const mediaItems = slides.length > 0 ? slides : uploadedImageUrl ? [{
+    id: 'main',
+    src: uploadedImageUrl,
+    name: imageName || 'Image',
+    duration: durationSeconds,
+  }] : [];
+
+  const itemDurationMs = timeline.duration / Math.max(1, mediaItems.length);
+
+  return (
+    <div className="flex h-14">
+      {/* Track label */}
+      <div
+        className="shrink-0 flex items-center gap-2.5 px-3 border-r border-border/20"
+        style={{ width: TRACK_LABEL_WIDTH }}
+      >
+        {/* Thumbnail */}
+        {mediaItems.length > 0 && mediaItems[0].src ? (
+          <div className="w-5 h-5 rounded overflow-hidden shrink-0 border border-border/30">
+            <img src={mediaItems[0].src} alt="" className="w-full h-full object-cover" />
+          </div>
+        ) : (
+          <Image01Icon size={16} className="text-muted-foreground shrink-0" />
+        )}
+        <span className="text-[11px] text-muted-foreground font-medium truncate">
+          {imageName || 'Screenshot'}
+        </span>
+      </div>
+
+      {/* Track content */}
+      <div
+        className="relative shrink-0 overflow-hidden"
+        style={{ width: trackWidth }}
+      >
+        {/* Clip items */}
+        <div className="absolute inset-0 flex">
+          {mediaItems.map((item) => {
+            const itemWidthPercent = 100 / mediaItems.length;
+            const itemDurationSeconds = itemDurationMs / 1000;
+            return (
+              <div
+                key={item.id}
+                className={cn(
+                  'relative h-full border-r border-border/10 cursor-pointer transition-all group/clip',
+                  activeSlideId === item.id && slides.length > 1 && 'ring-1 ring-inset ring-primary/50'
+                )}
+                style={{ width: `${itemWidthPercent}%` }}
+                onClick={() => item.id !== 'main' && setActiveSlide(item.id)}
+              >
+                {/* Clip content */}
+                <div className="absolute inset-1 rounded-md overflow-hidden bg-muted/30 border border-border/20">
+                  <div className="flex items-center gap-2 h-full px-2">
+                    {/* Mini preview */}
+                    <div className="w-8 h-8 rounded overflow-hidden shrink-0 border border-border/20">
+                      <img src={item.src} alt="" className="w-full h-full object-cover" />
+                    </div>
+                    {/* Details */}
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-[10px] text-foreground/70 font-medium truncate">
+                        {slides.length > 1 ? `Slide ${mediaItems.indexOf(item) + 1}` : 'Mockup'}
+                      </span>
+                      <span className="text-[9px] text-muted-foreground truncate">
+                        {imageName || 'Screenshot'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Remove button for multi-slide */}
+                {slides.length > 1 && item.id !== 'main' && (
+                  <button
+                    className="absolute top-0 right-0 w-4 h-4 bg-background/80 rounded-full flex items-center justify-center hover:bg-destructive z-10 opacity-0 group-hover/clip:opacity-100 transition-opacity"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removeSlide(item.id);
+                    }}
+                  >
+                    <Cancel01Icon size={8} className="text-foreground" />
+                  </button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Slide Duration Handle ──────────────────────────────────── */
+function SlideDurationHandle({ timelineWidth, trackWidth }: { timelineWidth: number; trackWidth: number }) {
+  const { timeline, setTimelineDuration } = useImageStore();
+  const [isDragging, setIsDragging] = React.useState(false);
+  const [showHint, setShowHint] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!isDragging) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const trackArea = document.querySelector('.timeline-track-area');
+      if (!trackArea) return;
+      const rect = trackArea.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const newDurationSeconds = Math.max(1, Math.min(30, Math.round(x / (PIXELS_PER_SECOND))));
+      setTimelineDuration(newDurationSeconds * 1000);
+    };
+
+    const handleMouseUp = () => setIsDragging(false);
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDragging, setTimelineDuration]);
+
+  return (
+    <div
+      className="absolute top-0 bottom-0 z-20 flex items-stretch cursor-ew-resize group/handle"
+      style={{ left: TRACK_LABEL_WIDTH + trackWidth }}
+      onMouseDown={() => setIsDragging(true)}
+      onMouseEnter={() => setShowHint(true)}
+      onMouseLeave={() => !isDragging && setShowHint(false)}
+    >
+      {/* Handle knob */}
+      <div className="w-2 h-full bg-border/40 hover:bg-primary/40 transition-colors flex items-center justify-center">
+        <div className="w-0.5 h-6 bg-muted-foreground/30 rounded-full" />
+      </div>
+
+      {/* Hint tooltip */}
+      {(showHint || isDragging) && (
+        <div className="absolute left-3 top-1/2 -translate-y-1/2 px-2 py-1 rounded bg-foreground text-background text-[10px] font-medium whitespace-nowrap shadow-lg z-50">
+          Drag to adjust duration
+        </div>
+      )}
+
+      {/* Gray area beyond the handle */}
+      <div className="w-[200px] h-full bg-muted/20" />
+    </div>
+  );
+}
+
+/* ─── Main Timeline Editor ───────────────────────────────────── */
 export function TimelineEditor() {
-  const { timeline, uploadedImageUrl, slides, showTimeline, setActiveRightPanelTab } = useImageStore();
+  const { timeline, uploadedImageUrl, slides, showTimeline, setActiveRightPanelTab, toggleTimeline } = useImageStore();
   const [timelineWidth, setTimelineWidth] = React.useState(800);
 
   useTimelinePlayback();
@@ -378,31 +470,54 @@ export function TimelineEditor() {
 
   const trackContentWidth = timelineWidth - TRACK_LABEL_WIDTH;
   const playheadPosition = (timeline.playhead / timeline.duration) * trackContentWidth + TRACK_LABEL_WIDTH;
-  const trackHeight = 64 + 40; // media + animation
+  const playheadTimeLabel = formatTime(timeline.playhead);
+  const totalTrackHeight = 25 + 49 + 57; // time(h-6=24+1border) + animation(h-12=48+1border) + video(h-14=56+1border)
 
   const handleAddAnimation = () => {
-    // Switch to the Animate tab in the right panel
     setActiveRightPanelTab('animate');
   };
 
+  const handleClose = () => {
+    toggleTimeline();
+  };
+
   return (
-    <div className="bg-background border-t border-border flex flex-col" style={{ height: TIMELINE_HEIGHT }}>
-      <TimelineControls />
+    <div className="bg-card border-t border-border/40 flex flex-col" style={{ height: TIMELINE_HEIGHT }}>
+      {/* Controls bar */}
+      <TimelineControls onAddAnimation={handleAddAnimation} onClose={handleClose} />
 
-      <div className="flex-1 overflow-x-auto overflow-y-hidden scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border">
-        <div style={{ width: timelineWidth }}>
-          {/* Time ruler */}
-          <div className="flex">
-            <div className="shrink-0 bg-card border-r border-border/40" style={{ width: TRACK_LABEL_WIDTH }} />
-            <TimeRuler duration={timeline.duration} width={trackContentWidth} />
+      {/* Tracks area */}
+      <div className="flex-1 overflow-x-auto overflow-y-hidden scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border/30">
+        <div style={{ width: timelineWidth + 200 }} className="relative">
+          {/* Time track row */}
+          <div className="flex h-6 border-b border-border/15">
+            {/* Empty label space for time track */}
+            <div
+              className="shrink-0 border-r border-border/20"
+              style={{ width: TRACK_LABEL_WIDTH }}
+            />
+            <TimeTrack duration={timeline.duration} width={trackContentWidth} />
           </div>
 
-          {/* Tracks with playhead */}
-          <div className="relative">
-            <MediaTrack width={timelineWidth} />
+          {/* Animation track */}
+          <div className="border-b border-border/15">
             <AnimationTrack width={timelineWidth} onAddAnimation={handleAddAnimation} />
-            <Playhead position={playheadPosition} height={trackHeight} />
           </div>
+
+          {/* Video / Media track */}
+          <div className="border-b border-border/15">
+            <VideoTrack width={timelineWidth} />
+          </div>
+
+          {/* Playhead ticker — spans all tracks */}
+          <PlayheadTicker
+            position={playheadPosition}
+            height={totalTrackHeight}
+            timeLabel={playheadTimeLabel}
+          />
+
+          {/* Slide duration handle */}
+          <SlideDurationHandle timelineWidth={timelineWidth} trackWidth={trackContentWidth} />
         </div>
       </div>
     </div>

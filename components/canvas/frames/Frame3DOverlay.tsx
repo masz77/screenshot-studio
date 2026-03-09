@@ -1,5 +1,7 @@
 'use client';
 
+import { SafariToolbar, ChromeToolbar } from './BrowserToolbar';
+
 export interface FrameConfig {
   enabled: boolean;
   type: 'none' | 'arc-light' | 'arc-dark' | 'macos-light' | 'macos-dark' | 'windows-light' | 'windows-dark' | 'photograph' | 'glass-light' | 'glass-dark' | 'outline-light' | 'border-light' | 'border-dark';
@@ -74,6 +76,7 @@ interface Frame3DOverlayProps {
 export function Frame3DOverlay({
   frame,
   showFrame,
+  windowHeader,
   screenshotRadius,
 }: Frame3DOverlayProps) {
   if (!showFrame || frame.type === 'none') {
@@ -98,120 +101,11 @@ export function Frame3DOverlay({
 
     case 'macos-light':
     case 'macos-dark':
-      // macOS title bar: 22px height (matches windowHeader in canvas-dimensions)
-      return (
-        <div
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: '22px',
-            background: isDark ? 'rgb(40, 40, 43)' : '#e8e8e8',
-            borderRadius: `${screenshotRadius}px ${screenshotRadius}px 0 0`,
-            display: 'flex',
-            alignItems: 'center',
-            padding: '0 12px',
-          }}
-        >
-          {/* Traffic lights */}
-          <div
-            style={{
-              display: 'flex',
-              gap: '5px',
-              zIndex: 2,
-            }}
-          >
-            <span
-              style={{
-                height: '6px',
-                width: '6px',
-                borderRadius: '50%',
-                backgroundColor: 'rgb(255, 95, 87)',
-              }}
-            />
-            <span
-              style={{
-                height: '6px',
-                width: '6px',
-                borderRadius: '50%',
-                backgroundColor: 'rgb(254, 188, 46)',
-              }}
-            />
-            <span
-              style={{
-                height: '6px',
-                width: '6px',
-                borderRadius: '50%',
-                backgroundColor: 'rgb(40, 201, 65)',
-              }}
-            />
-          </div>
-          {/* Title - centered */}
-          <div
-            style={{
-              position: 'absolute',
-              width: '100%',
-              left: 0,
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              pointerEvents: 'none',
-              zIndex: 1,
-            }}
-          >
-            <span
-              style={{
-                color: isDark ? 'rgb(159, 159, 159)' : '#4d4d4d',
-                fontSize: '10px',
-                fontWeight: 500,
-                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif',
-                letterSpacing: '-0.2px',
-              }}
-            >
-              {frame.title || 'file'}
-            </span>
-          </div>
-        </div>
-      );
+      return <SafariToolbar windowHeader={windowHeader} isDark={isDark} title={frame.title} screenshotRadius={screenshotRadius} />;
 
     case 'windows-light':
     case 'windows-dark':
-      return (
-        <div
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: '28px',
-            backgroundColor: isDark ? '#2d2d2d' : '#f3f3f3',
-            borderRadius: `${screenshotRadius}px ${screenshotRadius}px 0 0`,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '0 8px 0 16px',
-          }}
-        >
-          <div style={{ color: isDark ? '#ffffff' : '#1a1a1a', fontSize: '13px' }}>
-            {frame.title || ''}
-          </div>
-          <div style={{ display: 'flex', gap: '0' }}>
-            <div style={{ width: '46px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <div style={{ width: '12px', height: '1px', backgroundColor: isDark ? '#ffffff' : '#1a1a1a' }} />
-            </div>
-            <div style={{ width: '46px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <div style={{ width: '12px', height: '12px', border: `1px solid ${isDark ? '#ffffff' : '#1a1a1a'}`, boxSizing: 'border-box' }} />
-            </div>
-            <div style={{ width: '46px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <div style={{ position: 'relative', width: '12px', height: '12px' }}>
-                <div style={{ position: 'absolute', width: '16px', height: '1px', backgroundColor: isDark ? '#ffffff' : '#1a1a1a', transform: 'rotate(45deg)', top: '5px', left: '-2px' }} />
-                <div style={{ position: 'absolute', width: '16px', height: '1px', backgroundColor: isDark ? '#ffffff' : '#1a1a1a', transform: 'rotate(-45deg)', top: '5px', left: '-2px' }} />
-              </div>
-            </div>
-          </div>
-        </div>
-      );
+      return <ChromeToolbar windowHeader={windowHeader} isDark={isDark} title={frame.title} screenshotRadius={screenshotRadius} />;
 
     default:
       return null;
