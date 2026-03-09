@@ -2,12 +2,12 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { Navigation } from "@/components/landing/Navigation";
 import { Footer } from "@/components/landing/Footer";
-import { ArrowRight, Sparkles, Share2, Play, Box } from "lucide-react";
+import { ArrowRight, Sparkles, Share2, Play, Box, Globe } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Features - Screenshot Studio | All Tools & Capabilities",
   description:
-    "Explore all Screenshot Studio features: screenshot beautifier, social media graphics maker, animation creator, and 3D effects. Free browser-based tools.",
+    "Explore all Screenshot Studio features: screenshot beautifier, browser mockups, social media graphics, animation creator, and 3D effects. Free browser-based tools.",
   keywords: [
     "screenshot editor features",
     "image editing tools",
@@ -65,6 +65,14 @@ const features = [
       "Add stunning 3D perspective, rotation, and depth to flat screenshots. Real-time preview.",
     href: "/features/3d-effects",
     keywords: ["perspective", "rotation", "depth", "mockups"],
+  },
+  {
+    icon: Globe,
+    title: "Browser Mockups",
+    description:
+      "Add realistic Safari and Chrome browser frames to screenshots. Light and dark modes with custom URL.",
+    href: "/features/browser-mockups",
+    keywords: ["Safari", "Chrome", "browser frame", "URL bar"],
   },
 ];
 

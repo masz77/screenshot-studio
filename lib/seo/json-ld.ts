@@ -20,7 +20,7 @@ export function getOrganizationSchema() {
       "https://x.com/code_kartik",
     ],
     description:
-      "Free, open-source screenshot editor with backgrounds, 3D effects, animations, and video export.",
+      "Free, open-source screenshot editor with backgrounds, browser mockups, 3D effects, animations, and video export.",
   };
 }
 
@@ -66,7 +66,8 @@ export function getSoftwareApplicationSchema() {
     },
     featureList: [
       "100+ gradient backgrounds",
-      "Device frames (macOS, Windows, Arc, Polaroid)",
+      "Safari and Chrome browser mockups (light & dark)",
+      "Device frames (Arc, Polaroid, glass, outline, border)",
       "3D perspective transforms",
       "20+ animation presets with keyframe editor",
       "Video export (MP4, WebM, GIF)",

@@ -3,7 +3,7 @@ import { getAllComparisonSlugs } from '@/lib/seo/comparisons'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = process.env.BETTER_AUTH_URL || 'https://screenshot-studio.com'
-  const now = new Date('2026-03-08')
+  const now = new Date('2026-03-09')
 
   const comparisonSlugs = getAllComparisonSlugs()
 
@@ -57,6 +57,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: `${baseUrl}/features/3d-effects`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/features/browser-mockups`,
       lastModified: now,
       changeFrequency: 'monthly',
       priority: 0.8,
