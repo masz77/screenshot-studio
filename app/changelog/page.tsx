@@ -38,6 +38,39 @@ interface ChangelogEntry {
 
 const changelog: ChangelogEntry[] = [
   {
+    date: "March 9, 2026",
+    version: "2.5.0",
+    title: "Browser Mockups",
+    description:
+      "Realistic Safari and Chrome browser frames with light and dark modes, adjustable header size, and custom URL.",
+    changes: [
+      {
+        type: "added",
+        text: "Safari browser frame (light & dark) with traffic lights, sidebar, back/forward, and centered address bar",
+      },
+      {
+        type: "added",
+        text: "Chrome browser frame (light & dark) with tab bar, active tab, and omnibox address bar",
+      },
+      {
+        type: "added",
+        text: "Adjustable browser header size slider (50%–200%) for fine-tuning toolbar proportions",
+      },
+      {
+        type: "added",
+        text: "Custom URL display in the browser address bar",
+      },
+      {
+        type: "improved",
+        text: "Browser frames are shared components — identical rendering in both 2D and 3D perspective views",
+      },
+      {
+        type: "improved",
+        text: "Browser style previews in the editor now match the style section card layout",
+      },
+    ],
+  },
+  {
     date: "March 7, 2026",
     version: "2.4.0",
     title: "Tweet Import, Code Snippets & Overlay Improvements",

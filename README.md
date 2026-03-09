@@ -22,7 +22,8 @@ A free, browser-based screenshot editor. Beautiful backgrounds, device frames, 3
 ## Features
 
 - **100+ Backgrounds** — gradients, solid colors, images, blur, noise
-- **Device Frames** — macOS, Windows, Arc browser, Polaroid
+- **Browser Mockups** — Safari & Chrome (light/dark) with realistic toolbars, adjustable header size, and custom URL
+- **Device Frames** — Arc browser, Polaroid, glass, outline, border styles
 - **3D Transforms** — 30+ perspective presets with realistic depth
 - **Draw & Markup** — arrows, shapes, blur regions, text overlays
 - **Tweet & Code Snippets** — import tweets, generate code images

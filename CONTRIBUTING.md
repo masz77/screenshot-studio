@@ -47,7 +47,7 @@ Core features work without any configuration.
 screenshot-studio/
 ├── app/                  # Next.js pages and API routes
 ├── components/
-│   ├── canvas/           # HTML/CSS-based canvas rendering
+│   ├── canvas/           # HTML/CSS canvas rendering (frames, overlays, dimensions)
 │   ├── controls/         # Editor control panels
 │   ├── editor/           # Editor layout and header
 │   ├── export/           # Export dialogs and progress UI
@@ -106,6 +106,13 @@ Always run lint before committing.
 2. Add to the appropriate editor panel
 3. Connect to Zustand store (`lib/store/`)
 4. Update types if needed
+
+### Adding a Browser Mockup Style
+1. Add toolbar component in `components/canvas/frames/BrowserToolbar.tsx`
+2. The toolbar is shared between 2D (`HTMLMainImageLayer`) and 3D (`Frame3DOverlay`) views
+3. Add frame type to `FrameConfig` in `Frame3DOverlay.tsx`
+4. Update `canvas-dimensions.ts` with header height for the new frame
+5. Add preview card in `components/editor/sections/BrowserMockupSection.tsx`
 
 ### Adding a New Background
 1. Add definition to `lib/constants/backgrounds.ts`
