@@ -644,6 +644,7 @@ export interface ImageState {
   setTimelineDuration: (duration: number) => void;
   // Animation clips
   addAnimationClip: (presetId: string, startTime: number) => void;
+  applyAnimationToAllSlides: (presetId: string) => void;
   updateAnimationClip: (clipId: string, updates: Partial<AnimationClip>) => void;
   removeAnimationClip: (clipId: string) => void;
   clearAnimationClips: () => void;
@@ -1632,6 +1633,70 @@ export const useImageStore = create<ImageState>()(
         },
         showTimeline: true,
       }));
+    },
+
+    applyAnimationToAllSlides: (presetId) => {
+      const preset = ANIMATION_PRESETS.find(p => p.id === presetId);
+      if (!preset) return;
+
+      const { slides, slideshow, animationClips, timeline } = get();
+
+      // Need at least 2 slides for "apply to all" to make sense
+      if (slides.length < 2) {
+        // Fall back to single clip add (same as clicking once)
+        get().addAnimationClip(presetId, animationClips.reduce((max, clip) =>
+          Math.max(max, clip.startTime + clip.duration), 0));
+        return;
+      }
+
+      // Clear existing clips first for a clean slate
+      const clearedTracks = timeline.tracks.filter(t => !t.clipId || !animationClips.some(c => c.id === t.clipId));
+
+      // Calculate per-slide start times and create clips + tracks
+      const newClips: AnimationClip[] = [];
+      const newTracks: AnimationTrack[] = [];
+      const colors = ['#c9ff2e', '#10B981', '#22c55e', '#84cc16', '#34d399'];
+      let cumulativeTime = 0;
+
+      for (let i = 0; i < slides.length; i++) {
+        const slide = slides[i];
+        const startTime = cumulativeTime;
+        const slideDurationMs = (slide.duration || slideshow.defaultDuration) * 1000;
+
+        // Scale animation to fit within slide duration
+        const clipDuration = Math.min(preset.duration, slideDurationMs);
+        const id = `clip-${Date.now()}-${i}-${Math.random().toString(36).substr(2, 9)}`;
+        const color = colors[i % colors.length];
+
+        newClips.push({
+          id,
+          presetId,
+          name: preset.name,
+          startTime,
+          duration: clipDuration,
+          color,
+        });
+
+        // Clone preset tracks linked to this clip
+        const tracks = clonePresetTracks(preset, { startTime, clipId: id });
+        newTracks.push(...tracks);
+
+        cumulativeTime += slideDurationMs;
+      }
+
+      trackAnimationClipAdd(presetId, preset.name, preset.duration);
+
+      set({
+        animationClips: newClips,
+        timeline: {
+          ...timeline,
+          tracks: [...clearedTracks, ...newTracks],
+          duration: Math.max(timeline.duration, cumulativeTime),
+          playhead: 0,
+          isPlaying: false,
+        },
+        showTimeline: true,
+      });
     },
 
     updateAnimationClip: (clipId, updates) => {
