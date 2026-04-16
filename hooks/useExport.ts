@@ -292,7 +292,7 @@ export function useExport(selectedAspectRatio: string) {
         scale: 2,
         exportWidth: preset.width,
         exportHeight: preset.height,
-        skipSharp: true, // Clipboard doesn't need Sharp compression — speed matters more
+        skipCompression: true, // Clipboard doesn't need WASM compression — speed matters more
       };
 
       // exportElement reports progress 0-95 via callback

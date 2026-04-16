@@ -28,7 +28,7 @@ export interface ExportOptions {
   exportWidth: number;
   exportHeight: number;
   /** Skip WASM compression (e.g. for clipboard copies where speed matters more) */
-  skipSharp?: boolean;
+  skipCompression?: boolean;
 }
 
 export interface ExportResult {
@@ -639,7 +639,7 @@ export async function exportElement(
       finalCanvas,
       options.format,
       options.qualityPreset,
-      { skipApi: options.skipSharp, onProgress: report }
+      { skipApi: options.skipCompression, onProgress: report }
     );
 
     report(90);
@@ -657,7 +657,7 @@ export async function exportElement(
 }
 
 /**
- * Export element as raw canvas (no Sharp processing).
+ * Export element as raw canvas (no WASM compression).
  * Used for video frame capture where FFmpeg handles final encoding.
  */
 export async function exportElementAsCanvas(
