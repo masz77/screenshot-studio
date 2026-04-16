@@ -1,14 +1,13 @@
 /**
- * R2 Overlay Assets Configuration
+ * Overlay Assets Configuration
  *
- * These are the paths to overlay images stored in Cloudflare R2.
- * The paths are relative to the R2 bucket root.
+ * These are the paths to overlay images served from /public.
  */
 
 import { getR2PublicUrl } from './r2';
 
 /**
- * Arrow overlay paths in R2
+ * Arrow overlay paths
  */
 export const ARROW_PATHS = [
   "overlays/arrow/arrow-1.svg",
@@ -24,28 +23,28 @@ export const ARROW_PATHS = [
 ] as const;
 
 /**
- * Shadow overlay paths in R2
+ * Shadow overlay paths (served from /public/overlay-shadow/)
  */
 export const SHADOW_OVERLAY_PATHS = [
-  "overlays/shadow/001.webp",
-  "overlays/shadow/002.webp",
-  "overlays/shadow/007.webp",
-  "overlays/shadow/017.webp",
-  "overlays/shadow/019.webp",
-  "overlays/shadow/023.webp",
-  "overlays/shadow/031.webp",
-  "overlays/shadow/037.webp",
-  "overlays/shadow/041.webp",
-  "overlays/shadow/050.webp",
-  "overlays/shadow/053.webp",
-  "overlays/shadow/057.webp",
-  "overlays/shadow/063.webp",
-  "overlays/shadow/064.webp",
-  "overlays/shadow/082.webp",
-  "overlays/shadow/083.webp",
-  "overlays/shadow/088.webp",
-  "overlays/shadow/097.webp",
-  "overlays/shadow/099.webp",
+  "/overlay-shadow/001.webp",
+  "/overlay-shadow/002.webp",
+  "/overlay-shadow/007.webp",
+  "/overlay-shadow/017.webp",
+  "/overlay-shadow/019.webp",
+  "/overlay-shadow/023.webp",
+  "/overlay-shadow/031.webp",
+  "/overlay-shadow/037.webp",
+  "/overlay-shadow/041.webp",
+  "/overlay-shadow/050.webp",
+  "/overlay-shadow/053.webp",
+  "/overlay-shadow/057.webp",
+  "/overlay-shadow/063.webp",
+  "/overlay-shadow/064.webp",
+  "/overlay-shadow/082.webp",
+  "/overlay-shadow/083.webp",
+  "/overlay-shadow/088.webp",
+  "/overlay-shadow/097.webp",
+  "/overlay-shadow/099.webp",
 ] as const;
 
 /**
@@ -58,7 +57,7 @@ export type ShadowOverlayPath = typeof SHADOW_OVERLAY_PATHS[number];
 export type OverlayPath = typeof OVERLAY_PATHS[number];
 
 /**
- * Get full R2 URL for an overlay image
+ * Get URL for an overlay image
  */
 export function getOverlayUrl(path: string): string {
   return getR2PublicUrl(path);

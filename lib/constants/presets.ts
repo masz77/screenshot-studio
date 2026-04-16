@@ -40,7 +40,7 @@ export const presets: PresetConfig[] = [
     aspectRatio: '16_9',
     backgroundConfig: {
       type: 'image',
-      value: 'backgrounds/raycast/mono_dark_distortion_2.webp',
+      value: '/raycast/mono_dark_distortion_2.webp',
       opacity: 1,
     },
     borderRadius: 8,
@@ -74,7 +74,7 @@ export const presets: PresetConfig[] = [
     aspectRatio: '16_9',
     backgroundConfig: {
       type: 'image',
-      value: 'backgrounds/paper/26.webp',
+      value: '/paper/26.webp',
       opacity: 1,
     },
     borderRadius: 16,
@@ -121,7 +121,7 @@ export const presets: PresetConfig[] = [
     aspectRatio: '1_1',
     backgroundConfig: {
       type: 'image',
-      value: 'backgrounds/raycast/loupe-mono-light.webp',
+      value: '/raycast/loupe-mono-light.webp',
       opacity: 1,
     },
     borderRadius: 16,
@@ -159,7 +159,7 @@ export const presets: PresetConfig[] = [
     aspectRatio: '16_9',
     backgroundConfig: {
       type: 'image',
-      value: 'backgrounds/raycast/chromatic_dark_2.webp',
+      value: '/raycast/chromatic_dark_2.webp',
       opacity: 1,
     },
     borderRadius: 16,
@@ -193,7 +193,7 @@ export const presets: PresetConfig[] = [
     aspectRatio: '4_5',
     backgroundConfig: {
       type: 'image',
-      value: 'backgrounds/paper/27.webp',
+      value: '/paper/27.webp',
       opacity: 1,
     },
     borderRadius: 0,
@@ -274,7 +274,7 @@ export const presets: PresetConfig[] = [
     aspectRatio: '16_9',
     backgroundConfig: {
       type: 'image',
-      value: 'backgrounds/mesh/Peak.webp',
+      value: '/mesh/Peak.webp',
       opacity: 1,
     },
     borderRadius: 24,
@@ -308,7 +308,7 @@ export const presets: PresetConfig[] = [
     aspectRatio: 'og_image',
     backgroundConfig: {
       type: 'image',
-      value: 'backgrounds/raycast/blushing-fire.webp',
+      value: '/raycast/blushing-fire.webp',
       opacity: 1,
     },
     borderRadius: 20,

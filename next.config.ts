@@ -4,13 +4,7 @@ const nextConfig: NextConfig = {
   reactCompiler: true,
 
   images: {
-    remotePatterns: [
-      {
-        // R2 custom domain (new)
-        protocol: "https",
-        hostname: "assets.screenshot-studio.com",
-      },
-    ],
+    remotePatterns: [],
   },
 
   // Enable SharedArrayBuffer for multi-threaded FFmpeg WASM
@@ -58,11 +52,8 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  // Proxy R2 assets through same origin to avoid CORS issues
-  // (especially critical for canvas capture during video export)
-  // Also proxy PostHog through same origin to bypass ad blockers
+  // Proxy PostHog through same origin to bypass ad blockers
   async rewrites() {
-    const r2Url = process.env.NEXT_PUBLIC_R2_PUBLIC_URL;
     return [
       // PostHog reverse proxy — static assets must come first
       {
@@ -73,15 +64,6 @@ const nextConfig: NextConfig = {
         source: "/svc/:path*",
         destination: "https://us.i.posthog.com/:path*",
       },
-      // R2 asset proxy
-      ...(r2Url
-        ? [
-            {
-              source: "/r2-assets/:path*",
-              destination: `${r2Url}/:path*`,
-            },
-          ]
-        : []),
     ];
   },
 

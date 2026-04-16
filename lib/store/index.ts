@@ -712,7 +712,7 @@ export const useImageStore = create<ImageState>()(
     customDimensions: null,
     backgroundConfig: {
       type: "image",
-      value: "backgrounds/raycast/red_distortion_4.webp",
+      value: "/raycast/red_distortion_4.webp",
       opacity: 1,
     },
     backgroundBlur: 0,
@@ -799,7 +799,7 @@ export const useImageStore = create<ImageState>()(
         // Reset background
         backgroundConfig: {
           type: "image",
-          value: "backgrounds/raycast/red_distortion_4.webp",
+          value: "/raycast/red_distortion_4.webp",
           opacity: 1,
         },
         backgroundBlur: 0,
@@ -898,7 +898,7 @@ export const useImageStore = create<ImageState>()(
         // Reset background
         backgroundConfig: {
           type: "image",
-          value: "backgrounds/raycast/red_distortion_4.webp",
+          value: "/raycast/red_distortion_4.webp",
           opacity: 1,
         },
         backgroundBlur: 0,
@@ -1015,7 +1015,7 @@ export const useImageStore = create<ImageState>()(
         // If current value is a gradient or solid color key, or not a valid image, set default to asset-26
         const newValue =
           isGradientKey || isSolidColorKey || !isValidImage
-            ? "backgrounds/raycast/red_distortion_4.webp"
+            ? "/raycast/red_distortion_4.webp"
             : currentValue;
 
         set({
@@ -1281,7 +1281,7 @@ export const useImageStore = create<ImageState>()(
         backgroundBorderRadius: 10,
         backgroundConfig: {
           type: "image",
-          value: "backgrounds/raycast/red_distortion_4.webp",
+          value: "/raycast/red_distortion_4.webp",
           opacity: 1,
         },
         backgroundBlur: 0,

@@ -5,46 +5,6 @@ import { backgroundPaths } from '@/lib/r2-backgrounds';
 import type { BackgroundConfig } from '@/lib/constants/backgrounds';
 import type { ImageOverlay } from '@/lib/store';
 
-const MAX_RETRIES = 2;
-const RETRY_DELAY = 800; // ms
-
-function loadImageWithRetry(
-  url: string,
-  retries: number = 0,
-  signal?: AbortSignal
-): Promise<HTMLImageElement> {
-  return new Promise((resolve, reject) => {
-    if (signal?.aborted) {
-      reject(new DOMException('Aborted', 'AbortError'));
-      return;
-    }
-
-    const img = new window.Image();
-    img.crossOrigin = 'anonymous';
-    img.onload = () => resolve(img);
-    img.onerror = () => {
-      if (signal?.aborted) {
-        reject(new DOMException('Aborted', 'AbortError'));
-        return;
-      }
-      if (retries < MAX_RETRIES) {
-        // Retry with cache-busting param to bypass cached 404 responses
-        setTimeout(() => {
-          const bustUrl = url.includes('?')
-            ? `${url}&_r=${Date.now()}`
-            : `${url}?_r=${Date.now()}`;
-          loadImageWithRetry(bustUrl, retries + 1, signal)
-            .then(resolve)
-            .catch(reject);
-        }, RETRY_DELAY);
-      } else {
-        reject(new Error(`Failed to load image after ${MAX_RETRIES + 1} attempts: ${url}`));
-      }
-    };
-    img.src = url;
-  });
-}
-
 export function useBackgroundImage(
   backgroundConfig: BackgroundConfig,
   containerWidth: number,
@@ -85,32 +45,16 @@ export function useBackgroundImage(
         }
       }
 
-      // Determine if this is an R2 asset (eligible for retry on 404)
-      const isR2Asset = imageUrl.startsWith('/r2-assets/');
-
-      if (isR2Asset) {
-        loadImageWithRetry(imageUrl, 0, abortController.signal)
-          .then((img) => {
-            if (!abortController.signal.aborted) setBgImage(img);
-          })
-          .catch((err) => {
-            if (err.name !== 'AbortError') {
-              console.error('Failed to load background image:', backgroundConfig.value);
-              setBgImage(null);
-            }
-          });
-      } else {
-        const img = new window.Image();
-        img.crossOrigin = 'anonymous';
-        img.onload = () => {
-          if (!abortController.signal.aborted) setBgImage(img);
-        };
-        img.onerror = () => {
-          console.error('Failed to load background image:', backgroundConfig.value);
-          setBgImage(null);
-        };
-        img.src = imageUrl;
-      }
+      const img = new window.Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        if (!abortController.signal.aborted) setBgImage(img);
+      };
+      img.onerror = () => {
+        console.error('Failed to load background image:', backgroundConfig.value);
+        setBgImage(null);
+      };
+      img.src = imageUrl;
     } else {
       setBgImage(null);
     }
@@ -158,26 +102,6 @@ export function useOverlayImages(imageOverlays: ImageOverlay[]) {
             isR2Overlay && !overlay.isCustom
               ? getR2ImageUrl({ src: overlay.src })
               : overlay.src;
-
-          const isR2Asset = imageUrl.startsWith('/r2-assets/');
-
-          if (isR2Asset) {
-            loadImageWithRetry(imageUrl, 0, abortController.signal)
-              .then((img) => {
-                if (!abortController.signal.aborted) {
-                  resolve({ id: overlay.id, img });
-                } else {
-                  resolve(null);
-                }
-              })
-              .catch((err) => {
-                if (err.name !== 'AbortError') {
-                  console.error(`Failed to load overlay image for ${overlay.id}`);
-                }
-                resolve(null);
-              });
-            return;
-          }
 
           const img = new window.Image();
           // Don't set crossOrigin for blob/data URLs — they're same-origin

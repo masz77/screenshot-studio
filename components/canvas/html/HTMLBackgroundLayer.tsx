@@ -17,55 +17,6 @@ interface HTMLBackgroundLayerProps {
 }
 
 const TRANSITION_DURATION = 400; // ms
-const MAX_RETRIES = 2;
-const RETRY_DELAY = 800;
-
-/**
- * Preload an image URL with retry + cache-busting for R2 404s.
- * Returns the successfully loaded URL (may have cache-bust param).
- */
-function preloadImage(
-  url: string,
-  retries = 0,
-  signal?: AbortSignal
-): Promise<string> {
-  return new Promise((resolve, reject) => {
-    if (signal?.aborted) {
-      reject(new DOMException('Aborted', 'AbortError'));
-      return;
-    }
-    const img = new window.Image();
-    img.onload = () => resolve(url);
-    img.onerror = () => {
-      if (signal?.aborted) {
-        reject(new DOMException('Aborted', 'AbortError'));
-        return;
-      }
-      if (retries < MAX_RETRIES) {
-        setTimeout(() => {
-          const bustUrl = url.includes('?')
-            ? `${url}&_r=${Date.now()}`
-            : `${url}?_r=${Date.now()}`;
-          preloadImage(bustUrl, retries + 1, signal).then(resolve).catch(reject);
-        }, RETRY_DELAY);
-      } else {
-        reject(new Error(`Failed to load: ${url}`));
-      }
-    };
-    img.src = url;
-  });
-}
-
-/**
- * Extract image URL from a CSSProperties backgroundImage value.
- */
-function extractImageUrl(style: React.CSSProperties): string | null {
-  const bg = style.backgroundImage;
-  if (!bg || typeof bg !== 'string') return null;
-  const match = bg.match(/url\(([^)]+)\)/);
-  if (!match) return null;
-  return match[1].replace(/['"]/g, '');
-}
 
 /**
  * HTML/CSS-based background layer that replaces Konva BackgroundLayer.
@@ -103,27 +54,6 @@ export function HTMLBackgroundLayer({
     // Skip crossfade on initial render
     if (isFirstRender.current) {
       isFirstRender.current = false;
-      // For initial image backgrounds, preload to handle 404s
-      if (backgroundConfig.type === 'image') {
-        const url = extractImageUrl(backgroundStyle);
-        if (url && url.startsWith('/r2-assets/')) {
-          preloadImage(url, 0, abortController.signal)
-            .then((loadedUrl) => {
-              if (!abortController.signal.aborted) {
-                const style = {
-                  ...backgroundStyle,
-                  backgroundImage: `url(${loadedUrl})`,
-                };
-                setLayerAStyle(style);
-                setLayerBStyle(style);
-              }
-            })
-            .catch(() => {
-              // Use original URL as fallback
-            });
-          return () => abortController.abort();
-        }
-      }
       setLayerAStyle(backgroundStyle);
       setLayerBStyle(backgroundStyle);
       return;
@@ -158,30 +88,6 @@ export function HTMLBackgroundLayer({
           setShowTransition(false);
         }, TRANSITION_DURATION + 50);
       };
-
-      // For image backgrounds, preload before transitioning
-      if (backgroundConfig.type === 'image') {
-        const url = extractImageUrl(backgroundStyle);
-        if (url && url.startsWith('/r2-assets/')) {
-          preloadImage(url, 0, abortController.signal)
-            .then((loadedUrl) => {
-              applyNewBackground({
-                ...backgroundStyle,
-                backgroundImage: `url(${loadedUrl})`,
-              });
-            })
-            .catch((err) => {
-              if (err.name !== 'AbortError') {
-                // Still apply even if preload fails, so UI isn't stuck
-                applyNewBackground(backgroundStyle);
-              }
-            });
-          return () => {
-            abortController.abort();
-            if (timeoutRef.current) clearTimeout(timeoutRef.current);
-          };
-        }
-      }
 
       applyNewBackground(backgroundStyle);
     } else {
