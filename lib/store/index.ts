@@ -645,6 +645,7 @@ export interface ImageState {
   // Animation clips
   addAnimationClip: (presetId: string, startTime: number) => void;
   applyAnimationToAllSlides: (presetId: string) => void;
+  randomizeAnimationsAcrossSlides: () => void;
   updateAnimationClip: (clipId: string, updates: Partial<AnimationClip>) => void;
   removeAnimationClip: (clipId: string) => void;
   clearAnimationClips: () => void;
@@ -1685,6 +1686,69 @@ export const useImageStore = create<ImageState>()(
       }
 
       trackAnimationClipAdd(presetId, preset.name, preset.duration);
+
+      set({
+        animationClips: newClips,
+        timeline: {
+          ...timeline,
+          tracks: [...clearedTracks, ...newTracks],
+          duration: Math.max(timeline.duration, cumulativeTime),
+          playhead: 0,
+          isPlaying: false,
+        },
+        showTimeline: true,
+      });
+    },
+
+    randomizeAnimationsAcrossSlides: () => {
+      const { slides, slideshow, animationClips, timeline } = get();
+
+      if (slides.length < 2) return;
+
+      // Clear existing clip tracks
+      const clearedTracks = timeline.tracks.filter(t => !t.clipId || !animationClips.some(c => c.id === t.clipId));
+
+      const newClips: AnimationClip[] = [];
+      const newTracks: AnimationTrack[] = [];
+      const colors = ['#c9ff2e', '#10B981', '#22c55e', '#84cc16', '#34d399'];
+      let cumulativeTime = 0;
+      let lastPresetIndex = -1;
+
+      for (let i = 0; i < slides.length; i++) {
+        const slide = slides[i];
+        const startTime = cumulativeTime;
+        const slideDurationMs = (slide.duration || slideshow.defaultDuration) * 1000;
+
+        // Pick a random preset, avoiding consecutive repeats when possible
+        let presetIndex: number;
+        if (ANIMATION_PRESETS.length > 1) {
+          do {
+            presetIndex = Math.floor(Math.random() * ANIMATION_PRESETS.length);
+          } while (presetIndex === lastPresetIndex);
+        } else {
+          presetIndex = 0;
+        }
+        lastPresetIndex = presetIndex;
+        const preset = ANIMATION_PRESETS[presetIndex];
+
+        const clipDuration = Math.min(preset.duration, slideDurationMs);
+        const id = `clip-${Date.now()}-${i}-${Math.random().toString(36).substr(2, 9)}`;
+        const color = colors[i % colors.length];
+
+        newClips.push({
+          id,
+          presetId: preset.id,
+          name: preset.name,
+          startTime,
+          duration: clipDuration,
+          color,
+        });
+
+        const tracks = clonePresetTracks(preset, { startTime, clipId: id });
+        newTracks.push(...tracks);
+
+        cumulativeTime += slideDurationMs;
+      }
 
       set({
         animationClips: newClips,
