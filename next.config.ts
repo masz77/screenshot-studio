@@ -67,15 +67,6 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  // REQUIRED for react-konva
-  webpack: (config) => {
-    config.externals = [...(config.externals || []), { canvas: "canvas" }];
-    return config;
-  },
-
-  // Turbopack configuration (Next.js 16+ default bundler)
-  turbopack: {},
-
 };
 
 export default nextConfig;

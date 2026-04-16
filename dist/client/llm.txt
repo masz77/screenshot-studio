@@ -1,0 +1,47 @@
+# Screenshot Studio - Free Online Image Editor
+
+## About
+Screenshot Studio is a free, browser-based image editor for creating professional graphics in seconds. Transform screenshots into stunning social media images with beautiful backgrounds, text overlays, animations, and one-click export. No signup required.
+
+## Core Features
+- **Image Editing** - Upload images and adjust size, opacity, borders, shadows, and border radius
+- **Beautiful Backgrounds** - 100+ premium backgrounds including gradients, mesh, radiant, paper textures, and patterns
+- **Text Overlays** - Add multiple text overlays with custom fonts, colors, sizes, positions, and shadows
+- **3D Transforms** - Apply perspective, rotation, and tilt effects for depth
+- **Animation Timeline** - Create animated slideshows with 20+ animation presets (zoom, pan, Ken Burns, tilt, fade)
+- **Video Export** - Export animations as MP4, WebM, or GIF using browser-based encoding
+- **High-Resolution Export** - Export up to 5x resolution as PNG, JPEG, or WebP
+- **Device Frames** - Add macOS, Windows, Arc browser frames to screenshots
+- **Presets** - One-click professional styling presets
+
+## Pages
+- Home: https://screenshot-studio.com/ - Landing page with features overview
+- Editor: https://screenshot-studio.com/home - Main canvas editor for creating designs
+
+## Technology Stack
+- Next.js 16 with App Router
+- React 19
+- TypeScript
+- HTML Canvas with modern-screenshot for rendering
+- Cloudflare R2 for asset storage
+- Tailwind CSS for styling
+- Zustand for state management
+- FFmpeg WASM for video encoding
+
+## Use Cases
+- Creating social media graphics (Twitter/X, Instagram, LinkedIn)
+- Product screenshot beautification for SaaS landing pages
+- Developer portfolio and project showcase images
+- Marketing graphics and presentations
+- Animated slideshows and video content
+
+## Target Audience
+Developers, designers, content creators, indie hackers, and anyone who needs to create professional visual designs quickly without design skills.
+
+## Pricing
+100% free with no hidden costs, premium tiers, or watermarks. Unlimited exports and full feature access.
+
+## Contact
+- Website: https://screenshot-studio.com
+- Twitter: https://x.com/code_kartik
+- GitHub: https://github.com/KartikLabhshetwar/stage
