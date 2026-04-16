@@ -262,6 +262,10 @@ export interface EditorState {
     opacity: number;
   };
 
+  // Slot selection state
+  selectedSlot: { slideId: string; slot: 'in' | 'out' } | null;
+  pendingPresetId: string | null;
+
   // Setters
   setScreenshot: (screenshot: Partial<EditorState["screenshot"]>) => void;
   setBackground: (background: Partial<EditorState["background"]>) => void;
@@ -270,6 +274,8 @@ export interface EditorState {
   setFrame: (frame: Partial<EditorState["frame"]>) => void;
   setCanvas: (canvas: Partial<EditorState["canvas"]>) => void;
   setNoise: (noise: Partial<EditorState["noise"]>) => void;
+  setSelectedSlot: (slot: { slideId: string; slot: 'in' | 'out' } | null) => void;
+  setPendingPresetId: (presetId: string | null) => void;
 }
 
 // Create editor store
@@ -333,6 +339,9 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     opacity: 0.5,
   },
 
+  selectedSlot: null,
+  pendingPresetId: null,
+
   setScreenshot: (screenshot) => {
     set((state) => ({
       screenshot: { ...state.screenshot, ...screenshot },
@@ -374,6 +383,9 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       noise: { ...state.noise, ...noise },
     }));
   },
+
+  setSelectedSlot: (slot) => set({ selectedSlot: slot, pendingPresetId: null }),
+  setPendingPresetId: (presetId) => set({ pendingPresetId: presetId, selectedSlot: null }),
 }));
 
 // Sync hook to keep editor store in sync with image store

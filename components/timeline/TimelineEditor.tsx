@@ -5,20 +5,19 @@ import { Timeline } from '@xzdarcy/react-timeline-editor'
 import type { TimelineState } from '@xzdarcy/react-timeline-editor'
 import '@xzdarcy/react-timeline-editor/dist/react-timeline-editor.css'
 
-import { useImageStore } from '@/lib/store'
+import { useImageStore, useEditorStore } from '@/lib/store'
 import { TimelineControls } from '@/components/timeline/TimelineControls'
 import { useTimelinePlayback } from '@/components/timeline/hooks/useTimelinePlayback'
-import { AnimationClipRenderer } from '@/components/timeline/renderers/AnimationClipRenderer'
+import { SlotRenderer } from '@/components/timeline/renderers/SlotRenderer'
 import { MediaClipRenderer } from '@/components/timeline/renderers/MediaClipRenderer'
 import {
   toTimelineRows,
   timelineEffects,
-  applyAnimationRowChanges,
   ANIMATION_ROW_ID,
   MEDIA_ROW_ID,
 } from '@/lib/timeline/adapters'
 import type {
-  AnimationAction,
+  SlotAction,
   MediaAction,
   TimelineRowBase,
   TimelineActionBase,
@@ -36,7 +35,6 @@ const START_LEFT = 120
 export function TimelineEditor() {
   const {
     timeline,
-    animationClips,
     uploadedImageUrl,
     imageName,
     slides,
@@ -47,11 +45,18 @@ export function TimelineEditor() {
     setTimeline,
     setPlayhead,
     stopPlayback,
-    updateAnimationClip,
-    removeAnimationClip,
     removeSlide,
     setActiveSlide,
+    setSlideInPreset,
+    setSlideOutPreset,
   } = useImageStore()
+
+  const {
+    selectedSlot,
+    pendingPresetId,
+    setSelectedSlot,
+    setPendingPresetId,
+  } = useEditorStore()
 
   const timelineRef = React.useRef<TimelineState>(null)
   const scrollContainerRef = React.useRef<HTMLDivElement>(null)
@@ -62,13 +67,12 @@ export function TimelineEditor() {
   const editorData = React.useMemo(
     () =>
       toTimelineRows(
-        animationClips,
         slides,
         timeline.duration,
         uploadedImageUrl,
         imageName,
       ),
-    [animationClips, slides, timeline.duration, uploadedImageUrl, imageName],
+    [slides, timeline.duration, uploadedImageUrl, imageName],
   )
 
   // Sync store playhead → library cursor
@@ -77,21 +81,6 @@ export function TimelineEditor() {
     const timeSec = timeline.playhead / 1000
     timelineRef.current.setTime(timeSec)
   }, [timeline.playhead])
-
-  // Handle library onChange: sync actions back to store
-  // Guard: ignore onChange during playback to avoid feedback loops
-  const handleChange = React.useCallback(
-    (newEditorData: TimelineRowBase[]) => {
-      if (useImageStore.getState().timeline.isPlaying) return
-      const animationRow = newEditorData.find(
-        (row) => row.id === ANIMATION_ROW_ID,
-      )
-      if (animationRow) {
-        applyAnimationRowChanges(animationRow.actions, updateAnimationClip)
-      }
-    },
-    [updateAnimationClip],
-  )
 
   // Handle cursor drag: update store playhead
   const handleCursorDrag = React.useCallback(
@@ -102,7 +91,7 @@ export function TimelineEditor() {
     [stopPlayback, setPlayhead],
   )
 
-  // Handle click on time ruler: seek to that position
+  // Handle click on time ruler
   const handleClickTimeArea = React.useCallback(
     (time: number) => {
       stopPlayback()
@@ -126,14 +115,61 @@ export function TimelineEditor() {
     [setActiveSlide],
   )
 
+  // Slot click handler (supports bidirectional flow)
+  const handleSlotClick = React.useCallback(
+    (slideId: string, slot: 'in' | 'out') => {
+      // If a preset is pending (preset-first flow), assign it
+      if (pendingPresetId) {
+        if (slot === 'in') {
+          setSlideInPreset(slideId, pendingPresetId)
+        } else {
+          setSlideOutPreset(slideId, pendingPresetId)
+        }
+        setPendingPresetId(null)
+        return
+      }
+
+      // Otherwise, select the slot (slot-first flow)
+      const isSameSlot =
+        selectedSlot?.slideId === slideId && selectedSlot?.slot === slot
+      setSelectedSlot(isSameSlot ? null : { slideId, slot })
+
+      // Open animate tab in right panel
+      setActiveRightPanelTab('animate')
+    },
+    [
+      pendingPresetId,
+      selectedSlot,
+      setSlideInPreset,
+      setSlideOutPreset,
+      setPendingPresetId,
+      setSelectedSlot,
+      setActiveRightPanelTab,
+    ],
+  )
+
+  // Clear slot handler
+  const handleClearSlot = React.useCallback(
+    (slideId: string, slot: 'in' | 'out') => {
+      if (slot === 'in') {
+        setSlideInPreset(slideId, null)
+      } else {
+        setSlideOutPreset(slideId, null)
+      }
+    },
+    [setSlideInPreset, setSlideOutPreset],
+  )
+
   // Custom action renderer
   const getActionRender = React.useCallback(
     (action: TimelineActionBase, row: TimelineRowBase) => {
       if (row.id === ANIMATION_ROW_ID) {
         return (
-          <AnimationClipRenderer
-            action={action as AnimationAction}
-            onRemove={removeAnimationClip}
+          <SlotRenderer
+            action={action as SlotAction}
+            selectedSlot={selectedSlot}
+            onSlotClick={handleSlotClick}
+            onClearSlot={handleClearSlot}
           />
         )
       }
@@ -152,7 +188,7 @@ export function TimelineEditor() {
       }
       return null
     },
-    [removeAnimationClip, activeSlideId, slides.length, removeSlide, setActiveSlide],
+    [selectedSlot, handleSlotClick, handleClearSlot, activeSlideId, slides.length, removeSlide, setActiveSlide],
   )
 
   // Ctrl/Cmd + mousewheel zoom handler
@@ -179,12 +215,20 @@ export function TimelineEditor() {
     return () => container.removeEventListener('wheel', handleWheel)
   }, [setTimeline])
 
+  // Clear selection on Escape
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setSelectedSlot(null)
+        setPendingPresetId(null)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [setSelectedSlot, setPendingPresetId])
+
   if (!showTimeline || (!uploadedImageUrl && slides.length === 0)) {
     return null
-  }
-
-  const handleAddAnimation = () => {
-    setActiveRightPanelTab('animate')
   }
 
   const handleClose = () => {
@@ -199,11 +243,23 @@ export function TimelineEditor() {
       className="timeline-editor-wrapper bg-card border-t border-border/40 flex flex-col"
       style={{ height: TIMELINE_HEIGHT }}
     >
+      {/* Banner for preset-first flow */}
+      {pendingPresetId && (
+        <div className="flex items-center justify-between px-3 py-1.5 bg-primary/10 border-b border-primary/20 shrink-0">
+          <span className="text-xs font-medium text-primary">
+            Click a slot to apply the selected animation
+          </span>
+          <button
+            onClick={() => setPendingPresetId(null)}
+            className="text-xs text-muted-foreground hover:text-foreground"
+          >
+            Cancel
+          </button>
+        </div>
+      )}
+
       {/* Controls bar */}
-      <TimelineControls
-        onAddAnimation={handleAddAnimation}
-        onClose={handleClose}
-      />
+      <TimelineControls onClose={handleClose} />
 
       {/* Timeline area */}
       <div ref={scrollContainerRef} className="flex-1 overflow-hidden">
@@ -218,13 +274,11 @@ export function TimelineEditor() {
           minScaleCount={Math.ceil(durationSec)}
           maxScaleCount={Math.ceil(durationSec) + 2}
           rowHeight={48}
-          onChange={handleChange}
           onCursorDrag={handleCursorDrag}
           onCursorDragEnd={handleCursorDrag}
           onClickTimeArea={handleClickTimeArea}
           onClickAction={handleClickAction}
           getActionRender={getActionRender}
-          dragLine
           autoScroll
           style={{ width: '100%', height: '100%' }}
         />
