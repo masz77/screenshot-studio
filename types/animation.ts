@@ -87,6 +87,7 @@ export interface AnimationPreset {
   duration: number; // in milliseconds
   tracks: AnimationTrack[];
   thumbnail?: string; // optional thumbnail URL
+  direction: PresetDirection;
 }
 
 // Categories for organizing presets
@@ -99,6 +100,8 @@ export type AnimationPresetCategory =
   | 'orbit'
   | 'depth'
   | 'kenburns';
+
+export type PresetDirection = 'in' | 'out';
 
 // Helper type for creating keyframes with partial properties
 export type KeyframeInput = Omit<Keyframe, 'id'>;

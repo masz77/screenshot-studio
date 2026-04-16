@@ -60,6 +60,7 @@ export const ANIMATION_PRESETS: AnimationPreset[] = [
     description: 'Starts tilted back, lands flat — classic SaaS hero entrance',
     category: 'reveal',
     duration: 1200,
+    direction: 'in' as const,
     tracks: [
       createTrack('Hero Landing', 'transform', [
         createKeyframe(0, { rotateX: 25, scale: 0.95, perspective: 2400 }, 'ease-out'),
@@ -77,6 +78,7 @@ export const ANIMATION_PRESETS: AnimationPreset[] = [
     description: 'Enters from the right with a 3D rotation',
     category: 'reveal',
     duration: 1000,
+    direction: 'in' as const,
     tracks: [
       createTrack('Slide In 3D', 'transform', [
         createKeyframe(0, { rotateY: 30, translateX: 35, perspective: 2400 }, 'ease-out'),
@@ -94,6 +96,7 @@ export const ANIMATION_PRESETS: AnimationPreset[] = [
     description: 'Rises from below and settles into place',
     category: 'reveal',
     duration: 1000,
+    direction: 'in' as const,
     tracks: [
       createTrack('Rise & Settle', 'transform', [
         createKeyframe(0, { translateY: 25, rotateX: -15, perspective: 2400, scale: 0.97 }, 'ease-out'),
@@ -111,6 +114,7 @@ export const ANIMATION_PRESETS: AnimationPreset[] = [
     description: 'Falls from above with a tilt and fades in',
     category: 'reveal',
     duration: 1000,
+    direction: 'in' as const,
     tracks: [
       createTrack('Drop In', 'transform', [
         createKeyframe(0, { translateY: -20, rotateX: 12, perspective: 2400, scale: 0.97 }, 'ease-out'),
@@ -130,6 +134,7 @@ export const ANIMATION_PRESETS: AnimationPreset[] = [
     description: 'Smooth upward entrance with fade',
     category: 'slide',
     duration: 800,
+    direction: 'in' as const,
     tracks: [
       createTrack('Slide Up', 'transform', [
         createKeyframe(0, { translateY: 30, perspective: 2400 }, 'ease-out'),
@@ -147,6 +152,7 @@ export const ANIMATION_PRESETS: AnimationPreset[] = [
     description: 'Smooth downward entrance with fade',
     category: 'slide',
     duration: 800,
+    direction: 'in' as const,
     tracks: [
       createTrack('Slide Down', 'transform', [
         createKeyframe(0, { translateY: -30, perspective: 2400 }, 'ease-out'),
@@ -164,6 +170,7 @@ export const ANIMATION_PRESETS: AnimationPreset[] = [
     description: 'Enters from the right, slides left',
     category: 'slide',
     duration: 800,
+    direction: 'in' as const,
     tracks: [
       createTrack('Slide Left', 'transform', [
         createKeyframe(0, { translateX: 35, perspective: 2400 }, 'ease-out'),
@@ -181,6 +188,7 @@ export const ANIMATION_PRESETS: AnimationPreset[] = [
     description: 'Enters from the left, slides right',
     category: 'slide',
     duration: 800,
+    direction: 'in' as const,
     tracks: [
       createTrack('Slide Right', 'transform', [
         createKeyframe(0, { translateX: -35, perspective: 2400 }, 'ease-out'),
@@ -200,6 +208,7 @@ export const ANIMATION_PRESETS: AnimationPreset[] = [
     description: 'Simple clean fade in',
     category: 'fade',
     duration: 800,
+    direction: 'in' as const,
     tracks: [
       createTrack('Fade In', 'opacity', [
         createKeyframe(0, { imageOpacity: 0 }, 'ease-out'),
@@ -213,6 +222,7 @@ export const ANIMATION_PRESETS: AnimationPreset[] = [
     description: 'Fades in with a subtle scale-up — popular app entrance',
     category: 'fade',
     duration: 800,
+    direction: 'in' as const,
     tracks: [
       createTrack('Fade Scale', 'transform', [
         createKeyframe(0, { scale: 0.96, perspective: 2400 }, 'ease-out'),
@@ -230,6 +240,7 @@ export const ANIMATION_PRESETS: AnimationPreset[] = [
     description: 'Fades in while rising slightly — minimal and elegant',
     category: 'fade',
     duration: 800,
+    direction: 'in' as const,
     tracks: [
       createTrack('Fade Rise', 'transform', [
         createKeyframe(0, { translateY: 12, scale: 0.98, perspective: 2400 }, 'ease-out'),
@@ -247,6 +258,7 @@ export const ANIMATION_PRESETS: AnimationPreset[] = [
     description: 'Fades in while zooming out from close-up',
     category: 'fade',
     duration: 1000,
+    direction: 'in' as const,
     tracks: [
       createTrack('Fade Zoom Out', 'transform', [
         createKeyframe(0, { scale: 1.08, perspective: 2400 }, 'ease-out'),
@@ -266,6 +278,7 @@ export const ANIMATION_PRESETS: AnimationPreset[] = [
     description: 'Full 180° flip on the X axis with scale dip',
     category: 'flip',
     duration: 1500,
+    direction: 'in' as const,
     tracks: [
       createTrack('Flip X', 'transform', [
         createKeyframe(0, { rotateX: 0, scale: 1, perspective: 2400 }, 'ease-out'),
@@ -280,6 +293,7 @@ export const ANIMATION_PRESETS: AnimationPreset[] = [
     description: 'Full 180° flip on the Y axis with scale dip',
     category: 'flip',
     duration: 1500,
+    direction: 'in' as const,
     tracks: [
       createTrack('Flip Y', 'transform', [
         createKeyframe(0, { rotateY: 0, scale: 1, perspective: 2400 }, 'ease-out'),
@@ -294,6 +308,7 @@ export const ANIMATION_PRESETS: AnimationPreset[] = [
     description: 'Rotates to peek behind the card and returns',
     category: 'flip',
     duration: 2000,
+    direction: 'in' as const,
     tracks: [
       createTrack('Peek', 'transform', [
         createKeyframe(0, { rotateY: 0, perspective: 2400 }, 'ease-out'),
@@ -309,6 +324,7 @@ export const ANIMATION_PRESETS: AnimationPreset[] = [
     description: 'Starts flipped, rotates to reveal with a bounce',
     category: 'flip',
     duration: 1200,
+    direction: 'in' as const,
     tracks: [
       createTrack('Flip Reveal', 'transform', [
         createKeyframe(0, { rotateY: -90, scale: 0.95, perspective: 2400 }, 'ease-out'),
@@ -329,6 +345,7 @@ export const ANIMATION_PRESETS: AnimationPreset[] = [
     description: 'Slow pan to a product-showcase angle',
     category: 'perspective',
     duration: 2500,
+    direction: 'in' as const,
     tracks: [
       createTrack('Showcase Tilt', 'transform', [
         createKeyframe(0, { rotateY: 0, rotateX: 0, perspective: 2400 }, 'ease-in-out'),
@@ -342,6 +359,7 @@ export const ANIMATION_PRESETS: AnimationPreset[] = [
     description: 'Shifts to an isometric viewing angle',
     category: 'perspective',
     duration: 2000,
+    direction: 'in' as const,
     tracks: [
       createTrack('Isometric', 'transform', [
         createKeyframe(0, { rotateX: 0, rotateY: 0, scale: 1, perspective: 2400 }, 'ease-in-out'),
@@ -355,6 +373,7 @@ export const ANIMATION_PRESETS: AnimationPreset[] = [
     description: 'Subtle floating motion — great for looping ambient effects',
     category: 'perspective',
     duration: 3000,
+    direction: 'in' as const,
     tracks: [
       createTrack('Hover Float', 'transform', [
         createKeyframe(0, { rotateX: 0, translateY: 0, scale: 1, perspective: 2400 }, 'ease-in-out'),
@@ -371,6 +390,7 @@ export const ANIMATION_PRESETS: AnimationPreset[] = [
     description: 'Slow drift with perspective tightening for depth',
     category: 'perspective',
     duration: 3000,
+    direction: 'in' as const,
     tracks: [
       createTrack('Parallax Drift', 'transform', [
         createKeyframe(0, { translateX: -6, perspective: 2400, rotateY: -4 }, 'ease-in-out'),
@@ -384,6 +404,7 @@ export const ANIMATION_PRESETS: AnimationPreset[] = [
     description: 'Clean Apple-style product reveal with tilt and scale',
     category: 'perspective',
     duration: 1500,
+    direction: 'in' as const,
     tracks: [
       createTrack('Apple Showcase', 'transform', [
         createKeyframe(0, { rotateX: 20, rotateY: -15, scale: 0.96, perspective: 2400 }, 'ease-out'),
@@ -403,6 +424,7 @@ export const ANIMATION_PRESETS: AnimationPreset[] = [
     description: 'Smooth orbital arc to the left and back',
     category: 'orbit',
     duration: 2500,
+    direction: 'in' as const,
     tracks: [
       createTrack('Orbit Left', 'transform', [
         createKeyframe(0, { rotateY: 0, scale: 1, perspective: 2400 }, 'ease-in-out'),
@@ -417,6 +439,7 @@ export const ANIMATION_PRESETS: AnimationPreset[] = [
     description: 'Smooth orbital arc to the right and back',
     category: 'orbit',
     duration: 2500,
+    direction: 'in' as const,
     tracks: [
       createTrack('Orbit Right', 'transform', [
         createKeyframe(0, { rotateY: 0, scale: 1, perspective: 2400 }, 'ease-in-out'),
@@ -431,6 +454,7 @@ export const ANIMATION_PRESETS: AnimationPreset[] = [
     description: 'Full 360° rotation like a turntable display',
     category: 'orbit',
     duration: 3000,
+    direction: 'in' as const,
     tracks: [
       createTrack('Turntable', 'transform', [
         createKeyframe(0, { rotateY: 0, scale: 0.95, perspective: 2400 }, 'linear'),
@@ -444,6 +468,7 @@ export const ANIMATION_PRESETS: AnimationPreset[] = [
     description: 'Pendulum swing with slight rotation',
     category: 'orbit',
     duration: 2000,
+    direction: 'in' as const,
     tracks: [
       createTrack('Swing', 'transform', [
         createKeyframe(0, { rotateZ: 0, rotateY: 0, perspective: 2400 }, 'ease-in-out'),
@@ -462,6 +487,7 @@ export const ANIMATION_PRESETS: AnimationPreset[] = [
     description: 'Pushes the image away with tightening perspective',
     category: 'depth',
     duration: 2000,
+    direction: 'in' as const,
     tracks: [
       createTrack('Push Away', 'transform', [
         createKeyframe(0, { scale: 1, perspective: 2400, rotateX: 0 }, 'ease-in-out'),
@@ -475,6 +501,7 @@ export const ANIMATION_PRESETS: AnimationPreset[] = [
     description: 'Pulls the image closer with loosening perspective',
     category: 'depth',
     duration: 1200,
+    direction: 'in' as const,
     tracks: [
       createTrack('Pull Close', 'transform', [
         createKeyframe(0, { scale: 0.95, perspective: 1800, rotateX: -4 }, 'ease-out'),
@@ -488,6 +515,7 @@ export const ANIMATION_PRESETS: AnimationPreset[] = [
     description: 'Dramatic zoom with deep perspective shift',
     category: 'depth',
     duration: 1200,
+    direction: 'in' as const,
     tracks: [
       createTrack('Dramatic Zoom', 'transform', [
         createKeyframe(0, { scale: 0.95, perspective: 1400 }, 'ease-out'),
@@ -505,6 +533,7 @@ export const ANIMATION_PRESETS: AnimationPreset[] = [
     description: 'Gentle breathing motion with 3D rotation — great for loops',
     category: 'depth',
     duration: 3000,
+    direction: 'in' as const,
     tracks: [
       createTrack('Breathe 3D', 'transform', [
         createKeyframe(0, { scale: 1, rotateX: 0, rotateY: 0, perspective: 2400 }, 'ease-in-out'),
@@ -521,6 +550,7 @@ export const ANIMATION_PRESETS: AnimationPreset[] = [
     description: 'Slow cinematic zoom in — classic Ken Burns effect',
     category: 'kenburns',
     duration: 4000,
+    direction: 'in' as const,
     tracks: [
       createTrack('Ken Burns Zoom In', 'transform', [
         createKeyframe(0, { scale: 1, translateX: 0, translateY: 0, perspective: 2400 }, 'ease-in-out'),
@@ -534,6 +564,7 @@ export const ANIMATION_PRESETS: AnimationPreset[] = [
     description: 'Slow zoom out to reveal the full image',
     category: 'kenburns',
     duration: 4000,
+    direction: 'in' as const,
     tracks: [
       createTrack('Ken Burns Zoom Out', 'transform', [
         createKeyframe(0, { scale: 1.12, translateX: -3, translateY: 2, perspective: 2400 }, 'ease-in-out'),
@@ -547,6 +578,7 @@ export const ANIMATION_PRESETS: AnimationPreset[] = [
     description: 'Slow cinematic pan to the left with subtle zoom',
     category: 'kenburns',
     duration: 4000,
+    direction: 'in' as const,
     tracks: [
       createTrack('Ken Burns Pan Left', 'transform', [
         createKeyframe(0, { translateX: 8, scale: 1.05, perspective: 2400 }, 'ease-in-out'),
@@ -560,6 +592,7 @@ export const ANIMATION_PRESETS: AnimationPreset[] = [
     description: 'Slow cinematic pan to the right with subtle zoom',
     category: 'kenburns',
     duration: 4000,
+    direction: 'in' as const,
     tracks: [
       createTrack('Ken Burns Pan Right', 'transform', [
         createKeyframe(0, { translateX: -8, scale: 1.05, perspective: 2400 }, 'ease-in-out'),
