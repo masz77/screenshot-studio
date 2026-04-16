@@ -11,6 +11,9 @@ import type { AnimationClip } from '@/types/animation';
 const TIMELINE_HEIGHT = 210;
 const TRACK_LABEL_WIDTH = 120;
 const PIXELS_PER_SECOND = 105;
+const ZOOM_STEP = 0.1;
+const MIN_ZOOM = 0.25;
+const MAX_ZOOM = 4;
 
 function formatTime(ms: number): string {
   const totalSeconds = Math.floor(ms / 1000);
@@ -399,7 +402,7 @@ function VideoTrack({ width }: { width: number }) {
 }
 
 /* ─── Slide Duration Handle ──────────────────────────────────── */
-function SlideDurationHandle({ timelineWidth, trackWidth }: { timelineWidth: number; trackWidth: number }) {
+function SlideDurationHandle({ timelineWidth, trackWidth, pixelsPerSecond }: { timelineWidth: number; trackWidth: number; pixelsPerSecond: number }) {
   const { timeline, setTimelineDuration } = useImageStore();
   const [isDragging, setIsDragging] = React.useState(false);
   const [showHint, setShowHint] = React.useState(false);
@@ -412,7 +415,7 @@ function SlideDurationHandle({ timelineWidth, trackWidth }: { timelineWidth: num
       if (!trackArea) return;
       const rect = trackArea.getBoundingClientRect();
       const x = e.clientX - rect.left;
-      const newDurationSeconds = Math.max(1, Math.min(30, Math.round(x / (PIXELS_PER_SECOND))));
+      const newDurationSeconds = Math.max(1, Math.min(30, Math.round(x / pixelsPerSecond)));
       setTimelineDuration(newDurationSeconds * 1000);
     };
 
@@ -424,7 +427,7 @@ function SlideDurationHandle({ timelineWidth, trackWidth }: { timelineWidth: num
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [isDragging, setTimelineDuration]);
+  }, [isDragging, setTimelineDuration, pixelsPerSecond]);
 
   return (
     <div
@@ -459,7 +462,7 @@ export function TimelineEditor() {
 
   useTimelinePlayback();
 
-  const pixelsPerSecond = BASE_PPS * timeline.zoom;
+  const pixelsPerSecond = PIXELS_PER_SECOND * timeline.zoom;
   const durationSeconds = timeline.duration / 1000;
   const timelineWidth = Math.max(600, durationSeconds * pixelsPerSecond + TRACK_LABEL_WIDTH);
 
