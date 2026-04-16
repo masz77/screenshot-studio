@@ -10,9 +10,7 @@ import { BackgroundConfig, BackgroundType } from "@/lib/constants/backgrounds";
 import { gradientColors } from "@/lib/constants/gradient-colors";
 import { solidColors } from "@/lib/constants/solid-colors";
 import type { Mockup } from "@/types/mockup";
-import type { TimelineState, AnimationTrack, Keyframe, AnimatableProperties, AnimationClip } from "@/types/animation";
-import { DEFAULT_TIMELINE_STATE } from "@/types/animation";
-import { clonePresetTracks, getPresetById, ANIMATION_PRESETS } from "@/lib/animation/presets";
+import type { TimelineState } from "@/types/animation";
 import {
   trackImageUpload,
   trackBackgroundChange,
@@ -20,8 +18,6 @@ import {
   trackFrameApply,
   trackOverlayAdd,
   trackAspectRatioChange,
-  trackPresetApply,
-  trackAnimationClipAdd,
 } from "@/lib/analytics";
 
 interface TextShadow {
@@ -47,6 +43,8 @@ interface Slide {
   src: string;
   name: string | null;
   duration: number;
+  inPresetId: string | null;
+  outPresetId: string | null;
 }
 export interface TextOverlay {
   id: string;
@@ -623,32 +621,20 @@ export interface ImageState {
   stopPreview: () => void;
 
   // Timeline / Animation
-  timeline: TimelineState;
+  timeline: Omit<TimelineState, 'tracks' | 'snapToKeyframes'>;
   showTimeline: boolean;
-  animationClips: AnimationClip[];
-  setTimeline: (updates: Partial<TimelineState>) => void;
+  setTimeline: (updates: Partial<Omit<TimelineState, 'tracks' | 'snapToKeyframes'>>) => void;
   setShowTimeline: (show: boolean) => void;
   toggleTimeline: () => void;
   setPlayhead: (time: number) => void;
   togglePlayback: () => void;
   startPlayback: () => void;
   stopPlayback: () => void;
-  addKeyframe: (trackId: string, keyframe: Omit<Keyframe, 'id'>) => void;
-  updateKeyframe: (trackId: string, keyframeId: string, updates: Partial<Keyframe>) => void;
-  removeKeyframe: (trackId: string, keyframeId: string) => void;
-  addTrack: (track: Omit<AnimationTrack, 'id'>) => void;
-  updateTrack: (trackId: string, updates: Partial<AnimationTrack>) => void;
-  removeTrack: (trackId: string) => void;
-  applyAnimationPreset: (presetId: string) => void;
-  clearTimeline: () => void;
   setTimelineDuration: (duration: number) => void;
-  // Animation clips
-  addAnimationClip: (presetId: string, startTime: number) => void;
-  applyAnimationToAllSlides: (presetId: string) => void;
-  randomizeAnimationsAcrossSlides: () => void;
-  updateAnimationClip: (clipId: string, updates: Partial<AnimationClip>) => void;
-  removeAnimationClip: (clipId: string) => void;
-  clearAnimationClips: () => void;
+  clearTimeline: () => void;
+  // Per-slide animation assignment
+  setSlideInPreset: (slideId: string, presetId: string | null) => void;
+  setSlideOutPreset: (slideId: string, presetId: string | null) => void;
 
   // Annotations (custom SVG)
   annotations: AnnotationShape[];
@@ -858,8 +844,13 @@ export const useImageStore = create<ImageState>()(
         activeAnnotationTool: null,
         blurRegions: [],
         // Reset timeline/animation
-        timeline: { ...DEFAULT_TIMELINE_STATE },
-        animationClips: [],
+        timeline: {
+          duration: 3000,
+          playhead: 0,
+          isPlaying: false,
+          isLooping: true,
+          zoom: 1,
+        },
         showTimeline: false,
       });
     },
@@ -957,8 +948,13 @@ export const useImageStore = create<ImageState>()(
         activeAnnotationTool: null,
         blurRegions: [],
         // Reset timeline/animation
-        timeline: { ...DEFAULT_TIMELINE_STATE },
-        animationClips: [],
+        timeline: {
+          duration: 3000,
+          playhead: 0,
+          isPlaying: false,
+          isLooping: true,
+          zoom: 1,
+        },
         showTimeline: false,
       });
     },
@@ -1362,6 +1358,8 @@ export const useImageStore = create<ImageState>()(
         src: URL.createObjectURL(file),
         name: file.name,
         duration: slideshow.defaultDuration,
+        inPresetId: null,
+        outPresetId: null,
       }));
 
       const allSlides = [...slides, ...newSlides];
@@ -1436,9 +1434,14 @@ export const useImageStore = create<ImageState>()(
     },
 
     // Timeline / Animation state
-    timeline: { ...DEFAULT_TIMELINE_STATE },
+    timeline: {
+      duration: 3000,
+      playhead: 0,
+      isPlaying: false,
+      isLooping: true,
+      zoom: 1,
+    },
     showTimeline: false,
-    animationClips: [],
 
     setTimeline: (updates) => {
       set((state) => ({
@@ -1478,121 +1481,10 @@ export const useImageStore = create<ImageState>()(
       }));
     },
 
-    addKeyframe: (trackId, keyframe) => {
-      const id = `kf-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-      set((state) => ({
-        timeline: {
-          ...state.timeline,
-          tracks: state.timeline.tracks.map((track) =>
-            track.id === trackId
-              ? { ...track, keyframes: [...track.keyframes, { ...keyframe, id }] }
-              : track
-          ),
-        },
-      }));
-    },
-
-    updateKeyframe: (trackId, keyframeId, updates) => {
-      set((state) => ({
-        timeline: {
-          ...state.timeline,
-          tracks: state.timeline.tracks.map((track) =>
-            track.id === trackId
-              ? {
-                  ...track,
-                  keyframes: track.keyframes.map((kf) =>
-                    kf.id === keyframeId ? { ...kf, ...updates } : kf
-                  ),
-                }
-              : track
-          ),
-        },
-      }));
-    },
-
-    removeKeyframe: (trackId, keyframeId) => {
-      set((state) => ({
-        timeline: {
-          ...state.timeline,
-          tracks: state.timeline.tracks.map((track) =>
-            track.id === trackId
-              ? { ...track, keyframes: track.keyframes.filter((kf) => kf.id !== keyframeId) }
-              : track
-          ),
-        },
-      }));
-    },
-
-    addTrack: (track) => {
-      const id = `track-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-      set((state) => ({
-        timeline: {
-          ...state.timeline,
-          tracks: [...state.timeline.tracks, { ...track, id }],
-        },
-      }));
-    },
-
-    updateTrack: (trackId, updates) => {
-      set((state) => ({
-        timeline: {
-          ...state.timeline,
-          tracks: state.timeline.tracks.map((track) =>
-            track.id === trackId ? { ...track, ...updates } : track
-          ),
-        },
-      }));
-    },
-
-    removeTrack: (trackId) => {
-      set((state) => ({
-        timeline: {
-          ...state.timeline,
-          tracks: state.timeline.tracks.filter((track) => track.id !== trackId),
-        },
-      }));
-    },
-
-    applyAnimationPreset: (presetId) => {
-      const preset = getPresetById(presetId);
-      if (!preset) return;
-
-      const tracks = clonePresetTracks(preset);
-      set((state) => ({
-        timeline: {
-          ...state.timeline,
-          duration: preset.duration,
-          tracks,
-          playhead: 0,
-          isPlaying: false,
-        },
-      }));
-    },
-
-    clearTimeline: () => {
-      set({
-        timeline: { ...DEFAULT_TIMELINE_STATE },
-      });
-    },
-
     setTimelineDuration: (duration) => {
       set((state) => {
         const newDuration = Math.max(500, duration);
-        // Clamp animation clips to fit within the new duration
-        const clampedClips = state.animationClips.map((clip) => {
-          // Ensure clip doesn't extend beyond new duration
-          const maxStartTime = Math.max(0, newDuration - 200); // Minimum clip duration of 200ms
-          const clampedStart = Math.min(clip.startTime, maxStartTime);
-          const maxDuration = newDuration - clampedStart;
-          const clampedDuration = Math.min(clip.duration, maxDuration);
-          return {
-            ...clip,
-            startTime: clampedStart,
-            duration: Math.max(200, clampedDuration),
-          };
-        });
         return {
-          animationClips: clampedClips,
           timeline: {
             ...state.timeline,
             duration: newDuration,
@@ -1602,239 +1494,35 @@ export const useImageStore = create<ImageState>()(
       });
     },
 
-    // Animation clips
-    addAnimationClip: (presetId, startTime) => {
-      const preset = ANIMATION_PRESETS.find(p => p.id === presetId);
-      if (!preset) return;
-
-      trackAnimationClipAdd(presetId, preset.name, preset.duration);
-
-      const id = `clip-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-      // Brand-matching green color palette
-      const colors = ['#c9ff2e', '#10B981', '#22c55e', '#84cc16', '#34d399'];
-      const color = colors[Math.floor(Math.random() * colors.length)];
-
-      const newClip: AnimationClip = {
-        id,
-        presetId,
-        name: preset.name,
-        startTime,
-        duration: preset.duration,
-        color,
-      };
-
-      // Clone preset tracks with startTime offset and link to clip
-      const tracks = clonePresetTracks(preset, { startTime, clipId: id });
-
+    clearTimeline: () => {
       set((state) => ({
-        animationClips: [...state.animationClips, newClip],
         timeline: {
           ...state.timeline,
-          tracks: [...state.timeline.tracks, ...tracks],
-        },
-        showTimeline: true,
-      }));
-    },
-
-    applyAnimationToAllSlides: (presetId) => {
-      const preset = ANIMATION_PRESETS.find(p => p.id === presetId);
-      if (!preset) return;
-
-      const { slides, slideshow, animationClips, timeline } = get();
-
-      // Need at least 2 slides for "apply to all" to make sense
-      if (slides.length < 2) {
-        // Fall back to single clip add (same as clicking once)
-        get().addAnimationClip(presetId, animationClips.reduce((max, clip) =>
-          Math.max(max, clip.startTime + clip.duration), 0));
-        return;
-      }
-
-      // Clear existing clips first for a clean slate
-      const clearedTracks = timeline.tracks.filter(t => !t.clipId || !animationClips.some(c => c.id === t.clipId));
-
-      // Calculate per-slide start times and create clips + tracks
-      const newClips: AnimationClip[] = [];
-      const newTracks: AnimationTrack[] = [];
-      const colors = ['#c9ff2e', '#10B981', '#22c55e', '#84cc16', '#34d399'];
-      let cumulativeTime = 0;
-
-      for (let i = 0; i < slides.length; i++) {
-        const slide = slides[i];
-        const startTime = cumulativeTime;
-        const slideDurationMs = (slide.duration || slideshow.defaultDuration) * 1000;
-
-        // Scale animation to fit within slide duration
-        const clipDuration = Math.min(preset.duration, slideDurationMs);
-        const id = `clip-${Date.now()}-${i}-${Math.random().toString(36).substr(2, 9)}`;
-        const color = colors[i % colors.length];
-
-        newClips.push({
-          id,
-          presetId,
-          name: preset.name,
-          startTime,
-          duration: clipDuration,
-          color,
-        });
-
-        // Clone preset tracks linked to this clip
-        const tracks = clonePresetTracks(preset, { startTime, clipId: id });
-        newTracks.push(...tracks);
-
-        cumulativeTime += slideDurationMs;
-      }
-
-      trackAnimationClipAdd(presetId, preset.name, preset.duration);
-
-      set({
-        animationClips: newClips,
-        timeline: {
-          ...timeline,
-          tracks: [...clearedTracks, ...newTracks],
-          duration: Math.max(timeline.duration, cumulativeTime),
           playhead: 0,
           isPlaying: false,
         },
-        showTimeline: true,
-      });
-    },
-
-    randomizeAnimationsAcrossSlides: () => {
-      const { slides, slideshow, animationClips, timeline } = get();
-
-      if (slides.length < 2) return;
-
-      // Clear existing clip tracks
-      const clearedTracks = timeline.tracks.filter(t => !t.clipId || !animationClips.some(c => c.id === t.clipId));
-
-      const newClips: AnimationClip[] = [];
-      const newTracks: AnimationTrack[] = [];
-      const colors = ['#c9ff2e', '#10B981', '#22c55e', '#84cc16', '#34d399'];
-      let cumulativeTime = 0;
-      let lastPresetIndex = -1;
-
-      for (let i = 0; i < slides.length; i++) {
-        const slide = slides[i];
-        const startTime = cumulativeTime;
-        const slideDurationMs = (slide.duration || slideshow.defaultDuration) * 1000;
-
-        // Pick a random preset, avoiding consecutive repeats when possible
-        let presetIndex: number;
-        if (ANIMATION_PRESETS.length > 1) {
-          do {
-            presetIndex = Math.floor(Math.random() * ANIMATION_PRESETS.length);
-          } while (presetIndex === lastPresetIndex);
-        } else {
-          presetIndex = 0;
-        }
-        lastPresetIndex = presetIndex;
-        const preset = ANIMATION_PRESETS[presetIndex];
-
-        const clipDuration = Math.min(preset.duration, slideDurationMs);
-        const id = `clip-${Date.now()}-${i}-${Math.random().toString(36).substr(2, 9)}`;
-        const color = colors[i % colors.length];
-
-        newClips.push({
-          id,
-          presetId: preset.id,
-          name: preset.name,
-          startTime,
-          duration: clipDuration,
-          color,
-        });
-
-        const tracks = clonePresetTracks(preset, { startTime, clipId: id });
-        newTracks.push(...tracks);
-
-        cumulativeTime += slideDurationMs;
-      }
-
-      set({
-        animationClips: newClips,
-        timeline: {
-          ...timeline,
-          tracks: [...clearedTracks, ...newTracks],
-          duration: Math.max(timeline.duration, cumulativeTime),
-          playhead: 0,
-          isPlaying: false,
-        },
-        showTimeline: true,
-      });
-    },
-
-    updateAnimationClip: (clipId, updates) => {
-      set((state) => {
-        const existingClip = state.animationClips.find(c => c.id === clipId);
-        if (!existingClip) return state;
-
-        const newClip = { ...existingClip, ...updates };
-
-        // If startTime or duration changed, update the corresponding track keyframes
-        const startTimeChanged = updates.startTime !== undefined && updates.startTime !== existingClip.startTime;
-        const durationChanged = updates.duration !== undefined && updates.duration !== existingClip.duration;
-
-        let updatedTracks = state.timeline.tracks;
-
-        if (startTimeChanged || durationChanged) {
-          updatedTracks = state.timeline.tracks.map((track) => {
-            if (track.clipId !== clipId) return track;
-
-            const originalDuration = track.originalDuration || existingClip.duration;
-            const newStartTime = updates.startTime ?? existingClip.startTime;
-            const newDuration = updates.duration ?? existingClip.duration;
-            const oldStartTime = existingClip.startTime;
-
-            // Calculate time scaling factor if duration changed
-            const scaleFactor = durationChanged ? newDuration / existingClip.duration : 1;
-
-            return {
-              ...track,
-              keyframes: track.keyframes.map((kf) => {
-                // First, get the relative time within the clip (remove old startTime offset)
-                const relativeTime = kf.time - oldStartTime;
-                // Scale the relative time if duration changed
-                const scaledRelativeTime = relativeTime * scaleFactor;
-                // Add the new start time offset
-                const newTime = scaledRelativeTime + newStartTime;
-
-                return {
-                  ...kf,
-                  time: Math.max(0, newTime),
-                };
-              }),
-            };
-          });
-        }
-
-        return {
-          animationClips: state.animationClips.map((clip) =>
-            clip.id === clipId ? newClip : clip
-          ),
-          timeline: {
-            ...state.timeline,
-            tracks: updatedTracks,
-          },
-        };
-      });
-    },
-
-    removeAnimationClip: (clipId) => {
-      set((state) => ({
-        animationClips: state.animationClips.filter((clip) => clip.id !== clipId),
-        timeline: {
-          ...state.timeline,
-          // Remove tracks associated with this clip
-          tracks: state.timeline.tracks.filter((track) => track.clipId !== clipId),
-        },
+        slides: state.slides.map((s) => ({
+          ...s,
+          inPresetId: null,
+          outPresetId: null,
+        })),
       }));
     },
 
-    clearAnimationClips: () => {
-      set({
-        animationClips: [],
-        timeline: { ...DEFAULT_TIMELINE_STATE },
-      });
+    setSlideInPreset: (slideId, presetId) => {
+      set((state) => ({
+        slides: state.slides.map((s) =>
+          s.id === slideId ? { ...s, inPresetId: presetId } : s
+        ),
+      }));
+    },
+
+    setSlideOutPreset: (slideId, presetId) => {
+      set((state) => ({
+        slides: state.slides.map((s) =>
+          s.id === slideId ? { ...s, outPresetId: presetId } : s
+        ),
+      }));
     },
 
     // Annotations (custom SVG)
