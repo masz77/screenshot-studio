@@ -6,7 +6,7 @@ import { ANIMATION_PRESETS, CATEGORY_LABELS } from '@/lib/animation/presets';
 import { cn } from '@/lib/utils';
 import type { AnimationPreset } from '@/types/animation';
 import { Button } from '@/components/ui/button';
-import { Delete02Icon, Add01Icon } from 'hugeicons-react';
+import { Delete02Icon, Add01Icon, ShuffleIcon } from 'hugeicons-react';
 
 // Group presets by category
 const PRESET_BY_CATEGORY = ANIMATION_PRESETS.reduce(
@@ -30,6 +30,7 @@ export function AnimationPresetGallery() {
     animationClips,
     addAnimationClip,
     applyAnimationToAllSlides,
+    randomizeAnimationsAcrossSlides,
     clearAnimationClips,
     setShowTimeline,
     setTimelineDuration,
@@ -215,6 +216,19 @@ export function AnimationPresetGallery() {
           </div>
         </div>
       ))}
+
+      {/* Randomize button */}
+      {hasMultipleSlides && (
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-full h-8 text-xs"
+          onClick={randomizeAnimationsAcrossSlides}
+        >
+          <ShuffleIcon size={14} className="mr-1.5" />
+          Randomize All Slides
+        </Button>
+      )}
 
       {/* Info text */}
       {!previewImageUrl && (
