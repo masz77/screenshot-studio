@@ -1,8 +1,10 @@
 'use client';
 
+import { useCallback, useEffect } from 'react';
 import { Frame3DOverlay, getFrameImageStyle, type FrameConfig } from '../frames/Frame3DOverlay';
 import { type ShadowConfig } from '../utils/shadow-utils';
 import { type ImageFilters } from '@/lib/store';
+import { playbackRefs } from '@/lib/animation/playback-refs';
 
 export interface Perspective3DConfig {
   perspective: number;
@@ -64,6 +66,32 @@ export function Perspective3DOverlay({
   imageOpacity,
   imageFilters,
 }: Perspective3DOverlayProps) {
+  const perspectiveRef = useCallback((el: HTMLDivElement | null) => {
+    playbackRefs.perspectiveContainer = el;
+  }, []);
+
+  const transformRef = useCallback((el: HTMLDivElement | null) => {
+    playbackRefs.transformDiv = el;
+  }, []);
+
+  const imageRefCb = useCallback((el: HTMLImageElement | null) => {
+    playbackRefs.imageEl = el;
+  }, []);
+
+  // Keep screenshotRotation in sync for direct DOM path
+  useEffect(() => {
+    playbackRefs.screenshotRotation = screenshot.rotation;
+  }, [screenshot.rotation]);
+
+  // Cleanup refs on unmount
+  useEffect(() => {
+    return () => {
+      playbackRefs.perspectiveContainer = null;
+      playbackRefs.transformDiv = null;
+      playbackRefs.imageEl = null;
+    };
+  }, []);
+
   if (!has3DTransform) return null;
 
   // Build CSS filter string from imageFilters
@@ -189,6 +217,7 @@ export function Perspective3DOverlay({
 
   return (
     <div
+      ref={perspectiveRef}
       data-3d-overlay="true"
       data-untransformed-x={groupCenterX - framedW / 2}
       data-untransformed-y={groupCenterY - framedH / 2}
@@ -209,6 +238,7 @@ export function Perspective3DOverlay({
       }}
     >
       <div
+        ref={transformRef}
         style={{
           position: 'absolute',
           left: `${groupCenterX - framedW / 2}px`,
@@ -249,6 +279,7 @@ export function Perspective3DOverlay({
           />
 
           <img
+            ref={imageRefCb}
             src={image.src}
             alt="3D transformed"
             style={{
