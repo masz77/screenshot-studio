@@ -6,6 +6,7 @@ import {
   VideoReplayIcon,
   Delete02Icon,
   Add01Icon,
+  ShuffleIcon,
 } from 'hugeicons-react';
 import {
   TransformsGallery,
@@ -417,6 +418,7 @@ function AnimationControls() {
     animationClips,
     addAnimationClip,
     applyAnimationToAllSlides,
+    randomizeAnimationsAcrossSlides,
     clearAnimationClips,
     setShowTimeline,
     setTimelineDuration,
@@ -619,6 +621,19 @@ function AnimationControls() {
           </div>
         );
       })}
+
+      {/* Randomize button */}
+      {hasMultipleSlides && (
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-full h-8 text-xs"
+          onClick={randomizeAnimationsAcrossSlides}
+        >
+          <ShuffleIcon size={14} className="mr-1.5" />
+          Randomize All Slides
+        </Button>
+      )}
 
       {/* Info */}
       {!previewImageUrl && (
