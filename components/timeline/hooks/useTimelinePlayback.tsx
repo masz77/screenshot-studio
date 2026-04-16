@@ -4,6 +4,7 @@ import * as React from 'react';
 import { useImageStore } from '@/lib/store';
 import { getClipInterpolatedProperties } from '@/lib/animation/interpolation';
 import { DEFAULT_ANIMATABLE_PROPERTIES } from '@/types/animation';
+import { applyDirectDOM, restoreTransition } from '@/lib/animation/playback-refs';
 
 /**
  * Calculate which slide should be active at a given time
@@ -49,6 +50,8 @@ export function useTimelinePlayback() {
   const lastTimeRef = React.useRef<number | null>(null);
   const animationFrameRef = React.useRef<number | null>(null);
   const playheadRef = React.useRef(timeline.playhead);
+  const lastInterpolatedRef = React.useRef(DEFAULT_ANIMATABLE_PROPERTIES);
+  const hasPlayedRef = React.useRef(false);
 
   // Keep playhead ref in sync
   React.useEffect(() => {
@@ -63,14 +66,37 @@ export function useTimelinePlayback() {
         cancelAnimationFrame(animationFrameRef.current);
         animationFrameRef.current = null;
       }
+      // Sync final state if we actually played (not on initial mount)
+      if (hasPlayedRef.current) {
+        hasPlayedRef.current = false;
+        const state = useImageStore.getState();
+        const last = lastInterpolatedRef.current;
+        state.setPerspective3D({
+          perspective: last.perspective,
+          rotateX: last.rotateX,
+          rotateY: last.rotateY,
+          rotateZ: last.rotateZ,
+          translateX: last.translateX,
+          translateY: last.translateY,
+          scale: last.scale,
+        });
+        state.setImageOpacity(last.imageOpacity);
+        restoreTransition();
+      }
       return;
     }
+
+    hasPlayedRef.current = true;
 
     const animate = (currentTime: number) => {
       // Get fresh state values to avoid stale closures
       const state = useImageStore.getState();
       const currentPlayhead = playheadRef.current;
-      const { duration: currentDuration, isLooping: currentIsLooping, tracks: currentTracks } = state.timeline;
+      const {
+        duration: currentDuration,
+        isLooping: currentIsLooping,
+        tracks: currentTracks,
+      } = state.timeline;
       const currentSlides = state.slides;
       const currentActiveSlideId = state.activeSlideId;
       const currentAnimationClips = state.animationClips;
@@ -85,51 +111,78 @@ export function useTimelinePlayback() {
 
       // Calculate new playhead position
       let newPlayhead = currentPlayhead + deltaMs;
+      let shouldStop = false;
 
-      // Handle end of timeline
       if (newPlayhead >= currentDuration) {
         if (currentIsLooping) {
           newPlayhead = newPlayhead % currentDuration;
         } else {
           newPlayhead = currentDuration;
-          state.setTimeline({ isPlaying: false });
-          return; // Stop animation
+          shouldStop = true;
         }
       }
 
-      // Update playhead ref and store
+      // Update playhead ref and store (cheap write, needed for timeline UI)
       playheadRef.current = newPlayhead;
       state.setPlayhead(newPlayhead);
 
       // Switch to the correct slide based on playhead position
       if (currentSlides.length > 1) {
-        const targetSlideId = getActiveSlideAtTime(currentSlides, newPlayhead, defaultSlideDuration);
+        const targetSlideId = getActiveSlideAtTime(
+          currentSlides,
+          newPlayhead,
+          defaultSlideDuration,
+        );
         if (targetSlideId && targetSlideId !== currentActiveSlideId) {
           state.setActiveSlide(targetSlideId);
         }
       }
 
-      // Get interpolated properties at current time using clip-aware interpolation
+      // Compute interpolated properties at current time
       const interpolated = getClipInterpolatedProperties(
         currentAnimationClips,
         currentTracks,
         newPlayhead,
-        DEFAULT_ANIMATABLE_PROPERTIES
+        DEFAULT_ANIMATABLE_PROPERTIES,
       );
 
-      // Apply interpolated properties to store
-      state.setPerspective3D({
-        perspective: interpolated.perspective,
-        rotateX: interpolated.rotateX,
-        rotateY: interpolated.rotateY,
-        rotateZ: interpolated.rotateZ,
-        translateX: interpolated.translateX,
-        translateY: interpolated.translateY,
-        scale: interpolated.scale,
-      });
+      // Store for sync-back when playback stops
+      lastInterpolatedRef.current = interpolated;
 
-      if (interpolated.imageOpacity !== undefined) {
+      // Try direct DOM path (bypasses React re-renders for 3D overlay)
+      const usedDirectDOM = applyDirectDOM(interpolated);
+
+      if (!usedDirectDOM) {
+        // Fallback: no 3D overlay rendered, write to store
+        state.setPerspective3D({
+          perspective: interpolated.perspective,
+          rotateX: interpolated.rotateX,
+          rotateY: interpolated.rotateY,
+          rotateZ: interpolated.rotateZ,
+          translateX: interpolated.translateX,
+          translateY: interpolated.translateY,
+          scale: interpolated.scale,
+        });
+        if (interpolated.imageOpacity !== undefined) {
+          state.setImageOpacity(interpolated.imageOpacity);
+        }
+      }
+
+      if (shouldStop) {
+        // Sync final state to store before stopping
+        state.setPerspective3D({
+          perspective: interpolated.perspective,
+          rotateX: interpolated.rotateX,
+          rotateY: interpolated.rotateY,
+          rotateZ: interpolated.rotateZ,
+          translateX: interpolated.translateX,
+          translateY: interpolated.translateY,
+          scale: interpolated.scale,
+        });
         state.setImageOpacity(interpolated.imageOpacity);
+        restoreTransition();
+        state.setTimeline({ isPlaying: false });
+        return;
       }
 
       // Continue animation
