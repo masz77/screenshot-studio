@@ -261,7 +261,7 @@ export function getClipInterpolatedProperties(
 
     // Calculate time scale for stretched/compressed clips
     const timeScale = originalDuration > 0 ? originalDuration / clip.duration : 1;
-    const scaledTime = localTime * timeScale;
+    const scaledTime = localTime * timeScale + clip.startTime;
 
     // Find the track that animates this property and interpolate
     for (const track of clipTracks) {
