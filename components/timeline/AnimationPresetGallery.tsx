@@ -34,7 +34,6 @@ export function AnimationPresetGallery() {
     setShowTimeline,
     setTimelineDuration,
     slides,
-    slideshow,
   } = useImageStore();
 
   const { screenshot } = useEditorStore();
