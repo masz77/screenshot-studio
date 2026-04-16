@@ -29,9 +29,12 @@ export function AnimationPresetGallery() {
     timeline,
     animationClips,
     addAnimationClip,
+    applyAnimationToAllSlides,
     clearAnimationClips,
     setShowTimeline,
     setTimelineDuration,
+    slides,
+    slideshow,
   } = useImageStore();
 
   const { screenshot } = useEditorStore();
@@ -57,6 +60,12 @@ export function AnimationPresetGallery() {
   const handleClearAnimation = () => {
     clearAnimationClips();
   };
+
+  const handleApplyToAll = (preset: AnimationPreset) => {
+    applyAnimationToAllSlides(preset.id);
+  };
+
+  const hasMultipleSlides = slides.length >= 2;
 
   const getBackgroundStyle = (): React.CSSProperties => {
     const { type, value, opacity = 1 } = backgroundConfig;
@@ -158,11 +167,30 @@ export function AnimationPresetGallery() {
                       )}
                     </div>
 
-                    {/* Hover add indicator */}
-                    <div className="absolute inset-0 bg-foreground/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <div className="bg-foreground/20 rounded-full p-2">
-                        <Add01Icon size={16} className="text-primary-foreground" />
-                      </div>
+                    {/* Hover actions */}
+                    <div className="absolute inset-0 bg-foreground/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5">
+                      {hasMultipleSlides ? (
+                        <>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handlePresetClick(preset); }}
+                            className="bg-foreground/20 rounded-full p-1.5"
+                            title="Add once"
+                          >
+                            <Add01Icon size={14} className="text-primary-foreground" />
+                          </button>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handleApplyToAll(preset); }}
+                            className="bg-primary/80 rounded-full px-2 py-1 text-[9px] font-medium text-primary-foreground hover:bg-primary transition-colors"
+                            title="Apply to all slides"
+                          >
+                            All
+                          </button>
+                        </>
+                      ) : (
+                        <div className="bg-foreground/20 rounded-full p-2">
+                          <Add01Icon size={16} className="text-primary-foreground" />
+                        </div>
+                      )}
                     </div>
 
                     {/* Duration badge */}
