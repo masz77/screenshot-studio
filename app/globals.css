@@ -345,3 +345,79 @@
 .moveable-control-box * {
   pointer-events: auto !important;
 }
+
+/* ── @xzdarcy/react-timeline-editor overrides ────────────────────────
+   Match the library's visuals to our design system using CSS variables.
+   !important is required because the library ships its own styles. */
+
+.timeline-editor {
+  background-color: transparent !important;
+  font-family: inherit !important;
+  font-size: inherit !important;
+  height: 100% !important;
+  width: 100% !important;
+}
+
+.timeline-editor-time-area {
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 40%, transparent) !important;
+  background: transparent !important;
+}
+
+.timeline-editor-time-unit {
+  border-right-color: color-mix(in srgb, var(--border) 30%, transparent) !important;
+}
+
+.timeline-editor-time-unit-scale {
+  color: color-mix(in srgb, var(--muted-foreground) 60%, transparent) !important;
+  font-size: 9px !important;
+  font-family: var(--font-mono) !important;
+}
+
+.timeline-editor-edit-row {
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 15%, transparent) !important;
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+.timeline-editor-cursor {
+  border-left-color: var(--primary) !important;
+  border-right-color: var(--primary) !important;
+}
+
+.timeline-editor-cursor-top {
+  background-color: var(--primary) !important;
+  border-radius: 9999px !important;
+}
+
+.timeline-editor-action {
+  background-color: transparent !important;
+  border: none !important;
+}
+
+.timeline-editor-drag-line {
+  border-left-color: color-mix(in srgb, var(--primary) 50%, transparent) !important;
+}
+
+.timeline-editor-edit-area {
+  margin-top: 0 !important;
+}
+
+.timeline-editor-edit-area .ReactVirtualized__Grid::-webkit-scrollbar-thumb {
+  background: var(--border) !important;
+}
+
+.timeline-editor-action .timeline-editor-action-left-stretch,
+.timeline-editor-action .timeline-editor-action-right-stretch {
+  opacity: 0.4 !important;
+  transition: opacity 0.15s ease !important;
+}
+
+.timeline-editor-action:hover .timeline-editor-action-left-stretch,
+.timeline-editor-action:hover .timeline-editor-action-right-stretch {
+  opacity: 1 !important;
+}
+
+.timeline-editor-edit-row-placeholder {
+  background: color-mix(in srgb, var(--primary) 10%, transparent) !important;
+  border-color: var(--primary) !important;
+}
