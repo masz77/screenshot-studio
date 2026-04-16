@@ -1,5 +1,3 @@
-import type { AnimationClip } from '@/types/animation'
-
 // ── Base types (structurally compatible with @xzdarcy/timeline-engine) ──
 
 export interface TimelineActionBase {
@@ -30,9 +28,11 @@ export interface TimelineEffectBase {
 
 // ── Extended action types ────────────────────────────────────────────
 
-export interface AnimationAction extends TimelineActionBase {
-  clipName: string
-  clipColor: string
+export interface SlotAction extends TimelineActionBase {
+  slideId: string
+  slideName: string
+  inPresetId: string | null
+  outPresetId: string | null
 }
 
 export interface MediaAction extends TimelineActionBase {
@@ -48,6 +48,8 @@ export interface Slide {
   src: string
   name: string | null
   duration: number
+  inPresetId: string | null
+  outPresetId: string | null
 }
 
 // ── Row IDs ──────────────────────────────────────────────────────────
@@ -57,62 +59,68 @@ export const MEDIA_ROW_ID = 'media-row'
 
 // ── Effect IDs ───────────────────────────────────────────────────────
 
-export const ANIMATION_EFFECT_ID = 'animation-effect'
+export const SLOT_EFFECT_ID = 'slot-effect'
 export const MEDIA_EFFECT_ID = 'media-effect'
 
 // ── Effects map (required by the library) ────────────────────────────
 
 export const timelineEffects: Record<string, TimelineEffectBase> = {
-  [ANIMATION_EFFECT_ID]: { id: ANIMATION_EFFECT_ID, name: 'Animation' },
+  [SLOT_EFFECT_ID]: { id: SLOT_EFFECT_ID, name: 'Animation Slot' },
   [MEDIA_EFFECT_ID]: { id: MEDIA_EFFECT_ID, name: 'Media' },
 }
 
-// ── Conversion helpers (ms ↔ seconds) ────────────────────────────────
+// ── Conversion helpers ──────────────────────────────────────────────
 
 function msToSec(ms: number): number {
   return ms / 1000
 }
 
-function secToMs(sec: number): number {
-  return sec * 1000
+// ── Slides → Slot Actions (one per slide, full width) ────────────────
+
+function slidesToSlotActions(slides: Slide[]): SlotAction[] {
+  let startSec = 0
+  return slides.map((slide, index) => {
+    const durationSec = slide.duration
+    const action: SlotAction = {
+      id: `slot-${slide.id}`,
+      start: startSec,
+      end: startSec + durationSec,
+      effectId: SLOT_EFFECT_ID,
+      slideId: slide.id,
+      slideName: slide.name ?? `Slide ${index + 1}`,
+      inPresetId: slide.inPresetId,
+      outPresetId: slide.outPresetId,
+      flexible: false,
+      movable: false,
+    }
+    startSec += durationSec
+    return action
+  })
 }
 
-// ── Clips → Actions ──────────────────────────────────────────────────
+// ── Slides → Media Actions ──────────────────────────────────────────
 
-function clipsToActions(clips: AnimationClip[]): AnimationAction[] {
-  return clips.map((clip) => ({
-    id: clip.id,
-    start: msToSec(clip.startTime),
-    end: msToSec(clip.startTime + clip.duration),
-    effectId: ANIMATION_EFFECT_ID,
-    clipName: clip.name,
-    clipColor: clip.color,
-  }))
+function slidesToMediaActions(slides: Slide[]): MediaAction[] {
+  let startSec = 0
+  return slides.map((slide, index) => {
+    const durationSec = slide.duration
+    const action: MediaAction = {
+      id: `media-${slide.id}`,
+      start: startSec,
+      end: startSec + durationSec,
+      effectId: MEDIA_EFFECT_ID,
+      slideName: slide.name ?? `Slide ${index + 1}`,
+      slideSrc: slide.src,
+      slideIndex: index,
+      flexible: false,
+      movable: false,
+    }
+    startSec += durationSec
+    return action
+  })
 }
 
-// ── Slides → Actions (evenly distributed) ────────────────────────────
-
-function slidesToActions(
-  slides: Slide[],
-  timelineDurationMs: number,
-): MediaAction[] {
-  if (slides.length === 0) return []
-  const sliceDurationSec = msToSec(timelineDurationMs) / slides.length
-
-  return slides.map((slide, index) => ({
-    id: `media-${slide.id}`,
-    start: index * sliceDurationSec,
-    end: (index + 1) * sliceDurationSec,
-    effectId: MEDIA_EFFECT_ID,
-    slideName: slide.name ?? `Slide ${index + 1}`,
-    slideSrc: slide.src,
-    slideIndex: index,
-    flexible: false,
-    movable: false,
-  }))
-}
-
-// ── Single image → Action (full duration) ────────────────────────────
+// ── Single image → Action (full duration, no slots) ─────────────────
 
 function singleImageAction(
   imageUrl: string,
@@ -137,46 +145,36 @@ function singleImageAction(
 // ── Build editorData ─────────────────────────────────────────────────
 
 export function toTimelineRows(
-  clips: AnimationClip[],
   slides: Slide[],
   timelineDurationMs: number,
   uploadedImageUrl: string | null,
   imageName: string | null,
 ): TimelineRowBase[] {
-  const animationActions = clipsToActions(clips)
+  // Only show animation slots for multi-slide
+  const slotActions = slides.length > 1 ? slidesToSlotActions(slides) : []
 
   const mediaActions =
     slides.length > 0
-      ? slidesToActions(slides, timelineDurationMs)
+      ? slidesToMediaActions(slides)
       : uploadedImageUrl
         ? singleImageAction(uploadedImageUrl, imageName ?? 'Image', timelineDurationMs)
         : []
 
-  return [
-    {
+  const rows: TimelineRowBase[] = []
+
+  if (slotActions.length > 0) {
+    rows.push({
       id: ANIMATION_ROW_ID,
-      actions: animationActions,
+      actions: slotActions,
       rowHeight: 48,
-    },
-    {
-      id: MEDIA_ROW_ID,
-      actions: mediaActions,
-      rowHeight: 56,
-    },
-  ]
-}
-
-// ── Library onChange → store update ──────────────────────────────────
-
-export function applyAnimationRowChanges(
-  newActions: TimelineActionBase[],
-  updateClip: (id: string, updates: { startTime?: number; duration?: number }) => void,
-): void {
-  for (const action of newActions) {
-    updateClip(action.id, {
-      startTime: secToMs(action.start),
-      duration: secToMs(action.end - action.start),
     })
   }
-}
 
+  rows.push({
+    id: MEDIA_ROW_ID,
+    actions: mediaActions,
+    rowHeight: 56,
+  })
+
+  return rows
+}
