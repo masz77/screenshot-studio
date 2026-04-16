@@ -1,5 +1,5 @@
 /**
- * Type definitions for Sharp-based image export
+ * Type definitions for image export
  */
 
 export type ExportFormat = 'png' | 'jpeg' | 'webp';

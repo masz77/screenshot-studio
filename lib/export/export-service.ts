@@ -16,7 +16,7 @@ import { generateNoiseTextureAsync } from './export-utils';
 import { getBackgroundCSS } from '@/lib/constants/backgrounds';
 import { getFontCSS } from '@/lib/constants/fonts';
 import { exportWorkerService } from '@/lib/workers/export-worker-service';
-import { processWithSharp } from './sharp-client';
+import { processImage } from './image-compress';
 import type { ExportFormat, QualityPreset } from './types';
 import { useImageStore } from '@/lib/store';
 import type { BlurRegion } from '@/lib/store';
@@ -27,7 +27,7 @@ export interface ExportOptions {
   scale: number;
   exportWidth: number;
   exportHeight: number;
-  /** Skip Sharp API (e.g. for clipboard copies where speed matters more than compression) */
+  /** Skip WASM compression (e.g. for clipboard copies where speed matters more) */
   skipSharp?: boolean;
 }
 
@@ -633,9 +633,9 @@ export async function exportElement(
 
     report(55);
 
-    // Stage 3: Sharp processing (55 → 90%)
+    // Stage 3: Image compression (55 → 90%)
     report(60);
-    const sharpResult = await processWithSharp(
+    const result = await processImage(
       finalCanvas,
       options.format,
       options.qualityPreset,
@@ -644,12 +644,12 @@ export async function exportElement(
 
     report(90);
 
-    if (!sharpResult.blob || sharpResult.blob.size === 0) {
+    if (!result.blob || result.blob.size === 0) {
       throw new Error('Failed to generate image');
     }
 
     report(95);
-    return { dataURL: sharpResult.dataURL, blob: sharpResult.blob };
+    return { dataURL: result.dataURL, blob: result.blob };
   } catch (error) {
     console.error('Export failed:', error);
     throw error;
