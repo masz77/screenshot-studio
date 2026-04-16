@@ -17,6 +17,6 @@ export default defineConfig({
   },
   ssr: {
     noExternal: [],
-    external: ["canvas", "sharp"],
+    external: ["canvas"],
   },
 });
