@@ -2,6 +2,7 @@ import { useImageStore } from "@/lib/store";
 import { exportSlideFrame, exportSlideFrameAsCanvas } from "./export-slideFrame";
 import { getClipInterpolatedProperties } from "@/lib/animation/interpolation";
 import { DEFAULT_ANIMATABLE_PROPERTIES } from "@/types/animation";
+import { buildPlaybackData } from "@/lib/animation/build-playback-data";
 
 function wait(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
@@ -261,8 +262,11 @@ export async function renderAnimationToFrames(
   onProgress?: (progress: number) => void
 ) {
   const store = useImageStore.getState();
-  const { timeline, animationClips, slides, slideshow, setActiveSlide, setPerspective3D, setImageOpacity } = store;
-  const { duration, tracks } = timeline;
+  const { timeline, slides, slideshow, setActiveSlide, setPerspective3D, setImageOpacity } = store;
+  const { duration } = timeline;
+
+  // Build clips/tracks on-the-fly from slide preset IDs
+  const { clips: animationClips, tracks } = buildPlaybackData(slides, slideshow.defaultDuration);
 
   if (tracks.length === 0 && slides.length <= 1) {
     throw new Error("No animation tracks to render");
@@ -366,8 +370,11 @@ export async function streamAnimationToEncoder(
   onProgress?: (progress: number) => void
 ): Promise<{ width: number; height: number; totalFrames: number }> {
   const store = useImageStore.getState();
-  const { timeline, animationClips, slides, slideshow, setActiveSlide, setPerspective3D, setImageOpacity } = store;
-  const { duration, tracks } = timeline;
+  const { timeline, slides, slideshow, setActiveSlide, setPerspective3D, setImageOpacity } = store;
+  const { duration } = timeline;
+
+  // Build clips/tracks on-the-fly from slide preset IDs
+  const { clips: animationClips, tracks } = buildPlaybackData(slides, slideshow.defaultDuration);
 
   if (tracks.length === 0 && slides.length <= 1) {
     throw new Error("No animation tracks to render");
