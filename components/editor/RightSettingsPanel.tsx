@@ -416,10 +416,12 @@ function AnimationControls() {
     imageShadow,
     animationClips,
     addAnimationClip,
+    applyAnimationToAllSlides,
     clearAnimationClips,
     setShowTimeline,
     setTimelineDuration,
     timeline,
+    slides,
   } = useImageStore();
 
   const { screenshot } = useEditorStore();
@@ -450,6 +452,12 @@ function AnimationControls() {
     addAnimationClip(preset.id, lastClipEnd);
     setShowTimeline(true);
   };
+
+  const handleApplyToAll = (preset: AnimationPreset) => {
+    applyAnimationToAllSlides(preset.id);
+  };
+
+  const hasMultipleSlides = slides.length >= 2;
 
   const backgroundStyle = getBackgroundCSS(backgroundConfig);
   const hasAnimation = animationClips.length > 0;
@@ -555,11 +563,29 @@ function AnimationControls() {
                         )}
                       </div>
 
-                      {/* Hover add indicator */}
-                      <div className="absolute inset-0 bg-foreground/40 opacity-0 group-hover/card:opacity-100 transition-opacity flex items-center justify-center">
-                        <div className="bg-foreground/20 backdrop-blur-sm rounded-full p-2">
-                          <Add01Icon size={16} className="text-background" />
-                        </div>
+                      {/* Hover actions */}
+                      <div className="absolute inset-0 bg-foreground/40 opacity-0 group-hover/card:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                        {hasMultipleSlides ? (
+                          <>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); handlePresetClick(preset); }}
+                              className="bg-foreground/30 backdrop-blur-sm rounded-full px-2.5 py-1.5 text-[10px] font-medium text-background hover:bg-foreground/50 transition-colors"
+                            >
+                              <Add01Icon size={12} className="inline mr-1" />
+                              Add
+                            </button>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); handleApplyToAll(preset); }}
+                              className="bg-primary/80 backdrop-blur-sm rounded-full px-2.5 py-1.5 text-[10px] font-medium text-primary-foreground hover:bg-primary transition-colors"
+                            >
+                              All Slides
+                            </button>
+                          </>
+                        ) : (
+                          <div className="bg-foreground/20 backdrop-blur-sm rounded-full p-2">
+                            <Add01Icon size={16} className="text-background" />
+                          </div>
+                        )}
                       </div>
 
                       {/* Duration badge */}
