@@ -454,15 +454,35 @@ function SlideDurationHandle({ timelineWidth, trackWidth }: { timelineWidth: num
 
 /* ─── Main Timeline Editor ───────────────────────────────────── */
 export function TimelineEditor() {
-  const { timeline, uploadedImageUrl, slides, showTimeline, setActiveRightPanelTab, toggleTimeline } = useImageStore();
-  const [timelineWidth, setTimelineWidth] = React.useState(800);
+  const { timeline, uploadedImageUrl, slides, showTimeline, setActiveRightPanelTab, toggleTimeline, setTimeline } = useImageStore();
+  const scrollContainerRef = React.useRef<HTMLDivElement>(null);
 
   useTimelinePlayback();
 
+  const pixelsPerSecond = BASE_PPS * timeline.zoom;
+  const durationSeconds = timeline.duration / 1000;
+  const timelineWidth = Math.max(600, durationSeconds * pixelsPerSecond + TRACK_LABEL_WIDTH);
+
+  // Ctrl/Cmd + mousewheel zoom handler
   React.useEffect(() => {
-    const durationSeconds = timeline.duration / 1000;
-    setTimelineWidth(Math.max(600, durationSeconds * PIXELS_PER_SECOND + TRACK_LABEL_WIDTH));
-  }, [timeline.duration]);
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      if (!(e.ctrlKey || e.metaKey)) return;
+      e.preventDefault();
+
+      const delta = e.deltaY > 0 ? -ZOOM_STEP : ZOOM_STEP;
+      const currentZoom = useImageStore.getState().timeline.zoom;
+      const newZoom = Math.round(Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, currentZoom + delta)) * 100) / 100;
+      if (newZoom !== currentZoom) {
+        setTimeline({ zoom: newZoom });
+      }
+    };
+
+    container.addEventListener('wheel', handleWheel, { passive: false });
+    return () => container.removeEventListener('wheel', handleWheel);
+  }, [setTimeline]);
 
   if (!showTimeline || (!uploadedImageUrl && slides.length === 0)) {
     return null;
@@ -487,7 +507,10 @@ export function TimelineEditor() {
       <TimelineControls onAddAnimation={handleAddAnimation} onClose={handleClose} />
 
       {/* Tracks area */}
-      <div className="flex-1 overflow-x-auto overflow-y-hidden scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border/30">
+      <div
+        ref={scrollContainerRef}
+        className="flex-1 overflow-x-auto overflow-y-hidden scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border/30"
+      >
         <div style={{ width: timelineWidth + 200 }} className="relative">
           {/* Time track row */}
           <div className="flex h-6 border-b border-border/15">
@@ -517,7 +540,7 @@ export function TimelineEditor() {
           />
 
           {/* Slide duration handle */}
-          <SlideDurationHandle timelineWidth={timelineWidth} trackWidth={trackContentWidth} />
+          <SlideDurationHandle timelineWidth={timelineWidth} trackWidth={trackContentWidth} pixelsPerSecond={pixelsPerSecond} />
         </div>
       </div>
     </div>

@@ -8,7 +8,7 @@ import type {
 import { DEFAULT_ANIMATABLE_PROPERTIES } from '@/types/animation';
 
 // Easing functions - take progress (0-1) and return eased progress (0-1)
-export const easingFunctions: Record<EasingFunction, (t: number) => number> = {
+export const easingRegistry: Record<EasingFunction, (t: number) => number> = {
   linear: (t) => t,
 
   'ease-in': (t) => t * t,
@@ -41,7 +41,7 @@ export function applyEasing(
   progress: number,
   easing: EasingFunction
 ): number {
-  const easingFn = easingFunctions[easing] || easingFunctions.linear;
+  const easingFn = easingRegistry[easing] || easingRegistry.linear;
   return easingFn(Math.max(0, Math.min(1, progress)));
 }
 

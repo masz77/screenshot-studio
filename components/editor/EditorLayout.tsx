@@ -113,6 +113,11 @@ function EditorMain() {
           </Sheet>
         )}
       </div>
+
+      {/* Footer spacer — half navbar height to prevent bottom content clipping */}
+      {!isMobile && (
+        <div className="h-7 bg-card border-t border-border/40 shrink-0" />
+      )}
     </div>
   );
 }

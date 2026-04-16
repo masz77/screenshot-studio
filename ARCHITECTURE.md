@@ -2,14 +2,14 @@
 
 ## Overview
 
-Stage is a modern web-based canvas editor built with Next.js 16 and React 19. It enables users to create stunning visual designs by uploading images, adding text overlays, customizing backgrounds, and exporting high-quality graphics—all in the browser.
+Stage is a modern web-based canvas editor built with Next.js 16 and React 19, powered by [vinext](https://github.com/nicolo-ribaudo/vinext) (Vite replaces webpack). It enables users to create stunning visual designs by uploading images, adding text overlays, customizing backgrounds, and exporting high-quality graphics — all entirely in the browser. Deployed to Cloudflare Workers.
 
 ## Tech Stack
 
 ### Core Framework
-- **Next.js 16** - React framework with App Router
+- **Next.js 16** - React framework with App Router, built via **vinext** (Vite replaces webpack)
 - **React 19** - UI library with React Compiler enabled
-- **TypeScript** - Type safety throughout the codebase
+- **TypeScript 5.9** - Type safety throughout the codebase (strict mode)
 
 ### Canvas & Rendering
 - **Konva/React-Konva** - 2D canvas rendering engine for user images and overlays
@@ -627,26 +627,36 @@ BETTER_AUTH_URL=https://your-domain.com
 
 ## Deployment
 
-### Vercel Configuration
-- Serverless functions for API routes
-- Edge functions for static assets
-- Environment variables configured in Vercel dashboard
+### Cloudflare Workers
+
+Deployed via `vinext deploy` to Cloudflare Workers:
+
+- **Worker entry**: `worker/index.ts` — handles image optimization via Cloudflare Images binding and delegates everything else to vinext's app router handler
+- **Static assets**: Served from `dist/client/` via Cloudflare's asset binding
+- **Configuration**: `wrangler.jsonc` defines account ID, compatibility flags, and bindings
+
+```bash
+pnpm build             # Production build via vinext
+pnpm deploy            # Deploy to Cloudflare Workers
+pnpm deploy:preview    # Deploy to preview environment
+pnpm deploy:dry-run    # Dry run (no actual deploy)
+```
 
 ### Build Process
 
 ```bash
-npm run build  # Next.js production build
+pnpm build  # vinext production build (Vite-powered)
 ```
 
 ### Runtime Configuration
-- `vercel.json` configures function timeouts and memory
-- Screenshot API route has 60s timeout (maxDuration) for external API calls
+- `wrangler.jsonc` configures Cloudflare Worker bindings (ASSETS, IMAGES)
+- `nodejs_compat` compatibility flag enabled for Node.js API support
+- Image optimization runs through Cloudflare Images binding
 
 ## Monitoring & Analytics
 
-- **Umami Analytics**: Privacy-focused analytics integration
+- **PostHog**: Analytics proxied through `/svc/*` rewrites
 - **Error Tracking**: Error boundaries catch React errors
-- **Performance**: Next.js built-in performance monitoring
 
 ## Contributing
 
