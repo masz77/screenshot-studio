@@ -3,22 +3,11 @@
 import * as React from 'react';
 import { useImageStore, useEditorStore } from '@/lib/store';
 import { ANIMATION_PRESETS, CATEGORY_LABELS } from '@/lib/animation/presets';
+import { ALL_EXIT_PRESETS } from '@/lib/animation/exit-presets';
 import { cn } from '@/lib/utils';
 import type { AnimationPreset } from '@/types/animation';
 import { Button } from '@/components/ui/button';
-import { Delete02Icon, Add01Icon, ShuffleIcon } from 'hugeicons-react';
-
-// Group presets by category
-const PRESET_BY_CATEGORY = ANIMATION_PRESETS.reduce(
-  (acc, preset) => {
-    if (!acc[preset.category]) {
-      acc[preset.category] = [];
-    }
-    acc[preset.category].push(preset);
-    return acc;
-  },
-  {} as Record<string, AnimationPreset[]>
-);
+import { Delete02Icon } from 'hugeicons-react';
 
 export function AnimationPresetGallery() {
   const {
@@ -26,92 +15,123 @@ export function AnimationPresetGallery() {
     backgroundConfig,
     borderRadius,
     imageShadow,
-    timeline,
-    animationClips,
-    addAnimationClip,
-    applyAnimationToAllSlides,
-    randomizeAnimationsAcrossSlides,
-    clearAnimationClips,
-    setShowTimeline,
-    setTimelineDuration,
     slides,
+    setSlideInPreset,
+    setSlideOutPreset,
+    clearTimeline,
   } = useImageStore();
 
-  const { screenshot } = useEditorStore();
+  const {
+    screenshot,
+    selectedSlot,
+    pendingPresetId,
+    setSelectedSlot,
+    setPendingPresetId,
+  } = useEditorStore();
 
   const previewImageUrl = uploadedImageUrl || screenshot?.src || null;
 
-  const handlePresetClick = (preset: AnimationPreset) => {
-    // Calculate start time - add at end of existing clips or at 0
-    const lastClipEnd = animationClips.reduce((max, clip) => {
-      return Math.max(max, clip.startTime + clip.duration);
-    }, 0);
+  // Determine which presets to show based on selected slot direction
+  const showDirection: 'in' | 'out' | null = selectedSlot?.slot ?? null;
 
-    // Extend timeline if needed
-    const newEndTime = lastClipEnd + preset.duration;
-    if (newEndTime > timeline.duration) {
-      setTimelineDuration(newEndTime);
+  const presetsToShow: AnimationPreset[] = React.useMemo(() => {
+    if (showDirection === 'out') return ALL_EXIT_PRESETS;
+    if (showDirection === 'in') return ANIMATION_PRESETS;
+    // No slot selected — show all entrance presets by default
+    return ANIMATION_PRESETS;
+  }, [showDirection]);
+
+  // Group presets by category
+  const presetsByCategory = React.useMemo(() => {
+    return presetsToShow.reduce(
+      (acc, preset) => {
+        if (!acc[preset.category]) {
+          acc[preset.category] = [];
+        }
+        acc[preset.category].push(preset);
+        return acc;
+      },
+      {} as Record<string, AnimationPreset[]>,
+    );
+  }, [presetsToShow]);
+
+  const handlePresetClick = (preset: AnimationPreset) => {
+    // Slot-first flow: a slot is selected, assign preset to it
+    if (selectedSlot) {
+      if (selectedSlot.slot === 'in') {
+        setSlideInPreset(selectedSlot.slideId, preset.id);
+      } else {
+        setSlideOutPreset(selectedSlot.slideId, preset.id);
+      }
+      setSelectedSlot(null);
+      return;
     }
 
-    addAnimationClip(preset.id, lastClipEnd);
-    setShowTimeline(true);
+    // Preset-first flow: no slot selected, set pending preset
+    setPendingPresetId(preset.id);
   };
 
-  const handleClearAnimation = () => {
-    clearAnimationClips();
+  const handleClearAll = () => {
+    clearTimeline();
+    setSelectedSlot(null);
+    setPendingPresetId(null);
   };
 
-  const handleApplyToAll = (preset: AnimationPreset) => {
-    applyAnimationToAllSlides(preset.id);
-  };
-
-  const hasMultipleSlides = slides.length >= 2;
+  const hasAnyAnimations = slides.some(
+    (s) => s.inPresetId !== null || s.outPresetId !== null,
+  );
 
   const getBackgroundStyle = (): React.CSSProperties => {
     const { type, value, opacity = 1 } = backgroundConfig;
-
     if (type === 'image' && typeof value === 'string') {
-      return {
-        backgroundImage: `url(${value})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        opacity,
-      };
+      return { backgroundImage: `url(${value})`, backgroundSize: 'cover', backgroundPosition: 'center', opacity };
     }
-
     if (type === 'solid') {
-      return {
-        backgroundColor: value as string,
-        opacity,
-      };
+      return { backgroundColor: value as string, opacity };
     }
-
-    return {
-      background: value as string,
-      opacity,
-    };
+    return { background: value as string, opacity };
   };
 
-  const hasAnimation = animationClips.length > 0;
+  // Find selected slot's slide name for banner
+  const selectedSlideName = selectedSlot
+    ? slides.find((s) => s.id === selectedSlot.slideId)?.name ??
+      `Slide ${slides.findIndex((s) => s.id === selectedSlot.slideId) + 1}`
+    : null;
 
   return (
     <div className="space-y-5">
-      {/* Header with clear button */}
-      {hasAnimation && (
+      {/* Banner: slot-first flow */}
+      {selectedSlot && (
         <div className="flex items-center justify-between p-3 bg-primary/10 border border-primary/20 rounded-lg">
           <div>
             <span className="text-xs font-medium text-foreground/80">
-              {animationClips.length} animation{animationClips.length > 1 ? 's' : ''} added
+              Pick an animation for{' '}
+              <strong>
+                {selectedSlideName} &mdash;{' '}
+                {selectedSlot.slot === 'in' ? 'Entrance' : 'Exit'}
+              </strong>
             </span>
-            <p className="text-[10px] text-foreground/50 mt-0.5">
-              Click presets to add more, or drag clips in timeline
-            </p>
           </div>
+          <button
+            className="text-xs text-muted-foreground hover:text-foreground"
+            onClick={() => setSelectedSlot(null)}
+          >
+            Cancel
+          </button>
+        </div>
+      )}
+
+      {/* Clear all button */}
+      {hasAnyAnimations && !selectedSlot && (
+        <div className="flex items-center justify-between p-3 bg-muted/50 border border-border/30 rounded-lg">
+          <span className="text-xs text-foreground/60">
+            Animations applied to slides
+          </span>
           <Button
             variant="ghost"
             size="sm"
             className="h-7 text-xs text-red-500/70 hover:text-red-500 hover:bg-red-500/10"
-            onClick={handleClearAnimation}
+            onClick={handleClearAll}
           >
             <Delete02Icon size={14} className="mr-1" />
             Clear All
@@ -119,15 +139,22 @@ export function AnimationPresetGallery() {
         </div>
       )}
 
+      {/* Direction label */}
+      {showDirection && (
+        <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+          {showDirection === 'in' ? 'Entrance Animations' : 'Exit Animations'}
+        </div>
+      )}
+
       {/* Preset categories */}
-      {Object.entries(PRESET_BY_CATEGORY).map(([category, presets]) => (
+      {Object.entries(presetsByCategory).map(([category, presets]) => (
         <div key={category} className="space-y-2">
           <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
             {CATEGORY_LABELS[category as keyof typeof CATEGORY_LABELS] || category}
           </h4>
           <div className="grid grid-cols-3 gap-2">
             {presets.map((preset) => {
-              const isApplied = animationClips.some(c => c.presetId === preset.id);
+              const isPending = pendingPresetId === preset.id;
               return (
                 <button
                   key={preset.id}
@@ -136,9 +163,9 @@ export function AnimationPresetGallery() {
                     'relative flex flex-col items-center gap-1.5 p-1.5 rounded-lg transition-all group',
                     'bg-muted/60 hover:bg-card/80',
                     'border-2',
-                    isApplied
-                      ? 'border-primary/50'
-                      : 'border-transparent hover:border-border/50'
+                    isPending
+                      ? 'border-primary ring-2 ring-primary/30'
+                      : 'border-transparent hover:border-border/50',
                   )}
                 >
                   {/* Preview container */}
@@ -146,7 +173,6 @@ export function AnimationPresetGallery() {
                     className="relative w-full aspect-[4/3] rounded-md overflow-hidden"
                     style={getBackgroundStyle()}
                   >
-                    {/* Mini preview */}
                     <div className="absolute inset-0 flex items-center justify-center p-1">
                       {previewImageUrl ? (
                         <div className="w-3/4 h-3/4">
@@ -167,43 +193,10 @@ export function AnimationPresetGallery() {
                       )}
                     </div>
 
-                    {/* Hover actions */}
-                    <div className="absolute inset-0 bg-foreground/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5">
-                      {hasMultipleSlides ? (
-                        <>
-                          <button
-                            onClick={(e) => { e.stopPropagation(); handlePresetClick(preset); }}
-                            className="bg-foreground/20 rounded-full p-1.5"
-                            title="Add once"
-                          >
-                            <Add01Icon size={14} className="text-primary-foreground" />
-                          </button>
-                          <button
-                            onClick={(e) => { e.stopPropagation(); handleApplyToAll(preset); }}
-                            className="bg-primary/80 rounded-full px-2 py-1 text-[9px] font-medium text-primary-foreground hover:bg-primary transition-colors"
-                            title="Apply to all slides"
-                          >
-                            All
-                          </button>
-                        </>
-                      ) : (
-                        <div className="bg-foreground/20 rounded-full p-2">
-                          <Add01Icon size={16} className="text-primary-foreground" />
-                        </div>
-                      )}
-                    </div>
-
                     {/* Duration badge */}
                     <div className="absolute bottom-1 right-1 px-1 py-0.5 bg-foreground/60 rounded text-[8px] text-background/80">
                       {(preset.duration / 1000).toFixed(1)}s
                     </div>
-
-                    {/* Applied indicator */}
-                    {isApplied && (
-                      <div className="absolute top-1 left-1 px-1 py-0.5 bg-primary rounded text-[7px] text-primary-foreground font-medium">
-                        Added
-                      </div>
-                    )}
                   </div>
 
                   {/* Preset name */}
@@ -217,38 +210,17 @@ export function AnimationPresetGallery() {
         </div>
       ))}
 
-      {/* Randomize button */}
-      {hasMultipleSlides && (
-        <Button
-          variant="outline"
-          size="sm"
-          className="w-full h-8 text-xs"
-          onClick={randomizeAnimationsAcrossSlides}
-        >
-          <ShuffleIcon size={14} className="mr-1.5" />
-          Randomize All Slides
-        </Button>
-      )}
-
-      {/* Info text */}
-      {!previewImageUrl && (
-        <div className="p-3 rounded-lg bg-muted/50 border border-border text-center">
-          <p className="text-xs text-muted-foreground">
-            Upload an image to see animation previews
+      {/* Instructions */}
+      {!selectedSlot && !pendingPresetId && (
+        <div className="p-3 rounded-lg bg-muted/50 border border-border/30 space-y-1">
+          <p className="text-xs text-foreground/60">
+            Click a slot in the timeline, then pick an animation here.
+          </p>
+          <p className="text-[10px] text-foreground/40">
+            Or click an animation here first, then click a slot to apply it.
           </p>
         </div>
       )}
-
-      {/* Instructions */}
-      <div className="p-3 rounded-lg bg-muted/50 border border-border/30 space-y-1">
-        <p className="text-xs text-foreground/60">
-          Click any preset to add it to the timeline.
-          You can add multiple animations and arrange them.
-        </p>
-        <p className="text-[10px] text-foreground/40">
-          Use the timeline at the bottom to resize and reorder clips.
-        </p>
-      </div>
     </div>
   );
 }

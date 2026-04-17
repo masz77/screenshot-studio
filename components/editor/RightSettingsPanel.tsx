@@ -4,22 +4,16 @@ import * as React from 'react';
 import {
   RotateSquareIcon,
   VideoReplayIcon,
-  Delete02Icon,
-  Add01Icon,
-  ShuffleIcon,
 } from 'hugeicons-react';
 import {
   TransformsGallery,
   SectionWrapper,
 } from './sections';
 import { cn } from '@/lib/utils';
-import { useImageStore, useEditorStore } from '@/lib/store';
-import { ANIMATION_PRESETS, CATEGORY_LABELS } from '@/lib/animation/presets';
-import type { AnimationPreset } from '@/types/animation';
+import { useImageStore } from '@/lib/store';
+import { AnimationPresetGallery } from '@/components/timeline/AnimationPresetGallery';
 import { Slider } from '@/components/ui/slider';
-import { Button } from '@/components/ui/button';
 import { SegmentedControl } from '@/components/ui/segmented-control';
-import { getBackgroundCSS } from '@/lib/constants/backgrounds';
 import { useDrag } from '@use-gesture/react';
 import { aspectRatios } from '@/lib/constants/aspect-ratios';
 
@@ -396,256 +390,12 @@ function TransformControls() {
   );
 }
 
-// ─── Animation Tab (same pattern as 3D) ────────────────────────────────────
-
-const ANIM_PRESET_BY_CATEGORY = ANIMATION_PRESETS.reduce(
-  (acc, preset) => {
-    if (!acc[preset.category]) {
-      acc[preset.category] = [];
-    }
-    acc[preset.category].push(preset);
-    return acc;
-  },
-  {} as Record<string, AnimationPreset[]>
-);
+// ─── Animation Tab ──────────────────────────────────────────────────────────
 
 function AnimationControls() {
-  const {
-    uploadedImageUrl,
-    backgroundConfig,
-    borderRadius,
-    imageShadow,
-    animationClips,
-    addAnimationClip,
-    applyAnimationToAllSlides,
-    randomizeAnimationsAcrossSlides,
-    clearAnimationClips,
-    setShowTimeline,
-    setTimelineDuration,
-    timeline,
-    slides,
-  } = useImageStore();
-
-  const { screenshot } = useEditorStore();
-  const cssAspectRatio = useCanvasAspectRatio();
-  const previewImageUrl = uploadedImageUrl || screenshot?.src || null;
-
-  const [expandedCategories, setExpandedCategories] = React.useState<Set<string>>(
-    new Set(Object.keys(ANIM_PRESET_BY_CATEGORY).slice(0, 1))
-  );
-
-  const toggleCategory = (name: string) => {
-    setExpandedCategories((prev) => {
-      const next = new Set(prev);
-      if (next.has(name)) next.delete(name);
-      else next.add(name);
-      return next;
-    });
-  };
-
-  const handlePresetClick = (preset: AnimationPreset) => {
-    const lastClipEnd = animationClips.reduce((max, clip) => {
-      return Math.max(max, clip.startTime + clip.duration);
-    }, 0);
-    const newEndTime = lastClipEnd + preset.duration;
-    if (newEndTime > timeline.duration) {
-      setTimelineDuration(newEndTime);
-    }
-    addAnimationClip(preset.id, lastClipEnd);
-    setShowTimeline(true);
-  };
-
-  const handleApplyToAll = (preset: AnimationPreset) => {
-    applyAnimationToAllSlides(preset.id);
-  };
-
-  const hasMultipleSlides = slides.length >= 2;
-
-  const backgroundStyle = getBackgroundCSS(backgroundConfig);
-  const hasAnimation = animationClips.length > 0;
-
-  return (
-    <div className="space-y-3">
-      {/* Status bar */}
-      {hasAnimation && (
-        <div className="flex items-center justify-between px-2 py-1.5 rounded-lg bg-primary/10 border border-primary/20">
-          <span className="text-xs font-medium text-primary">
-            {animationClips.length} clip{animationClips.length > 1 ? 's' : ''}
-          </span>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-6 px-2 text-[10px] text-destructive hover:text-destructive hover:bg-destructive/10"
-            onClick={clearAnimationClips}
-          >
-            <Delete02Icon size={12} className="mr-1" />
-            Clear
-          </Button>
-        </div>
-      )}
-
-      {/* Divider */}
-      <div className="flex items-center gap-2 pt-1">
-        <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-          Animation Presets
-        </span>
-        <div className="flex-1 h-px bg-border/30" />
-      </div>
-
-      {/* Preset categories - same pattern as TransformsGallery */}
-      {Object.entries(ANIM_PRESET_BY_CATEGORY).map(([category, presets]) => {
-        const isExpanded = expandedCategories.has(category);
-        const categoryLabel = CATEGORY_LABELS[category as keyof typeof CATEGORY_LABELS] || category;
-        return (
-          <div key={category}>
-            <button
-              onClick={() => toggleCategory(category)}
-              className="w-full flex items-center gap-2 py-1.5 group"
-            >
-              <span
-                className={cn(
-                  'text-[10px] font-semibold uppercase tracking-widest transition-colors',
-                  isExpanded ? 'text-muted-foreground' : 'text-muted-foreground/60'
-                )}
-              >
-                {categoryLabel}
-              </span>
-              <div className="flex-1 h-px bg-border/30" />
-              <svg
-                width="10"
-                height="10"
-                viewBox="0 0 10 10"
-                className={cn(
-                  'text-muted-foreground/50 transition-transform duration-200',
-                  !isExpanded && '-rotate-90'
-                )}
-              >
-                <path d="M3 2L7 5L3 8" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-
-            {isExpanded && (
-              <div className="space-y-2 pt-1 pb-2">
-                {presets.map((preset) => {
-                  const isApplied = animationClips.some((c) => c.presetId === preset.id);
-                  return (
-                    <button
-                      key={preset.id}
-                      onClick={() => handlePresetClick(preset)}
-                      className={cn(
-                        'relative w-full rounded-xl overflow-hidden transition-all duration-200 group/card',
-                        'border-2',
-                        isApplied
-                          ? 'border-primary ring-1 ring-primary/20'
-                          : 'border-border/30 hover:border-border/60'
-                      )}
-                      style={{ aspectRatio: cssAspectRatio }}
-                    >
-                      {/* Background - matches canvas */}
-                      <div className="absolute inset-0" style={backgroundStyle} />
-
-                      {/* Preview */}
-                      <div className="absolute inset-0 flex items-center justify-center p-2">
-                        {previewImageUrl ? (
-                          <div className="w-[85%] h-[85%]">
-                            <img
-                              src={previewImageUrl}
-                              alt={preset.name}
-                              className="w-full h-full object-contain"
-                              style={{
-                                borderRadius: `${Math.min(borderRadius, 6)}px`,
-                                boxShadow: imageShadow.enabled
-                                  ? 'rgba(0, 0, 0, 0.35) 0px 2px 8px -1px, rgba(0, 0, 0, 0.25) 0px 6px 20px -3px'
-                                  : undefined,
-                              }}
-                            />
-                          </div>
-                        ) : (
-                          <div className="w-[85%] h-[85%] bg-muted-foreground/20 rounded-md border border-border/20" />
-                        )}
-                      </div>
-
-                      {/* Hover actions */}
-                      <div className="absolute inset-0 bg-foreground/40 opacity-0 group-hover/card:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                        {hasMultipleSlides ? (
-                          <>
-                            <button
-                              onClick={(e) => { e.stopPropagation(); handlePresetClick(preset); }}
-                              className="bg-foreground/30 backdrop-blur-sm rounded-full px-2.5 py-1.5 text-[10px] font-medium text-background hover:bg-foreground/50 transition-colors"
-                            >
-                              <Add01Icon size={12} className="inline mr-1" />
-                              Add
-                            </button>
-                            <button
-                              onClick={(e) => { e.stopPropagation(); handleApplyToAll(preset); }}
-                              className="bg-primary/80 backdrop-blur-sm rounded-full px-2.5 py-1.5 text-[10px] font-medium text-primary-foreground hover:bg-primary transition-colors"
-                            >
-                              All Slides
-                            </button>
-                          </>
-                        ) : (
-                          <div className="bg-foreground/20 backdrop-blur-sm rounded-full p-2">
-                            <Add01Icon size={16} className="text-background" />
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Duration badge */}
-                      <div className="absolute top-1.5 right-1.5 px-1.5 py-0.5 bg-foreground/60 backdrop-blur-sm rounded-md text-[9px] font-medium text-background/90">
-                        {(preset.duration / 1000).toFixed(1)}s
-                      </div>
-
-                      {/* Name badge */}
-                      <div
-                        className={cn(
-                          'absolute bottom-0 inset-x-0 flex justify-center pb-1.5 transition-opacity duration-150',
-                          isApplied ? 'opacity-100' : 'opacity-0 group-hover/card:opacity-100'
-                        )}
-                      >
-                        <span
-                          className={cn(
-                            'px-2 py-0.5 rounded-full text-[10px] font-medium backdrop-blur-md',
-                            isApplied
-                              ? 'bg-primary/90 text-primary-foreground'
-                              : 'bg-foreground/60 text-background'
-                          )}
-                        >
-                          {preset.name}
-                        </span>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        );
-      })}
-
-      {/* Randomize button */}
-      {hasMultipleSlides && (
-        <Button
-          variant="outline"
-          size="sm"
-          className="w-full h-8 text-xs"
-          onClick={randomizeAnimationsAcrossSlides}
-        >
-          <ShuffleIcon size={14} className="mr-1.5" />
-          Randomize All Slides
-        </Button>
-      )}
-
-      {/* Info */}
-      {!previewImageUrl && (
-        <div className="p-3 rounded-lg bg-muted/50 border border-border text-center">
-          <p className="text-xs text-muted-foreground">
-            Upload an image to see animation previews
-          </p>
-        </div>
-      )}
-    </div>
-  );
+  return <AnimationPresetGallery />;
 }
+
 
 // ─── Main Panel ─────────────────────────────────────────────────────────────
 
