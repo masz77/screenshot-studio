@@ -231,7 +231,7 @@ export function useAutosaveDraft() {
             })
           );
 
-          const editorState: OmitFunctions<EditorState> = {
+          const editorState: Omit<OmitFunctions<EditorState>, 'selectedSlot' | 'pendingPresetId'> = {
             screenshot: {
               ...screenshot,
               src: processedScreenshotSrc,

@@ -10,10 +10,11 @@ import {
   SectionWrapper,
 } from './sections';
 import { cn } from '@/lib/utils';
-import { useImageStore } from '@/lib/store';
+import { useImageStore, useEditorStore } from '@/lib/store';
 import { AnimationPresetGallery } from '@/components/timeline/AnimationPresetGallery';
 import { Slider } from '@/components/ui/slider';
 import { SegmentedControl } from '@/components/ui/segmented-control';
+import { getBackgroundCSS } from '@/lib/constants/backgrounds';
 import { useDrag } from '@use-gesture/react';
 import { aspectRatios } from '@/lib/constants/aspect-ratios';
 

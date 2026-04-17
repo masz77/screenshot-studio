@@ -17,7 +17,7 @@ const MAX_DRAFT_AGE_MS = MAX_DRAFT_AGE_DAYS * 24 * 60 * 60 * 1000;
 
 export interface DraftStorage {
   id: string;
-  editorState: OmitFunctions<EditorState>;
+  editorState: Omit<OmitFunctions<EditorState>, 'selectedSlot' | 'pendingPresetId'>;
   imageState: OmitFunctions<ImageState>;
   timestamp: number;
 }
@@ -90,7 +90,7 @@ function getDB(): Promise<IDBDatabase> {
 // ── CRUD Operations ──────────────────────────────────────────────────────────
 
 export async function saveDraft(
-  editorState: OmitFunctions<EditorState>,
+  editorState: Omit<OmitFunctions<EditorState>, 'selectedSlot' | 'pendingPresetId'>,
   imageState: OmitFunctions<ImageState>,
 ): Promise<void> {
   try {
