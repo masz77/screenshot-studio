@@ -143,10 +143,6 @@ export function trackAspectRatioChange(ratio: string): void {
   trackEvent('aspect_ratio_change', { ratio });
 }
 
-export function trackAnimationClipAdd(presetId: string, presetName: string, duration: number): void {
-  trackEvent('animation_clip_add', { preset_id: presetId, preset_name: presetName.substring(0, 50), duration_ms: duration });
-}
-
 // =============================================================================
 // Session & Navigation
 // =============================================================================

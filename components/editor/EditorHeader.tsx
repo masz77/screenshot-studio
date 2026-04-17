@@ -38,7 +38,7 @@ import { FeedbackWidget } from '@/components/FeedbackWidget';
 
 export function EditorHeader() {
   const { screenshot } = useEditorStore();
-  const { selectedAspectRatio, slides, uploadedImageUrl, clearImage, timeline, animationClips, resetCanvasSettings, setShowTemplates } = useImageStore();
+  const { selectedAspectRatio, slides, uploadedImageUrl, clearImage, resetCanvasSettings, setShowTemplates } = useImageStore();
   const [aspectRatioOpen, setAspectRatioOpen] = React.useState(false);
   const [exportOpen, setExportOpen] = React.useState(false);
   const [exportSlideshowOpen, setExportSlideshowOpen] = React.useState(false);
@@ -72,7 +72,7 @@ export function EditorHeader() {
     if (futureStates.length > 0) redo();
   }, []);
 
-  const showVideoExport = slides.length > 0 || timeline.tracks.length > 0 || animationClips.length > 0;
+  const showVideoExport = slides.length > 0 || slides.some((s) => s.inPresetId !== null || s.outPresetId !== null);
 
   const {
     copyImage,
