@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { PresetGallery } from '@/components/presets/PresetGallery';
+import { RandomizeButtons } from '@/components/editor/RandomizeButtons';
 import {
   SlidersHorizontalIcon,
   ColorsIcon,
@@ -127,6 +128,11 @@ export function LeftEditPanel() {
       {/* Mode Dropdown */}
       <div className="px-2.5 pt-2.5 pb-1 shrink-0">
         <ModeDropdown />
+      </div>
+
+      {/* Randomize (Frame + Background) */}
+      <div className="px-2.5 pt-1.5 pb-1 shrink-0">
+        <RandomizeButtons variant="left" />
       </div>
 
       {/* Tab Navigation */}
