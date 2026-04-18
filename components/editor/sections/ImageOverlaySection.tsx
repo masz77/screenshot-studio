@@ -48,7 +48,7 @@ export function ImageOverlaySection() {
   const previewOverlays = imageOverlays.slice(-4);
 
   return (
-    <SectionWrapper title="Stickers" defaultOpen={true}>
+    <SectionWrapper title="Stickers" sectionId="image-overlay" defaultOpen={true}>
       <div className="space-y-2">
         {/* Add Image button */}
         <input

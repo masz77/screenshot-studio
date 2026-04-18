@@ -289,7 +289,7 @@ function PerspectiveSliders() {
   const { perspective3D, setPerspective3D } = useImageStore();
 
   return (
-    <SectionWrapper title="Fine Tune" defaultOpen={false}>
+    <SectionWrapper title="Fine Tune" sectionId="rs-fine-tune" defaultOpen={false}>
       <div className="space-y-2">
         <Slider
           value={[perspective3D.perspective]}

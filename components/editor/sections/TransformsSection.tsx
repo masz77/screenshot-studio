@@ -4,35 +4,14 @@ import * as React from 'react';
 import { useImageStore } from '@/lib/store';
 import { SectionWrapper } from './SectionWrapper';
 import { cn } from '@/lib/utils';
-
-interface TransformPreset {
-  name: string;
-  values: {
-    perspective: number;
-    rotateX: number;
-    rotateY: number;
-    rotateZ: number;
-    translateX: number;
-    translateY: number;
-    scale: number;
-  };
-}
-
-// Perspective in px (150em ≈ 2400px at 16px base)
-const PRESETS: TransformPreset[] = [
-  { name: 'Default', values: { perspective: 2400, rotateX: 0, rotateY: 0, rotateZ: 0, translateX: 0, translateY: 0, scale: 1 } },
-  { name: 'Tilted', values: { perspective: 2400, rotateX: 0, rotateY: 0, rotateZ: -8, translateX: 0, translateY: 0, scale: 0.95 } },
-  { name: 'Dramatic Left', values: { perspective: 2400, rotateX: 10, rotateY: -20, rotateZ: 8, translateX: -4, translateY: -2, scale: 0.95 } },
-  { name: 'Dramatic Right', values: { perspective: 2400, rotateX: 10, rotateY: 20, rotateZ: -8, translateX: 4, translateY: -2, scale: 0.95 } },
-  { name: 'Top Down', values: { perspective: 2400, rotateX: 40, rotateY: 0, rotateZ: 0, translateX: 0, translateY: -5, scale: 0.95 } },
-];
+import { TRANSFORM_PRESETS, type TransformPreset } from '@/lib/constants/transform-presets';
 
 export function TransformsSection() {
   const { perspective3D, setPerspective3D } = useImageStore();
   const [selectedIndex, setSelectedIndex] = React.useState<number | null>(null);
 
   React.useEffect(() => {
-    const idx = PRESETS.findIndex((preset) => {
+    const idx = TRANSFORM_PRESETS.findIndex((preset) => {
       const v = preset.values;
       return (
         Math.abs(v.rotateX - perspective3D.rotateX) < 2 &&
@@ -56,9 +35,9 @@ export function TransformsSection() {
   };
 
   return (
-    <SectionWrapper title="Transforms" defaultOpen={true}>
+    <SectionWrapper title="Transforms" sectionId="transforms" defaultOpen={true}>
       <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-        {PRESETS.map((preset, index) => {
+        {TRANSFORM_PRESETS.map((preset, index) => {
           const isSelected = selectedIndex === index;
           return (
             <button

@@ -39,7 +39,7 @@ export function ShadowSection() {
   const { shadowPreset, setShadowPreset } = useImageStore();
 
   return (
-    <SectionWrapper title="Shadow" defaultOpen={true}>
+    <SectionWrapper title="Shadow" sectionId="shadow" defaultOpen={true}>
       <div className="grid grid-cols-2 gap-2 p-1">
         {shadowPresets.map(({ value, label, shadow }) => {
           const isSelected = shadowPreset === value;

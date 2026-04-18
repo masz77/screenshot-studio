@@ -40,7 +40,7 @@ export function BorderSection() {
   const { borderRadius, setBorderRadius, imageScale, setImageScale } = useImageStore();
 
   return (
-    <SectionWrapper title="Border" defaultOpen={true}>
+    <SectionWrapper title="Border" sectionId="border" defaultOpen={true}>
       <div className="space-y-3">
         <div className="grid grid-cols-3 gap-2 p-1">
           {borderPresets.map(({ value, label }) => {

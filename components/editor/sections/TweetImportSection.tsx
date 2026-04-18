@@ -419,7 +419,7 @@ export function TweetImportSection() {
 
   return (
     <>
-    <SectionWrapper title="Add Tweet" defaultOpen={false}>
+    <SectionWrapper title="Add Tweet" sectionId="tweet-import" defaultOpen={false}>
       <div className="space-y-2.5">
         {/* URL input */}
         <div className="relative">

@@ -89,7 +89,7 @@ export function ImagePositionSection() {
   }, [screenshot.offsetX, screenshot.offsetY, canvasDimensions]);
 
   return (
-    <SectionWrapper title="Position" defaultOpen={true}>
+    <SectionWrapper title="Position" sectionId="image-position" defaultOpen={true}>
       <div className="grid grid-cols-5 gap-1 p-1">
         {/* AUTO button - spans first column */}
         <button

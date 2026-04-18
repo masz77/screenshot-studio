@@ -253,7 +253,7 @@ export function CodeSnippetSection() {
 
   return (
     <>
-    <SectionWrapper title="Add Code" defaultOpen={false}>
+    <SectionWrapper title="Add Code" sectionId="code-snippet" defaultOpen={false}>
       <div className="space-y-2.5">
         {/* Code textarea — primary input, shown first */}
         <textarea

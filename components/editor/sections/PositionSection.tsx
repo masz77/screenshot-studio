@@ -40,7 +40,7 @@ export function PositionSection() {
   const activePosition = getActivePosition();
 
   return (
-    <SectionWrapper title="Position" defaultOpen={false}>
+    <SectionWrapper title="Position" sectionId="position" defaultOpen={false}>
       {/* Position Grid (3x3) */}
       <div className="flex flex-col items-center">
         <span className="text-xs text-muted-foreground mb-2">Quick Position</span>

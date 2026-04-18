@@ -51,7 +51,7 @@ export function SettingsSection() {
   return (
     <>
       {/* Filters Section */}
-      <SectionWrapper title="Color Filters" defaultOpen={false}>
+      <SectionWrapper title="Color Filters" sectionId="settings-color-filters" defaultOpen={false}>
         <div className="space-y-3">
           {/* Foreground/Background Toggle - Segmented Control */}
           <div className="relative flex p-0.5 bg-muted dark:bg-muted/80 rounded-lg border border-border/30">
@@ -156,7 +156,7 @@ export function SettingsSection() {
       </SectionWrapper>
 
       {/* Canvas Section */}
-      <SectionWrapper title="Canvas" defaultOpen={false}>
+      <SectionWrapper title="Canvas" sectionId="settings-canvas" defaultOpen={false}>
         <Slider
           value={[backgroundBorderRadius]}
           onValueChange={(value) => setBackgroundBorderRadius(value[0])}

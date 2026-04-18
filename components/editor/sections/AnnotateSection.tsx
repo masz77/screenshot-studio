@@ -134,7 +134,7 @@ export function AnnotateSection() {
   const totalItems = annotations.length + blurRegions.length;
 
   return (
-    <SectionWrapper title="Draw & Markup" defaultOpen={true}>
+    <SectionWrapper title="Draw & Markup" sectionId="annotate" defaultOpen={true}>
       <div className="space-y-3">
 
         {/* ── Tool grid ── */}

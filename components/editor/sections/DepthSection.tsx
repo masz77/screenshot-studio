@@ -251,6 +251,7 @@ export function DepthSection() {
       {/* ── Layer list (at the top) ── */}
       <SectionWrapper
         title="Layers"
+        sectionId="depth-layers"
         defaultOpen={true}
         action={
           layers.length > 0 ? (
@@ -420,7 +421,7 @@ export function DepthSection() {
 
       {/* ── Selected overlay controls ── */}
       {selectedOverlay && (
-        <SectionWrapper title="Properties" defaultOpen={true}>
+        <SectionWrapper title="Properties" sectionId="depth-properties" defaultOpen={true}>
           <OverlayProperties
             overlay={selectedOverlay}
             onUpdate={(updates) => updateImageOverlay(selectedOverlay.id, updates)}
@@ -433,7 +434,7 @@ export function DepthSection() {
       )}
 
       {/* ── Asset picker ── */}
-      <SectionWrapper title="3D Objects" defaultOpen={layers.length === 0}>
+      <SectionWrapper title="3D Objects" sectionId="depth-3d-objects" defaultOpen={layers.length === 0}>
         <div className="space-y-3">
           {/* Upload button */}
           <button

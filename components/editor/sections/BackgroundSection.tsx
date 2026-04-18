@@ -169,7 +169,7 @@ export function BackgroundSection() {
   return (
     <>
       {/* Shadow Overlays */}
-      <SectionWrapper title="Light & Shadow" defaultOpen={true}>
+      <SectionWrapper title="Light & Shadow" sectionId="bg-light-shadow" defaultOpen={true}>
         <div className="space-y-3">
           <div className="grid grid-cols-3 gap-2 p-1">
             <button
@@ -207,7 +207,7 @@ export function BackgroundSection() {
       </SectionWrapper>
 
       {/* Custom BG */}
-      <SectionWrapper title="Custom Background" defaultOpen={true}>
+      <SectionWrapper title="Custom Background" sectionId="bg-custom" defaultOpen={true}>
         <div className="grid grid-cols-3 gap-2 p-1">
           {/* Image Upload */}
           <div
@@ -301,6 +301,7 @@ export function BackgroundSection() {
         <SectionWrapper
           key={category}
           title={CATEGORY_LABELS[category] || category}
+          sectionId={`bg-category-${category}`}
           defaultOpen={true}
         >
           <div className="grid grid-cols-4 gap-2 p-1">
@@ -332,6 +333,7 @@ export function BackgroundSection() {
       {/* Magic Gradients */}
       <SectionWrapper
         title="Magic Gradients"
+        sectionId="bg-magic-gradients"
         defaultOpen={true}
         action={
           <button
@@ -375,7 +377,7 @@ export function BackgroundSection() {
       </SectionWrapper>
 
       {/* Gradients */}
-      <SectionWrapper title="Gradients" defaultOpen={true}>
+      <SectionWrapper title="Gradients" sectionId="bg-gradients" defaultOpen={true}>
         <div className="overflow-x-auto scrollbar-hide">
           <div
             className="grid grid-flow-col auto-cols-min gap-2 w-max"
