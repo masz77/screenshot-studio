@@ -39,51 +39,58 @@ function BorderPreview({ radius, selected }: { radius: number; selected: boolean
 export function BorderSection() {
   const { borderRadius, setBorderRadius, imageScale, setImageScale } = useImageStore();
 
-  return (
-    <SectionWrapper title="Border" sectionId="border" defaultOpen={true}>
-      <div className="space-y-3">
-        <div className="grid grid-cols-3 gap-2 p-1">
-          {borderPresets.map(({ value, label }) => {
-            const isSelected = borderRadius === value;
-            return (
-              <button
-                key={value}
-                type="button"
-                onClick={() => setBorderRadius(value)}
-                className="flex flex-col items-center gap-1.5 group"
-              >
-                <BorderPreview radius={value} selected={isSelected} />
-                <span
-                  className={cn(
-                    'text-[10px] leading-tight transition-colors',
-                    isSelected ? 'text-foreground font-medium' : 'text-muted-foreground group-hover:text-foreground/70',
-                  )}
-                >
-                  {label}
-                </span>
-              </button>
-            );
-          })}
-        </div>
+  const advanced = (
+    <>
+      <Slider
+        value={[borderRadius]}
+        onValueChange={(value) => setBorderRadius(value[0])}
+        min={0}
+        max={50}
+        step={1}
+        label="Radius"
+        valueDisplay={borderRadius}
+      />
+      <Slider
+        value={[imageScale / 100]}
+        onValueChange={(value) => setImageScale(Math.round(value[0] * 100))}
+        min={0.1}
+        max={2}
+        step={0.01}
+        label="Scale"
+        valueDisplay={(imageScale / 100).toFixed(1)}
+      />
+    </>
+  );
 
-        <Slider
-          value={[borderRadius]}
-          onValueChange={(value) => setBorderRadius(value[0])}
-          min={0}
-          max={50}
-          step={1}
-          label="Radius"
-          valueDisplay={borderRadius}
-        />
-        <Slider
-          value={[imageScale / 100]}
-          onValueChange={(value) => setImageScale(Math.round(value[0] * 100))}
-          min={0.1}
-          max={2}
-          step={0.01}
-          label="Scale"
-          valueDisplay={(imageScale / 100).toFixed(1)}
-        />
+  return (
+    <SectionWrapper
+      title="Border"
+      sectionId="border"
+      defaultOpen={true}
+      advancedContent={advanced}
+    >
+      <div className="grid grid-cols-3 gap-2 p-1">
+        {borderPresets.map(({ value, label }) => {
+          const isSelected = borderRadius === value;
+          return (
+            <button
+              key={value}
+              type="button"
+              onClick={() => setBorderRadius(value)}
+              className="flex flex-col items-center gap-1.5 group"
+            >
+              <BorderPreview radius={value} selected={isSelected} />
+              <span
+                className={cn(
+                  'text-[10px] leading-tight transition-colors',
+                  isSelected ? 'text-foreground font-medium' : 'text-muted-foreground group-hover:text-foreground/70',
+                )}
+              >
+                {label}
+              </span>
+            </button>
+          );
+        })}
       </div>
     </SectionWrapper>
   );
