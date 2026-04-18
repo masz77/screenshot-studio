@@ -21,12 +21,4 @@ export function checkRateLimit(identifier: string): { allowed: boolean; remainin
   return { allowed: true, remaining: RATE_LIMIT_MAX_REQUESTS - record.count, resetAt: record.resetAt }
 }
 
-setInterval(() => {
-  const now = Date.now()
-  for (const [key, value] of rateLimitMap.entries()) {
-    if (now > value.resetAt) {
-      rateLimitMap.delete(key)
-    }
-  }
-}, RATE_LIMIT_WINDOW_MS)
 
