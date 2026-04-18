@@ -89,55 +89,58 @@ export function StyleSection() {
   const currentOpacity = imageBorder.opacity ?? 0.3;
   const currentPadding = imageBorder.padding ?? 2;
 
-  return (
-    <SectionWrapper title="Style" sectionId="style" defaultOpen={true}>
-      <div className="space-y-3">
-        <div className="grid grid-cols-3 gap-2 p-1">
-          {stylePresets.map(({ value, label }) => {
-            const isSelected = imageStylePreset === value;
-            return (
-              <button
-                key={value}
-                type="button"
-                onClick={() => setImageStylePreset(value)}
-                className="flex flex-col items-center gap-1.5 group"
-              >
-                <StylePreview preset={value} selected={isSelected} />
-                <span
-                  className={cn(
-                    'text-[10px] leading-tight transition-colors',
-                    isSelected ? 'text-foreground font-medium' : 'text-muted-foreground group-hover:text-foreground/70',
-                  )}
-                >
-                  {label}
-                </span>
-              </button>
-            );
-          })}
-        </div>
+  const advanced = isNonDefault ? (
+    <>
+      <Slider
+        value={[currentPadding]}
+        onValueChange={(value) => setImageBorder({ padding: value[0] })}
+        min={0}
+        max={8}
+        step={0.5}
+        label="Padding"
+        valueDisplay={currentPadding.toFixed(1)}
+      />
+      <Slider
+        value={[Math.round(currentOpacity * 100)]}
+        onValueChange={(value) => setImageBorder({ opacity: value[0] / 100 })}
+        min={5}
+        max={100}
+        step={1}
+        label="Opacity"
+        valueDisplay={`${Math.round(currentOpacity * 100)}%`}
+      />
+    </>
+  ) : undefined;
 
-        {isNonDefault && (
-          <>
-            <Slider
-              value={[currentPadding]}
-              onValueChange={(value) => setImageBorder({ padding: value[0] })}
-              min={0}
-              max={8}
-              step={0.5}
-              label="Padding"
-              valueDisplay={currentPadding.toFixed(1)}
-            />
-            <Slider
-              value={[Math.round(currentOpacity * 100)]}
-              onValueChange={(value) => setImageBorder({ opacity: value[0] / 100 })}
-              min={5}
-              max={100}
-              step={1}
-              label="Opacity"
-              valueDisplay={`${Math.round(currentOpacity * 100)}%`}
-            />
-          </>
-        )}
+  return (
+    <SectionWrapper
+      title="Style"
+      sectionId="style"
+      defaultOpen={true}
+      advancedContent={advanced}
+    >
+      <div className="grid grid-cols-3 gap-2 p-1">
+        {stylePresets.map(({ value, label }) => {
+          const isSelected = imageStylePreset === value;
+          return (
+            <button
+              key={value}
+              type="button"
+              onClick={() => setImageStylePreset(value)}
+              className="flex flex-col items-center gap-1.5 group"
+            >
+              <StylePreview preset={value} selected={isSelected} />
+              <span
+                className={cn(
+                  'text-[10px] leading-tight transition-colors',
+                  isSelected ? 'text-foreground font-medium' : 'text-muted-foreground group-hover:text-foreground/70',
+                )}
+              >
+                {label}
+              </span>
+            </button>
+          );
+        })}
       </div>
     </SectionWrapper>
   );
