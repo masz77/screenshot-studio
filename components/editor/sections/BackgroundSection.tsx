@@ -19,6 +19,7 @@ import { SectionWrapper } from './SectionWrapper';
 import { Cancel01Icon, Image01Icon, ShuffleIcon } from 'hugeicons-react';
 import { cn } from '@/lib/utils';
 import { CachedImage } from '@/components/ui/cached-image';
+import { DISCLOSURE_FOLDS } from '@/lib/editor/sidebar-config';
 
 // Shadow overlay IDs
 const OVERLAY_SHADOW_IDS = [
@@ -169,7 +170,36 @@ export function BackgroundSection() {
   return (
     <>
       {/* Shadow Overlays */}
-      <SectionWrapper title="Light & Shadow" sectionId="bg-light-shadow" defaultOpen={true}>
+      <SectionWrapper
+        title="Light & Shadow"
+        sectionId="bg-light-shadow"
+        defaultOpen={true}
+        advancedContent={
+          <div className="grid grid-cols-3 gap-2 p-1">
+            {OVERLAY_SHADOW_URLS
+              .slice(DISCLOSURE_FOLDS.lightAndShadow.primaryTileCount - 1)
+              .map((shadowUrl, index) => (
+                <button
+                  key={`adv-${index}`}
+                  onClick={() => handleAddShadow(shadowUrl)}
+                  className={cn(
+                    'aspect-[16/9] rounded-xl overflow-hidden border transition-all bg-secondary dark:bg-secondary',
+                    currentShadow?.src === shadowUrl
+                      ? 'border-primary/50 ring-1 ring-primary/30'
+                      : 'border-border/30 hover:border-border/60'
+                  )}
+                >
+                  <img
+                    src={shadowUrl}
+                    alt={`Shadow advanced ${index + 1}`}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                </button>
+              ))}
+          </div>
+        }
+      >
         <div className="space-y-3">
           <div className="grid grid-cols-3 gap-2 p-1">
             <button
@@ -183,25 +213,27 @@ export function BackgroundSection() {
             >
               None
             </button>
-            {OVERLAY_SHADOW_URLS.slice(0, 11).map((shadowUrl, index) => (
-              <button
-                key={index}
-                onClick={() => handleAddShadow(shadowUrl)}
-                className={cn(
-                  'aspect-[16/9] rounded-xl overflow-hidden border transition-all bg-secondary dark:bg-secondary',
-                  currentShadow?.src === shadowUrl
-                    ? 'border-primary/50 ring-1 ring-primary/30'
-                    : 'border-border/30 hover:border-border/60'
-                )}
-              >
-                <img
-                  src={shadowUrl}
-                  alt={`Shadow ${index + 1}`}
-                  className="w-full h-full object-cover"
-                  loading="lazy"
-                />
-              </button>
-            ))}
+            {OVERLAY_SHADOW_URLS
+              .slice(0, DISCLOSURE_FOLDS.lightAndShadow.primaryTileCount - 1)
+              .map((shadowUrl, index) => (
+                <button
+                  key={index}
+                  onClick={() => handleAddShadow(shadowUrl)}
+                  className={cn(
+                    'aspect-[16/9] rounded-xl overflow-hidden border transition-all bg-secondary dark:bg-secondary',
+                    currentShadow?.src === shadowUrl
+                      ? 'border-primary/50 ring-1 ring-primary/30'
+                      : 'border-border/30 hover:border-border/60'
+                  )}
+                >
+                  <img
+                    src={shadowUrl}
+                    alt={`Shadow ${index + 1}`}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                </button>
+              ))}
           </div>
         </div>
       </SectionWrapper>
@@ -297,93 +329,155 @@ export function BackgroundSection() {
       </SectionWrapper>
 
       {/* Background Images - Each category shown separately */}
-      {availableCategories.map((category) => (
-        <SectionWrapper
-          key={category}
-          title={CATEGORY_LABELS[category] || category}
-          sectionId={`bg-category-${category}`}
-          defaultOpen={true}
-        >
-          <div className="grid grid-cols-4 gap-2 p-1">
-            {(backgroundCategories[category] || []).map((imagePath: string, idx: number) => (
-              <button
-                key={`${category}-${idx}`}
-                onClick={() => {
-                  setBackgroundValue(imagePath);
-                  setBackgroundType('image');
-                }}
-                className={cn(
-                  'aspect-square rounded-lg overflow-hidden border-2 transition-all hover:scale-105 relative',
-                  backgroundConfig.value === imagePath
-                    ? 'border-primary ring-1 ring-primary/30'
-                    : 'border-transparent hover:border-border/50'
-                )}
-              >
-                <CachedImage
-                  src={getBackgroundThumbnailUrl(imagePath)}
-                  alt={`${category} ${idx + 1}`}
-                  className="w-full h-full object-cover"
-                />
-              </button>
-            ))}
-          </div>
-        </SectionWrapper>
-      ))}
+      {availableCategories.map((category) => {
+        const tiles = backgroundCategories[category] || [];
+        const primaryCount = DISCLOSURE_FOLDS.backgroundCategory.primaryTilesPerCategory;
+        const primaryTiles = tiles.slice(0, primaryCount);
+        const advancedTiles = tiles.slice(primaryCount);
+
+        const renderTile = (imagePath: string, idx: number) => (
+          <button
+            key={`${category}-${imagePath}-${idx}`}
+            onClick={() => {
+              setBackgroundValue(imagePath);
+              setBackgroundType('image');
+            }}
+            className={cn(
+              'aspect-square rounded-lg overflow-hidden border-2 transition-all hover:scale-105 relative',
+              backgroundConfig.value === imagePath
+                ? 'border-primary ring-1 ring-primary/30'
+                : 'border-transparent hover:border-border/50'
+            )}
+          >
+            <CachedImage
+              src={getBackgroundThumbnailUrl(imagePath)}
+              alt={`${category} ${idx + 1}`}
+              className="w-full h-full object-cover"
+            />
+          </button>
+        );
+
+        return (
+          <SectionWrapper
+            key={category}
+            title={CATEGORY_LABELS[category] || category}
+            sectionId={`bg-category-${category}`}
+            defaultOpen={true}
+            advancedContent={
+              advancedTiles.length > 0 ? (
+                <div className="grid grid-cols-4 gap-2 p-1">
+                  {advancedTiles.map((p, i) => renderTile(p, i + primaryCount))}
+                </div>
+              ) : undefined
+            }
+          >
+            <div className="grid grid-cols-4 gap-2 p-1">
+              {primaryTiles.map((p, i) => renderTile(p, i))}
+            </div>
+          </SectionWrapper>
+        );
+      })}
 
       {/* Magic Gradients */}
-      <SectionWrapper
-        title="Magic Gradients"
-        sectionId="bg-magic-gradients"
-        defaultOpen={true}
-        action={
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              shuffleMagicGradient();
-            }}
-            className="py-0.5 bg-muted hover:bg-card cursor-pointer border border-border/20 rounded-md transition-colors flex text-[10px] text-muted-foreground space-x-1 px-2 items-center"
+      {(() => {
+        const keys = Object.keys(magicGradients) as MagicGradientKey[];
+        const primaryRows = DISCLOSURE_FOLDS.magicGradients.primaryRows;
+        const primaryCount = primaryRows * 8;
+        const primaryKeys = keys.slice(0, primaryCount);
+        const advancedKeys = keys.slice(primaryCount);
+
+        const renderGridRows = (subset: MagicGradientKey[], keyPrefix: string) => (
+          <div className="overflow-x-auto scrollbar-hide">
+            <div
+              className="grid grid-flow-col auto-cols-min gap-2 w-max"
+              style={{ gridTemplateRows: 'repeat(4, 1fr)', gridAutoFlow: 'column' }}
+            >
+              {subset.map((key, idx) => (
+                <button
+                  key={`${keyPrefix}-${key}`}
+                  onClick={() => {
+                    setBackgroundType('gradient');
+                    setBackgroundValue(`magic:${key}`);
+                  }}
+                  className={cn(
+                    'block h-8 w-8 shrink-0 cursor-pointer transition-all duration-200 border border-border/20 hover:scale-105',
+                    backgroundConfig.value === `magic:${key}`
+                      ? 'rounded-full scale-110'
+                      : 'rounded-lg'
+                  )}
+                  style={{
+                    background: magicGradients[key],
+                    gridArea: `${(idx % 4) + 1} / ${Math.floor(idx / 4) + 1}`,
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        );
+
+        return (
+          <SectionWrapper
+            title="Magic Gradients"
+            sectionId="bg-magic-gradients"
+            defaultOpen={true}
+            advancedContent={advancedKeys.length > 0 ? renderGridRows(advancedKeys, 'magic-adv') : undefined}
+            action={
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  shuffleMagicGradient();
+                }}
+                className="py-0.5 bg-muted hover:bg-card cursor-pointer border border-border/20 rounded-md transition-colors flex text-[10px] text-muted-foreground space-x-1 px-2 items-center"
+              >
+                <span>SHUFFLE</span>
+                <ShuffleIcon size={12} />
+              </button>
+            }
           >
-            <span>SHUFFLE</span>
-            <ShuffleIcon size={12} />
-          </button>
+            {renderGridRows(primaryKeys, 'magic-pri')}
+          </SectionWrapper>
+        );
+      })()}
+
+      {/* Gradients */}
+      <SectionWrapper
+        title="Gradients"
+        sectionId="bg-gradients"
+        defaultOpen={true}
+        advancedContent={
+          <div className="overflow-x-auto scrollbar-hide">
+            <div
+              className="grid grid-flow-col auto-cols-min gap-2 w-max"
+              style={{ gridTemplateRows: 'repeat(2, 1fr)', gridAutoFlow: 'column' }}
+            >
+              {(Object.keys(meshGradients) as MeshGradientKey[]).map((key, idx) => (
+                <button
+                  key={`mesh-${key}`}
+                  onClick={() => {
+                    setBackgroundType('gradient');
+                    setBackgroundValue(`mesh:${key}`);
+                  }}
+                  className={cn(
+                    'block h-8 w-8 shrink-0 cursor-pointer transition-all duration-200 border border-border/20 hover:scale-105',
+                    backgroundConfig.value === `mesh:${key}`
+                      ? 'rounded-full scale-110'
+                      : 'rounded-lg'
+                  )}
+                  style={{
+                    background: meshGradients[key],
+                    gridArea: `${(idx % 2) + 1} / ${Math.floor(idx / 2) + 1}`,
+                  }}
+                />
+              ))}
+            </div>
+          </div>
         }
       >
         <div className="overflow-x-auto scrollbar-hide">
           <div
             className="grid grid-flow-col auto-cols-min gap-2 w-max"
-            style={{ gridTemplateRows: 'repeat(4, 1fr)', gridAutoFlow: 'column' }}
-          >
-            {(Object.keys(magicGradients) as MagicGradientKey[]).map((key, idx) => (
-              <button
-                key={`magic-${key}`}
-                onClick={() => {
-                  setBackgroundType('gradient');
-                  setBackgroundValue(`magic:${key}`);
-                }}
-                className={cn(
-                  'block h-8 w-8 shrink-0 cursor-pointer transition-all duration-200 border border-border/20 hover:scale-105',
-                  backgroundConfig.value === `magic:${key}`
-                    ? 'rounded-full scale-110'
-                    : 'rounded-lg'
-                )}
-                style={{
-                  background: magicGradients[key],
-                  gridArea: `${(idx % 4) + 1} / ${Math.floor(idx / 4) + 1}`,
-                }}
-              />
-            ))}
-          </div>
-        </div>
-      </SectionWrapper>
-
-      {/* Gradients */}
-      <SectionWrapper title="Gradients" sectionId="bg-gradients" defaultOpen={true}>
-        <div className="overflow-x-auto scrollbar-hide">
-          <div
-            className="grid grid-flow-col auto-cols-min gap-2 w-max"
             style={{ gridTemplateRows: 'repeat(2, 1fr)', gridAutoFlow: 'column' }}
           >
-            {/* Classic Gradients */}
             {(Object.keys(gradientColors) as GradientKey[]).map((key, idx) => (
               <button
                 key={`classic-${key}`}
@@ -403,30 +497,6 @@ export function BackgroundSection() {
                 }}
               />
             ))}
-            {/* Mesh Gradients */}
-            {(Object.keys(meshGradients) as MeshGradientKey[]).map((key, idx) => {
-              const classicCount = Object.keys(gradientColors).length;
-              const colOffset = Math.ceil(classicCount / 2);
-              return (
-                <button
-                  key={`mesh-${key}`}
-                  onClick={() => {
-                    setBackgroundType('gradient');
-                    setBackgroundValue(`mesh:${key}`);
-                  }}
-                  className={cn(
-                    'block h-8 w-8 shrink-0 cursor-pointer transition-all duration-200 border border-border/20 hover:scale-105',
-                    backgroundConfig.value === `mesh:${key}`
-                      ? 'rounded-full scale-110'
-                      : 'rounded-lg'
-                  )}
-                  style={{
-                    background: meshGradients[key],
-                    gridArea: `${(idx % 2) + 1} / ${Math.floor(idx / 2) + 1 + colOffset}`,
-                  }}
-                />
-              );
-            })}
           </div>
         </div>
       </SectionWrapper>
