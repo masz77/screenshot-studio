@@ -3,7 +3,6 @@
 import * as React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { NewTwitterIcon } from 'hugeicons-react';
 import { Button } from '@/components/ui/button';
 import {
   Download04Icon,
@@ -33,7 +32,6 @@ import { ExportSlideshowDialog } from '@/lib/export-slideshow-dialog';
 import { ImageExportProgressView } from '@/components/canvas/dialogs/ImageProgressView';
 import { FormatSelector, QualityPresetSelector, ScaleSlider } from '@/components/export';
 import { cn } from '@/lib/utils';
-import { GitHubStarButton } from '@/components/ui/github-star-button';
 import { FeedbackWidget } from '@/components/FeedbackWidget';
 
 export function EditorHeader() {
@@ -309,15 +307,6 @@ export function EditorHeader() {
 
           <div className="flex items-center gap-1 ml-1">
             <FeedbackWidget />
-            <GitHubStarButton compact />
-            <a
-              href="https://x.com/code_kartik"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-2 hover:bg-muted rounded-lg transition-colors text-muted-foreground hover:text-foreground"
-            >
-              <NewTwitterIcon className="h-4 w-4" />
-            </a>
           </div>
         </div>
       </header>

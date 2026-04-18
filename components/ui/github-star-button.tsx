@@ -105,16 +105,16 @@ export function GitHubStarButton({ compact }: { compact?: boolean }) {
       className={cn(
         'inline-flex items-center gap-1.5 rounded-lg border border-border/60 transition-colors',
         'text-muted-foreground hover:text-foreground hover:border-border hover:bg-muted/50',
-        compact ? 'h-8 px-2.5 text-xs' : 'h-9 px-3 text-sm'
+        compact ? 'h-5 px-1.5 text-[11px] gap-1' : 'h-9 px-3 text-sm'
       )}
     >
-      <GitHubIcon className={compact ? 'w-3.5 h-3.5' : 'w-4 h-4'} />
+      <GitHubIcon className={compact ? 'w-3 h-3' : 'w-4 h-4'} />
       {!compact && (
         <span className="font-medium hidden sm:inline">Star</span>
       )}
       {stars !== null && stars > 0 && (
         <>
-          <span className="w-px h-3.5 bg-border/60" />
+          <span className={cn('w-px bg-border/60', compact ? 'h-3' : 'h-3.5')} />
           <span className="font-medium flex items-center gap-0.5 tabular-nums">
             <StarIcon
               className={cn(

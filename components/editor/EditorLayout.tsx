@@ -17,8 +17,9 @@ import { MobileBanner } from "./MobileBanner";
 import { TimelineEditor } from "@/components/timeline";
 import { useImageStore } from "@/lib/store";
 import { trackEditorOpen } from "@/lib/analytics";
-import { VideoReplayIcon } from "hugeicons-react";
+import { VideoReplayIcon, NewTwitterIcon } from "hugeicons-react";
 import { cn } from "@/lib/utils";
+import { GitHubStarButton } from "@/components/ui/github-star-button";
 
 function EditorMain() {
   const isMobile = useIsMobile();
@@ -116,7 +117,18 @@ function EditorMain() {
 
       {/* Footer spacer — half navbar height to prevent bottom content clipping */}
       {!isMobile && (
-        <div className="h-7 bg-card border-t border-border/40 shrink-0" />
+        <div className="h-7 bg-card border-t border-border/40 shrink-0 flex items-center justify-end px-3 gap-1.5">
+          <GitHubStarButton compact />
+          <a
+            href="https://x.com/code_kartik"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center h-5 w-5 rounded-md hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+            title="@code_kartik on X"
+          >
+            <NewTwitterIcon className="h-3 w-3" />
+          </a>
+        </div>
       )}
     </div>
   );
