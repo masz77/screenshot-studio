@@ -44,7 +44,8 @@ Reduce sidebar cognitive load by moving power-user controls behind an **Advanced
 | File | Purpose |
 |---|---|
 | `components/editor/RandomizeButtons.tsx` | Shared 2-button row rendered in both sidebars. Variant prop selects which pair (`left` → Frame + Background; `right` → 3D + Motion). |
-| `lib/randomize/index.ts` | Pure pick functions: `pickFrame(current)`, `pickBackground(current)`, `pick3D(current)`, `pickMotion(current)`. No store imports. |
+| `lib/randomize/index.ts` | Pure pick functions: `pickFrame(current)`, `pickBackground(current)`, `pick3D(current)`, `pickMotion(current)`. No store imports; all numeric ranges and catalog choices read from `lib/editor/sidebar-config.ts`. |
+| `lib/editor/sidebar-config.ts` | Central tunables for disclosure fold caps and randomize ranges. See "Centralized Configuration" below. |
 | `lib/store/disclosure-store.ts` | `localStorage`-backed Zustand store for per-section `{open, advancedOpen}` state keyed by `sectionId`. |
 | `docs/ARCHITECT/sidebar-progressive-disclosure.md` | Decision doc per project `decision-docs.md` rule — mirrors this spec's architecture choices. |
 
@@ -165,6 +166,39 @@ Applies a random animation preset from `lib/animation/presets.ts`, using `cloneP
 ### What randomize does NOT touch
 
 Image upload, image overlays, text overlays, annotations, code snippets, tweet imports, browser mockup, slide list, editor mode (Screenshot / Browser), active tab, templates overlay, timeline playback state.
+
+## Centralized Configuration
+
+All tunable knobs for disclosure folds and randomize ranges live in a single file so they can be adjusted without touching component or store logic.
+
+**File:** `lib/editor/sidebar-config.ts`
+
+```ts
+// Disclosure fold caps — how many items show as primary before "Advanced"
+export const DISCLOSURE_FOLDS = {
+  lightAndShadow: { primaryTileCount: 6 },
+  magicGradients: { primaryRows: 2 },      // 2 × 4 = 8 per column, across visible columns
+  gradients: { primaryRows: 1 },            // classic row only; mesh row under Advanced
+  backgroundCategory: { primaryTilesPerCategory: 8 },
+} as const;
+
+// Randomize field ranges — inclusive
+export const RANDOMIZE_RANGES = {
+  frame: {
+    borderRadius: { choices: [0, 12, 20] as const },
+    imageScale: { min: 85, max: 115, step: 1 },
+    padding: { min: 0, max: 8, step: 0.5 },
+    opacity: { min: 0.05, max: 1.0, step: 0.01 },
+    // stylePreset and shadowPreset pull from existing catalogs by name
+  },
+  // background / 3D / motion pull from existing catalogs by name
+  rerollAttempts: 3,
+} as const;
+```
+
+- Pickers in `lib/randomize/index.ts` import from this file; no magic numbers inside picker logic.
+- `SectionWrapper` consumers read fold caps from here when slicing their tile arrays (e.g., `tiles.slice(0, DISCLOSURE_FOLDS.backgroundCategory.primaryTilesPerCategory)`).
+- Adjusting a range is a one-line edit in this file plus a page reload — no component edits required.
 
 ## Data Flow
 
