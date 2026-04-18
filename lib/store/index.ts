@@ -19,6 +19,7 @@ import {
   trackOverlayAdd,
   trackAspectRatioChange,
 } from "@/lib/analytics";
+import { pickFrame, pickBackground, pick3D, pickMotion } from "@/lib/randomize";
 
 interface TextShadow {
   enabled: boolean;
@@ -605,6 +606,10 @@ export interface ImageState {
   setImageStylePreset: (preset: ImageStylePreset) => void;
   setShadowPreset: (preset: ShadowPreset) => void;
   setPerspective3D: (perspective: Partial<ImageState["perspective3D"]>) => void;
+  randomizeFrame: () => void;
+  randomizeBackground: () => void;
+  randomize3D: () => void;
+  randomizeMotion: () => void;
   setImageFilter: (key: keyof ImageFilters, value: number) => void;
   resetImageFilters: () => void;
   resetCanvasSettings: () => void;
@@ -1535,6 +1540,58 @@ export const useImageStore = create<ImageState>()(
           s.id === slideId ? { ...s, outPresetId: presetId } : s
         ),
       }));
+    },
+
+    randomizeFrame: () => {
+      const state = get();
+      const next = pickFrame({
+        imageStylePreset: state.imageStylePreset,
+        borderRadius: state.borderRadius,
+        imageScale: state.imageScale,
+        imageBorder: state.imageBorder,
+        shadowPreset: state.shadowPreset,
+      });
+      set({
+        imageStylePreset: next.imageStylePreset,
+        borderRadius: next.borderRadius,
+        imageScale: next.imageScale,
+        imageBorder: next.imageBorder,
+        shadowPreset: next.shadowPreset,
+      });
+    },
+
+    randomizeBackground: () => {
+      const state = get();
+      const next = pickBackground(state.backgroundConfig);
+      set({
+        backgroundConfig: {
+          ...state.backgroundConfig,
+          type: next.type,
+          value: next.value,
+        },
+      });
+    },
+
+    randomize3D: () => {
+      const state = get();
+      const preset = pick3D({
+        rotateX: state.perspective3D.rotateX,
+        rotateY: state.perspective3D.rotateY,
+        rotateZ: state.perspective3D.rotateZ,
+      });
+      set({
+        perspective3D: { ...state.perspective3D, ...preset.values },
+      });
+    },
+
+    randomizeMotion: () => {
+      const state = get();
+      if (state.slides.length === 0) return;
+      const currentId = state.slides[0]?.inPresetId ?? null;
+      const preset = pickMotion(currentId);
+      set({
+        slides: state.slides.map((s) => ({ ...s, inPresetId: preset.id })),
+      });
     },
 
     // Annotations (custom SVG)
