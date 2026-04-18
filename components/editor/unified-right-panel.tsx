@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { PresetGallery } from '@/components/presets/PresetGallery';
+import { RandomizeButtons } from '@/components/editor/RandomizeButtons';
 import {
   Settings02Icon,
   SlidersHorizontalIcon,
@@ -76,6 +77,11 @@ export function UnifiedRightPanel() {
 
   return (
     <div className="w-full h-full bg-card flex flex-col overflow-hidden md:w-[460px] border-r border-border/40 relative">
+      {/* Randomize (3D + Motion) */}
+      <div className="px-3 pt-3 pb-1 shrink-0">
+        <RandomizeButtons variant="right" />
+      </div>
+
       {/* Tab Navigation */}
       <div className="px-3 py-3 border-b border-border/30 shrink-0">
         <div className="flex gap-1 p-1 bg-muted/80 dark:bg-muted/50 rounded-xl border border-border/20">
