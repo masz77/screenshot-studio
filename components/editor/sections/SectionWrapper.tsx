@@ -30,21 +30,19 @@ export function SectionWrapper({
   className,
   action,
 }: SectionWrapperProps) {
-  const { open, advancedOpen, setOpen, setAdvancedOpen } = useDisclosureStore(
-    (s) => s.getSection(sectionId, { open: defaultOpen, advancedOpen: defaultAdvancedOpen })
+  const open = useDisclosureStore(
+    (s) => s.sections[sectionId]?.open ?? defaultOpen
+  );
+  const advancedOpen = useDisclosureStore(
+    (s) => s.sections[sectionId]?.advancedOpen ?? defaultAdvancedOpen
   );
 
-  // Selector above returns primitives plus setters via closure helpers below.
   const toggleOpen = React.useCallback(() => {
     useDisclosureStore.getState().setOpen(sectionId, !open);
   }, [sectionId, open]);
   const toggleAdvanced = React.useCallback(() => {
     useDisclosureStore.getState().setAdvancedOpen(sectionId, !advancedOpen);
   }, [sectionId, advancedOpen]);
-
-  // Unused reads to silence TS if selector shape changes. Safe to remove later.
-  void setOpen;
-  void setAdvancedOpen;
 
   return (
     <div className={cn('mb-1', className)}>
