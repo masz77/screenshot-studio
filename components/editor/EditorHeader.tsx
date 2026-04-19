@@ -27,6 +27,12 @@ import {
   PopoverTrigger,
   PopoverContent,
 } from '@/components/ui/popover';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { CopyProgressDialog } from '@/components/canvas/dialogs/CopyProgressDialog';
 import { ExportSlideshowDialog } from '@/lib/export-slideshow-dialog';
 import { ImageExportProgressView } from '@/components/canvas/dialogs/ImageProgressView';
@@ -98,7 +104,7 @@ export function EditorHeader() {
   const formatLabel = exportSettings.format === 'jpeg' ? 'JPEG' : exportSettings.format === 'webp' ? 'WebP' : 'PNG';
 
   return (
-    <>
+    <TooltipProvider delayDuration={200}>
       <header className="h-14 bg-card border-b border-border/40 flex items-center justify-between px-4 shrink-0">
         {/* Left - Logo + Undo/Redo */}
         <div className="flex items-center gap-3">
@@ -174,16 +180,21 @@ export function EditorHeader() {
         <div className="flex items-center gap-1.5">
           {/* Canvas controls */}
           <Popover open={aspectRatioOpen} onOpenChange={setAspectRatioOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-8 gap-1.5 rounded-lg text-muted-foreground hover:text-foreground px-2.5"
-              >
-                <AspectRatioIcon size={15} />
-                <span className="text-xs">{currentAspectRatio ? `${currentAspectRatio.width}:${currentAspectRatio.height}` : 'Auto'}</span>
-              </Button>
-            </PopoverTrigger>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 gap-1.5 rounded-lg text-muted-foreground hover:text-foreground px-2.5"
+                  >
+                    <AspectRatioIcon size={15} />
+                    <span className="text-xs">{currentAspectRatio ? `${currentAspectRatio.width}:${currentAspectRatio.height}` : 'Auto'}</span>
+                  </Button>
+                </PopoverTrigger>
+              </TooltipTrigger>
+              <TooltipContent>Change canvas aspect ratio</TooltipContent>
+            </Tooltip>
             <PopoverContent className="p-0 w-[420px]" align="end" sideOffset={8} collisionPadding={16}>
               <AspectRatioPicker onSelect={() => setAspectRatioOpen(false)} />
             </PopoverContent>
@@ -225,29 +236,39 @@ export function EditorHeader() {
           {hasImage && <div className="w-px h-5 bg-border/60 mx-1" />}
 
           {/* Export actions */}
-          <Button
-            onClick={() => copyImage()}
-            disabled={!hasImage || isExporting || isCopying}
-            variant="ghost"
-            size="sm"
-            className="h-8 gap-1.5 rounded-lg text-muted-foreground hover:text-foreground px-2.5 text-xs"
-          >
-            <Copy01Icon size={15} />
-            <span>Copy</span>
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                onClick={() => copyImage()}
+                disabled={!hasImage || isExporting || isCopying}
+                variant="ghost"
+                size="sm"
+                className="h-8 gap-1.5 rounded-lg text-muted-foreground hover:text-foreground px-2.5 text-xs"
+              >
+                <Copy01Icon size={15} />
+                <span>Copy</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Copy rendered image to clipboard</TooltipContent>
+          </Tooltip>
 
           <Popover open={exportOpen} onOpenChange={isExporting ? undefined : setExportOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                disabled={!hasImage}
-                size="sm"
-                className="h-8 gap-1.5 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-medium px-3"
-              >
-                <Download04Icon size={15} />
-                <span>Save</span>
-                <ArrowDown01Icon size={12} className="ml-0.5 opacity-70" />
-              </Button>
-            </PopoverTrigger>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <PopoverTrigger asChild>
+                  <Button
+                    disabled={!hasImage}
+                    size="sm"
+                    className="h-8 gap-1.5 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-medium px-3"
+                  >
+                    <Download04Icon size={15} />
+                    <span>Save</span>
+                    <ArrowDown01Icon size={12} className="ml-0.5 opacity-70" />
+                  </Button>
+                </PopoverTrigger>
+              </TooltipTrigger>
+              <TooltipContent>Export as PNG, JPEG, or WebP</TooltipContent>
+            </Tooltip>
             <PopoverContent
               className="w-[340px] p-0"
               align="end"
@@ -294,15 +315,20 @@ export function EditorHeader() {
           {hasImage && <div className="w-px h-5 bg-border/60 mx-1" />}
 
           {hasImage && (
-            <Button
-              onClick={clearImage}
-              variant="ghost"
-              size="sm"
-              className="h-8 gap-1.5 px-2.5 text-xs text-muted-foreground hover:text-destructive"
-            >
-              <Delete02Icon size={14} />
-              <span>Remove</span>
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  onClick={clearImage}
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 gap-1.5 px-2.5 text-xs text-muted-foreground hover:text-destructive"
+                >
+                  <Delete02Icon size={14} />
+                  <span>Remove</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Clear image and reset canvas</TooltipContent>
+            </Tooltip>
           )}
 
           <div className="flex items-center gap-1 ml-1">
@@ -317,6 +343,6 @@ export function EditorHeader() {
         open={exportSlideshowOpen}
         onOpenChange={setExportSlideshowOpen}
       />
-    </>
+    </TooltipProvider>
   );
 }
