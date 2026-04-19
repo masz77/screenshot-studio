@@ -12,6 +12,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useImageStore, useEditorStore } from '@/lib/store';
 import { AnimationPresetGallery } from '@/components/timeline/AnimationPresetGallery';
+import { RandomizeButtons } from '@/components/editor/RandomizeButtons';
 import { Slider } from '@/components/ui/slider';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import { getBackgroundCSS } from '@/lib/constants/backgrounds';
@@ -427,6 +428,11 @@ export function RightSettingsPanel() {
 
   return (
     <div className="w-[240px] h-full bg-card flex flex-col overflow-hidden border-l border-border/40 shrink-0">
+      {/* Randomize (3D + Motion) */}
+      <div className="px-2.5 pt-2.5 pb-1 shrink-0">
+        <RandomizeButtons variant="right" />
+      </div>
+
       {/* Tab Navigation */}
       <div className="px-2.5 py-2.5 border-b border-border/30 shrink-0">
         <div className="flex gap-1 p-0.5 bg-muted/80 dark:bg-muted/50 rounded-lg border border-border/20">
