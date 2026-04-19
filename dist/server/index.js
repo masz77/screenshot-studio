@@ -1,4 +1,4 @@
-globalThis.__VINEXT_LAZY_CHUNKS__ = ["assets/ClientCanvas-hAfqXh4S.js","assets/query-RNEeZVC5.js","assets/ClientCanvas-DWWg2HIw.js","assets/jpeg-oGrGpG26.js","assets/png-C7Cf6B3g.js","assets/webp_enc-B91uRTWM.js","assets/webp_enc_simd-BPXtLPSQ.js","assets/webp-C9UpTvK5.js","assets/router-Bfht9CS0.js","assets/worker-entry-D_XpPAcS.js"];
+globalThis.__VINEXT_LAZY_CHUNKS__ = ["assets/ClientCanvas-Cbf0n0Ds.js","assets/query-RNEeZVC5.js","assets/ClientCanvas-BILW7fzs.js","assets/jpeg-oGrGpG26.js","assets/png-C7Cf6B3g.js","assets/webp_enc-B91uRTWM.js","assets/webp_enc_simd-BPXtLPSQ.js","assets/webp-C9UpTvK5.js","assets/router-Bfht9CS0.js","assets/worker-entry-BKQWamL2.js"];
 import * as __viteRscAsyncHooks from "node:async_hooks";
 import { AsyncLocalStorage as AsyncLocalStorage$1 } from "node:async_hooks";
 import assetsManifest from "./__vite_rsc_assets_manifest.js";
@@ -4222,7 +4222,7 @@ var NextURL = class NextURL {
 	* Matches the Next.js API: `request.nextUrl.buildId`.
 	*/
 	get buildId() {
-		return "77a816e1-47ff-487c-bd0b-fbd3d33da5eb";
+		return "62609b52-32ef-4bc1-8df4-5c81e4041c7b";
 	}
 };
 var RequestCookies = class {
@@ -40714,7 +40714,7 @@ function __isrFnv1a64(s) {
 }
 function __isrCacheKey(pathname, suffix) {
 	const normalized = pathname === "/" ? "/" : pathname.replace(/\/$/, "");
-	const prefix = "app:77a816e1-47ff-487c-bd0b-fbd3d33da5eb";
+	const prefix = "app:62609b52-32ef-4bc1-8df4-5c81e4041c7b";
 	const key = prefix + ":" + normalized + ":" + suffix;
 	if (key.length <= 200) return key;
 	return prefix + ":__hash:" + __isrFnv1a64(normalized) + ":" + suffix;
