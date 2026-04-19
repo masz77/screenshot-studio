@@ -35,7 +35,7 @@ export function RandomizeButtons({ variant, className }: RandomizeButtonsProps) 
         ];
 
   return (
-    <div className={cn('grid grid-cols-2 gap-1.5', className)}>
+    <div className={cn('flex flex-col gap-1.5', className)}>
       {buttons.map((b) => (
         <button
           key={b.label}
