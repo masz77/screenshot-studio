@@ -612,6 +612,7 @@ export interface ImageState {
   randomizeBackground: () => void;
   randomize3D: () => void;
   randomizeMotion: () => void;
+  applyPresetToAllSlides: (presetId: string, slot: 'in' | 'out') => void;
   setImageFilter: (key: keyof ImageFilters, value: number) => void;
   resetImageFilters: () => void;
   resetCanvasSettings: () => void;
@@ -1636,6 +1637,16 @@ export const useImageStore = create<ImageState>()(
           inPresetId: pickMotion(s.inPresetId ?? null).id,
         })),
       });
+    },
+
+    applyPresetToAllSlides: (presetId: string, slot: 'in' | 'out') => {
+      set((state) => ({
+        slides: state.slides.map((s) =>
+          slot === 'in'
+            ? { ...s, inPresetId: presetId, inCustomTracks: null }
+            : { ...s, outPresetId: presetId, outCustomTracks: null },
+        ),
+      }));
     },
 
     // Annotations (custom SVG)

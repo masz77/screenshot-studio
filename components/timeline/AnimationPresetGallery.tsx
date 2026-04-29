@@ -19,6 +19,7 @@ export function AnimationPresetGallery() {
     setSlideInPreset,
     setSlideOutPreset,
     clearTimeline,
+    applyPresetToAllSlides,
   } = useImageStore();
 
   const {
@@ -155,12 +156,24 @@ export function AnimationPresetGallery() {
           <div className="grid grid-cols-3 gap-2">
             {presets.map((preset) => {
               const isPending = pendingPresetId === preset.id;
+              // `selectedSlot?.slot` is the user's current selection if any;
+              // otherwise default to the slot direction this gallery is showing.
+              const effectiveSlot: 'in' | 'out' =
+                selectedSlot?.slot ?? showDirection ?? 'in';
               return (
-                <button
+                <div
                   key={preset.id}
+                  role="button"
+                  tabIndex={0}
                   onClick={() => handlePresetClick(preset)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handlePresetClick(preset);
+                    }
+                  }}
                   className={cn(
-                    'relative flex flex-col items-center gap-1.5 p-1.5 rounded-lg transition-all group',
+                    'group/preset relative flex flex-col items-center gap-1.5 p-1.5 rounded-lg transition-all cursor-pointer',
                     'bg-muted/60 hover:bg-card/80',
                     'border-2',
                     isPending
@@ -203,7 +216,20 @@ export function AnimationPresetGallery() {
                   <span className="text-[9px] font-medium text-foreground/70 truncate w-full text-center">
                     {preset.name}
                   </span>
-                </button>
+
+                  {/* Bulk apply pill */}
+                  <button
+                    type="button"
+                    className="absolute top-1 right-1 px-1.5 py-0.5 rounded text-[9px] font-medium bg-primary/90 text-primary-foreground opacity-0 group-hover/preset:opacity-100 transition-opacity hover:bg-primary"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      applyPresetToAllSlides(preset.id, effectiveSlot);
+                    }}
+                    aria-label="Apply this preset to all slides"
+                  >
+                    All
+                  </button>
+                </div>
               );
             })}
           </div>
