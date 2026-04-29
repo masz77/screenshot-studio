@@ -13,15 +13,16 @@ export default defineConfig({
       strategies: "injectManifest",
       srcDir: "app",
       filename: "sw.ts",
+      // Cloudflare Vite plugin emits client assets to dist/client/, but the
+      // worker serves them from URL root. Pin the PWA outDir to dist/client so
+      // (1) sw.js is emitted next to the assets it references and
+      // (2) Workbox precache URLs become root-relative (e.g. "assets/foo.js"
+      //     -> "/assets/foo.js") instead of being prefixed with "client/".
+      outDir: "dist/client",
       registerType: "autoUpdate",
       injectRegister: false,
       manifest: false,
       injectManifest: {
-        // Cloudflare Vite plugin emits client assets to dist/client/, but
-        // wrangler serves them from URL root. Scan and write SW there so
-        // precache URLs are root-relative (e.g. "assets/foo.js" -> "/assets/foo.js").
-        globDirectory: "dist/client",
-        swDest: "dist/client/sw.js",
         globPatterns: ["**/*.{js,css,html,woff2,ico}", "icons/*.png", "logo.svg"],
         globIgnores: [
           "**/server/**",
