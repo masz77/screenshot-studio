@@ -123,5 +123,18 @@ self.addEventListener("install", () => {
 });
 
 self.addEventListener("activate", (event) => {
-  event.waitUntil(self.clients.claim());
+  event.waitUntil(
+    (async () => {
+      await self.clients.claim();
+      try {
+        const cache = await caches.open("html-pages-v1");
+        const offlineResponse = await fetch("/offline", { cache: "reload" });
+        if (offlineResponse.ok) {
+          await cache.put("/offline", offlineResponse);
+        }
+      } catch {
+        // Cache warming is best-effort; SW activation must not fail
+      }
+    })()
+  );
 });
