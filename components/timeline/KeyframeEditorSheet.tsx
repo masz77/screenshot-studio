@@ -69,31 +69,53 @@ export function KeyframeEditorSheet({
   const timelineRef = React.useRef<KFTimeline | null>(null);
 
   const slide = slideId ? slides.find((s) => s.id === slideId) : null;
-  const presetId = slide && slot === 'in' ? slide.inPresetId : slide?.outPresetId ?? null;
-  const customTracks = slide && slot === 'in' ? slide.inCustomTracks : slide?.outCustomTracks ?? null;
+  const presetId = slot === 'in' ? slide?.inPresetId ?? null : slide?.outPresetId ?? null;
+  const customTracks = slot === 'in' ? slide?.inCustomTracks ?? null : slide?.outCustomTracks ?? null;
 
-  // Compute the working tracks: prefer custom, otherwise fall back to preset clone.
-  const workingTracks: AnimationTrack[] | null = React.useMemo(() => {
-    if (!slide || !slot) return null;
-    if (customTracks && customTracks.length > 0) return customTracks;
-    if (!presetId) return null;
-    const preset = getAnyPresetById(presetId);
-    if (!preset) return null;
-    return clonePresetTracks(preset, { clipId: `kf-${slide.id}-${slot}` });
-  }, [slide, slot, customTracks, presetId]);
+  // Mirror current values into refs so the mount effect can read them once at open
+  // without subscribing to their changes (avoids tearing down mid-drag).
+  const customTracksRef = React.useRef<AnimationTrack[] | null>(null);
+  const presetIdRef = React.useRef<string | null>(null);
+  React.useEffect(() => {
+    customTracksRef.current = customTracks;
+    presetIdRef.current = presetId;
+  }, [customTracks, presetId]);
+
+  // Snapshot of tracks captured at mount-time. Used by handleChange when writing
+  // edits back to the store via modelToTracks.
+  const tracksRef = React.useRef<AnimationTrack[] | null>(null);
 
   // Mount the animation-timeline-js instance when the sheet opens.
+  // Deps intentionally exclude `customTracks`/`presetId`: the handler writes to the
+  // store, which would otherwise re-run this effect mid-drag and dispose the lib.
   React.useEffect(() => {
-    if (!open || !containerRef.current || !workingTracks) return;
+    if (!open || !containerRef.current || !slideId || !slot) return;
+
+    // Compute the initial snapshot once at mount: prefer custom tracks, else clone preset.
+    const snapshotCustom = customTracksRef.current;
+    const snapshotPresetId = presetIdRef.current;
+    let snapshot: AnimationTrack[] | null = null;
+    if (snapshotCustom && snapshotCustom.length > 0) {
+      snapshot = snapshotCustom;
+    } else if (snapshotPresetId) {
+      const preset = getAnyPresetById(snapshotPresetId);
+      if (preset) {
+        snapshot = clonePresetTracks(preset, { clipId: `kf-${slideId}-${slot}` });
+      }
+    }
+    if (!snapshot) return;
+
+    tracksRef.current = snapshot;
 
     const tl = new KFTimeline({ id: containerRef.current });
-    tl.setModel(tracksToModel(workingTracks));
+    tl.setModel(tracksToModel(snapshot));
     timelineRef.current = tl;
 
     const handleChange = () => {
-      if (!slideId || !slot) return;
+      const baseTracks = tracksRef.current;
+      if (!baseTracks) return;
       const model = tl.getModel();
-      const next = modelToTracks(model, workingTracks);
+      const next = modelToTracks(model, baseTracks);
       setSlideCustomTracks(slideId, slot, next);
     };
 
@@ -105,8 +127,9 @@ export function KeyframeEditorSheet({
       tl.off('keyframeChanged', handleChange);
       tl.dispose?.();
       timelineRef.current = null;
+      tracksRef.current = null;
     };
-  }, [open, workingTracks, slideId, slot, setSlideCustomTracks]);
+  }, [open, slideId, slot, setSlideCustomTracks]);
 
   const handleResetToPreset = () => {
     if (slideId && slot) clearSlideCustomTracks(slideId, slot);
