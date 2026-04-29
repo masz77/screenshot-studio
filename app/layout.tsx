@@ -333,9 +333,14 @@ export const metadata: Metadata = {
       { url: "/logo.svg", type: "image/svg+xml" },
     ],
     shortcut: "/icon",
-    apple: "/apple-icon",
+    apple: "/icons/apple-touch-icon.png",
   },
   manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Screenshot Studio",
+  },
   category: "Design Tools",
 };
 
@@ -344,6 +349,10 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
   userScalable: true,
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: "#059669" },
+    { media: "(prefers-color-scheme: light)", color: "#059669" },
+  ],
 };
 
 export default function RootLayout({
