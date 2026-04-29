@@ -436,3 +436,12 @@
   background: color-mix(in srgb, var(--primary) 10%, transparent) !important;
   border-color: var(--primary) !important;
 }
+
+/* Disable text selection across the entire timeline player —
+   prevents accidental highlighting of slide names, chip labels,
+   and ruler ticks during scrubbing. */
+.timeline-editor-wrapper,
+.timeline-editor-wrapper * {
+  user-select: none;
+  -webkit-user-select: none;
+}

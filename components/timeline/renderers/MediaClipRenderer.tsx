@@ -16,7 +16,7 @@ export function MediaClipRenderer({ action, isActive, slidesCount, onRemove, onS
   return (
     <div
       className={cn(
-        'relative w-full h-full cursor-pointer group/clip',
+        'relative w-full h-full cursor-pointer group/clip select-none',
         isActive && slidesCount > 1 && 'ring-1 ring-inset ring-primary/50',
       )}
       onClick={() => action.id !== 'main' && onSelect?.(action.id)}

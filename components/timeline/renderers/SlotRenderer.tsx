@@ -28,7 +28,7 @@ export function SlotRenderer({
     selectedSlot?.slideId === action.slideId && selectedSlot?.slot === 'out'
 
   return (
-    <div className="flex w-full h-full gap-px">
+    <div className="flex w-full h-full gap-px select-none">
       {/* In slot (50%) */}
       <button
         className={cn(
