@@ -16,6 +16,10 @@ import {
   ANIMATION_ROW_ID,
   MEDIA_ROW_ID,
 } from '@/lib/timeline/adapters'
+import {
+  TimelineRowLegend,
+  TIMELINE_LEGEND_ROWS,
+} from '@/components/timeline/TimelineRowLegend'
 import type {
   SlotAction,
   MediaAction,
@@ -316,26 +320,40 @@ export function TimelineEditor() {
       <TimelineControls onClose={handleClose} />
 
       {/* Timeline area */}
-      <div ref={scrollContainerRef} className="flex-1 overflow-hidden">
-        <Timeline
-          ref={timelineRef}
-          editorData={editorData as TimelineRowBase[]}
-          effects={timelineEffects}
-          scale={durationSec > 10 ? 2 : 1}
-          scaleWidth={scaleWidth}
-          scaleSplitCount={SCALE_SPLIT_COUNT}
-          startLeft={START_LEFT}
-          minScaleCount={Math.ceil(durationSec)}
-          maxScaleCount={Math.ceil(durationSec) + 2}
-          rowHeight={48}
-          onCursorDrag={handleCursorDrag}
-          onCursorDragEnd={handleCursorDrag}
-          onClickTimeArea={handleClickTimeArea}
-          onClickAction={handleClickAction}
-          getActionRender={getActionRender}
-          autoScroll
-          style={{ width: '100%', height: '100%' }}
+      <div className="flex-1 flex overflow-hidden">
+        <TimelineRowLegend
+          rows={TIMELINE_LEGEND_ROWS({
+            animation:
+              editorData.find((r) => r.id === ANIMATION_ROW_ID)?.rowHeight ?? 48,
+            media: editorData.find((r) => r.id === MEDIA_ROW_ID)?.rowHeight ?? 56,
+          }).filter((r) =>
+            // hide animation row when there are no slides yet
+            r.id === 'animation'
+              ? editorData.some((row) => row.id === ANIMATION_ROW_ID)
+              : true
+          )}
         />
+        <div ref={scrollContainerRef} className="flex-1 overflow-hidden">
+          <Timeline
+            ref={timelineRef}
+            editorData={editorData as TimelineRowBase[]}
+            effects={timelineEffects}
+            scale={durationSec > 10 ? 2 : 1}
+            scaleWidth={scaleWidth}
+            scaleSplitCount={SCALE_SPLIT_COUNT}
+            startLeft={START_LEFT}
+            minScaleCount={Math.ceil(durationSec)}
+            maxScaleCount={Math.ceil(durationSec) + 2}
+            rowHeight={48}
+            onCursorDrag={handleCursorDrag}
+            onCursorDragEnd={handleCursorDrag}
+            onClickTimeArea={handleClickTimeArea}
+            onClickAction={handleClickAction}
+            getActionRender={getActionRender}
+            autoScroll
+            style={{ width: '100%', height: '100%' }}
+          />
+        </div>
       </div>
     </div>
   )
