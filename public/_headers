@@ -1,0 +1,7 @@
+# Service Worker — never cached at the edge so users get new versions on deploy
+/sw.js
+  Cache-Control: public, max-age=0, must-revalidate
+
+# Workbox runtime files (vite-plugin-pwa may emit these alongside)
+/workbox-*.js
+  Cache-Control: public, max-age=0, must-revalidate
