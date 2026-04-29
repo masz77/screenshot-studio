@@ -1,6 +1,6 @@
 /// <reference lib="webworker" />
 import { precacheAndRoute } from "workbox-precaching";
-import { registerRoute } from "workbox-routing";
+import { registerRoute, setCatchHandler } from "workbox-routing";
 import {
   CacheFirst,
   NetworkFirst,
@@ -108,22 +108,13 @@ registerRoute(
 );
 
 // Fallback for navigations that fail entirely (offline + no cached HTML)
-self.addEventListener("fetch", (event) => {
-  if (event.request.mode === "navigate") {
-    event.respondWith(
-      (async () => {
-        try {
-          // Workbox routes will handle this first; this catches when ALL fail
-          return await fetch(event.request);
-        } catch {
-          const cache = await caches.open("html-pages-v1");
-          const offline = await cache.match("/offline");
-          if (offline) return offline;
-          return new Response("Offline", { status: 503, statusText: "Offline" });
-        }
-      })()
-    );
+setCatchHandler(async ({ request }) => {
+  if (request.mode === "navigate") {
+    const cache = await caches.open("html-pages-v1");
+    const offlinePage = await cache.match("/offline");
+    if (offlinePage) return offlinePage;
   }
+  return Response.error();
 });
 
 // Lifecycle: take over immediately on install/activate
