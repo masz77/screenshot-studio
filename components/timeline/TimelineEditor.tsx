@@ -22,6 +22,7 @@ import {
 import {
   TimelineRowLegend,
   TIMELINE_LEGEND_ROWS,
+  TIMELINE_LEGEND_WIDTH,
 } from '@/components/timeline/TimelineRowLegend'
 import type {
   SlotAction,
@@ -363,7 +364,7 @@ export function TimelineEditor() {
       <TimelineControls onClose={handleClose} />
 
       {/* Timeline area */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-hidden relative">
         <TimelineRowLegend
           rows={TIMELINE_LEGEND_ROWS({
             animation:
@@ -396,6 +397,20 @@ export function TimelineEditor() {
             autoScroll
             style={{ width: '100%', height: '100%' }}
           />
+        </div>
+        {/* Sticky playhead time badge */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute z-20 bg-foreground text-background text-[10px] font-semibold tabular-nums px-1.5 py-0.5 rounded shadow"
+          style={{
+            left: `calc(${TIMELINE_LEGEND_WIDTH}px + ${START_LEFT}px + ${
+              (timeline.playhead / 1000) * scaleWidth
+            }px)`,
+            top: 8,
+            transform: 'translateX(-50%)',
+          }}
+        >
+          {(timeline.playhead / 1000).toFixed(2)}s
         </div>
       </div>
 
