@@ -32,6 +32,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { QueryProvider } from "@/lib/query-client";
 import { GlobalDropZone } from "@/components/GlobalDropZone";
+import { ServiceWorkerRegister } from "@/components/pwa/ServiceWorkerRegister";
 import { getRootJsonLd } from "@/lib/seo/json-ld";
 
 // System UI fonts
@@ -374,6 +375,7 @@ export default function RootLayout({
       <body
         className={`${fontVariables} antialiased`}
       >
+        <ServiceWorkerRegister />
         <QueryProvider>
           <GlobalDropZone>
             {children}
