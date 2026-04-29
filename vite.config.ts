@@ -17,6 +17,11 @@ export default defineConfig({
       injectRegister: false,
       manifest: false,
       injectManifest: {
+        // Cloudflare Vite plugin emits client assets to dist/client/, but
+        // wrangler serves them from URL root. Scan and write SW there so
+        // precache URLs are root-relative (e.g. "assets/foo.js" -> "/assets/foo.js").
+        globDirectory: "dist/client",
+        swDest: "dist/client/sw.js",
         globPatterns: ["**/*.{js,css,html,woff2,ico}", "icons/*.png", "logo.svg"],
         globIgnores: [
           "**/server/**",

@@ -1,7 +1,6 @@
 'use client';
 
 import * as React from 'react';
-import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import {
@@ -38,7 +37,6 @@ import { ExportSlideshowDialog } from '@/lib/export-slideshow-dialog';
 import { ImageExportProgressView } from '@/components/canvas/dialogs/ImageProgressView';
 import { FormatSelector, QualityPresetSelector, ScaleSlider } from '@/components/export';
 import { cn } from '@/lib/utils';
-import { FeedbackWidget } from '@/components/FeedbackWidget';
 
 export function EditorHeader() {
   const { screenshot } = useEditorStore();
@@ -108,15 +106,28 @@ export function EditorHeader() {
       <header className="h-14 bg-card border-b border-border/40 flex items-center justify-between px-4 shrink-0">
         {/* Left - Logo + Undo/Redo */}
         <div className="flex items-center gap-3">
-          <Link href="/landing" className="flex items-center gap-2.5 hover:opacity-80 transition-opacity">
-            <Image
-              src="/logo.svg"
-              alt="Screenshot Studio"
-              width={48}
-              height={48}
-              className="h-12 w-12"
-            />
-          </Link>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                onClick={() => {
+                  clearImage();
+                  resetCanvasSettings();
+                }}
+                className="flex items-center gap-2.5 hover:opacity-80 transition-opacity"
+                aria-label="Reset editor to a clean slate"
+              >
+                <Image
+                  src="/logo.svg"
+                  alt="Screenshot Studio"
+                  width={48}
+                  height={48}
+                  className="h-12 w-12"
+                />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>Reset editor to a clean slate</TooltipContent>
+          </Tooltip>
 
           <button
             onClick={() => setShowTemplates(true)}
@@ -331,9 +342,6 @@ export function EditorHeader() {
             </Tooltip>
           )}
 
-          <div className="flex items-center gap-1 ml-1">
-            <FeedbackWidget />
-          </div>
         </div>
       </header>
 
