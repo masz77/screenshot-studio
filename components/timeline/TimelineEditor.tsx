@@ -78,9 +78,6 @@ export function TimelineEditor() {
     () => loadTimelinePrefs().panelHeight ?? null,
   )
 
-  React.useEffect(() => {
-    saveTimelinePrefs({ panelHeight: overrideHeight })
-  }, [overrideHeight])
   const [editorTarget, setEditorTarget] =
     React.useState<{ slideId: string; slot: 'in' | 'out' } | null>(null)
 
@@ -118,10 +115,12 @@ export function TimelineEditor() {
       const startY = e.clientY
       const startHeight = height
       const maxHeight = Math.floor(window.innerHeight * 0.8)
+      let latestHeight = startHeight
 
       const onMove = (ev: MouseEvent) => {
         const delta = startY - ev.clientY
         const next = Math.max(MIN_HEIGHT, Math.min(maxHeight, startHeight + delta))
+        latestHeight = next
         setOverrideHeight(next)
       }
       const onUp = () => {
@@ -129,6 +128,7 @@ export function TimelineEditor() {
         document.removeEventListener('mouseup', onUp)
         document.body.style.cursor = ''
         document.body.style.userSelect = ''
+        saveTimelinePrefs({ panelHeight: latestHeight })
       }
       document.body.style.cursor = 'ns-resize'
       document.body.style.userSelect = 'none'
@@ -340,7 +340,10 @@ export function TimelineEditor() {
       {/* Resize handle (drag top edge to adjust height; double-click to auto-fit) */}
       <div
         onMouseDown={handleResizeStart}
-        onDoubleClick={() => setOverrideHeight(null)}
+        onDoubleClick={() => {
+          setOverrideHeight(null)
+          saveTimelinePrefs({ panelHeight: null })
+        }}
         title="Drag to resize, double-click to auto-fit"
         className="absolute top-0 left-0 right-0 h-1.5 -translate-y-1/2 z-10 cursor-ns-resize hover:bg-primary/40 transition-colors"
       />

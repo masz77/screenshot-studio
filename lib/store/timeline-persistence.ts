@@ -18,12 +18,21 @@ export function loadTimelinePrefs(): Partial<PersistedTimeline> {
   }
 }
 
+let pendingTimer: ReturnType<typeof setTimeout> | null = null;
+let pendingPrefs: Partial<PersistedTimeline> = {};
+
 export function saveTimelinePrefs(prefs: Partial<PersistedTimeline>): void {
   if (typeof window === 'undefined') return;
-  try {
-    const current = loadTimelinePrefs();
-    window.localStorage.setItem(KEY, JSON.stringify({ ...current, ...prefs }));
-  } catch {
-    // ignore quota / privacy-mode failures
-  }
+  pendingPrefs = { ...pendingPrefs, ...prefs };
+  if (pendingTimer) clearTimeout(pendingTimer);
+  pendingTimer = setTimeout(() => {
+    try {
+      const current = loadTimelinePrefs();
+      window.localStorage.setItem(KEY, JSON.stringify({ ...current, ...pendingPrefs }));
+      pendingPrefs = {};
+    } catch {
+      // ignore quota / privacy-mode failures
+    }
+    pendingTimer = null;
+  }, 250);
 }
