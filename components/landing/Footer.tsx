@@ -127,7 +127,18 @@ export function Footer({ brandName = "Screenshot Studio" }: FooterProps) {
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2"
                 >
                   <GithubIcon className="w-4 h-4" />
-                  GitHub
+                  Original GitHub
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="https://github.com/masz77/screenshot-studio"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2"
+                >
+                  <GithubIcon className="w-4 h-4" />
+                  This Fork
                 </Link>
               </li>
               <li>
