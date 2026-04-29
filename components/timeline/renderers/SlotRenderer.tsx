@@ -17,6 +17,7 @@ interface SlotRendererProps {
   selectedSlot: { slideId: string; slot: 'in' | 'out' } | null
   onSlotClick: (slideId: string, slot: 'in' | 'out') => void
   onClearSlot: (slideId: string, slot: 'in' | 'out') => void
+  onSlotDoubleClick?: (slideId: string, slot: 'in' | 'out') => void
 }
 
 export function SlotRenderer({
@@ -24,6 +25,7 @@ export function SlotRenderer({
   selectedSlot,
   onSlotClick,
   onClearSlot,
+  onSlotDoubleClick,
 }: SlotRendererProps) {
   const inPreset = action.inPresetId ? getAnyPresetById(action.inPresetId) : null
   const outPreset = action.outPresetId ? getAnyPresetById(action.outPresetId) : null
@@ -50,6 +52,10 @@ export function SlotRenderer({
               onClick={(e) => {
                 e.stopPropagation();
                 onSlotClick(action.slideId, 'in');
+              }}
+              onDoubleClick={(e) => {
+                e.stopPropagation();
+                if (inPreset) onSlotDoubleClick?.(action.slideId, 'in');
               }}
               onMouseDown={(e) => e.stopPropagation()}
             >
@@ -100,6 +106,10 @@ export function SlotRenderer({
               onClick={(e) => {
                 e.stopPropagation();
                 onSlotClick(action.slideId, 'out');
+              }}
+              onDoubleClick={(e) => {
+                e.stopPropagation();
+                if (outPreset) onSlotDoubleClick?.(action.slideId, 'out');
               }}
               onMouseDown={(e) => e.stopPropagation()}
             >

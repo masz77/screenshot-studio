@@ -10,6 +10,7 @@ import { TimelineControls } from '@/components/timeline/TimelineControls'
 import { useTimelinePlayback } from '@/components/timeline/hooks/useTimelinePlayback'
 import { SlotRenderer } from '@/components/timeline/renderers/SlotRenderer'
 import { MediaClipRenderer } from '@/components/timeline/renderers/MediaClipRenderer'
+import { KeyframeEditorSheet } from '@/components/timeline/KeyframeEditorSheet'
 import {
   toTimelineRows,
   timelineEffects,
@@ -71,6 +72,8 @@ export function TimelineEditor() {
   const timelineRef = React.useRef<TimelineState>(null)
   const scrollContainerRef = React.useRef<HTMLDivElement>(null)
   const [overrideHeight, setOverrideHeight] = React.useState<number | null>(null)
+  const [editorTarget, setEditorTarget] =
+    React.useState<{ slideId: string; slot: 'in' | 'out' } | null>(null)
 
   useTimelinePlayback()
 
@@ -220,6 +223,7 @@ export function TimelineEditor() {
             selectedSlot={selectedSlot}
             onSlotClick={handleSlotClick}
             onClearSlot={handleClearSlot}
+            onSlotDoubleClick={(slideId, slot) => setEditorTarget({ slideId, slot })}
           />
         )
       }
@@ -355,6 +359,13 @@ export function TimelineEditor() {
           />
         </div>
       </div>
+
+      <KeyframeEditorSheet
+        open={editorTarget !== null}
+        onOpenChange={(open) => !open && setEditorTarget(null)}
+        slideId={editorTarget?.slideId ?? null}
+        slot={editorTarget?.slot ?? null}
+      />
     </div>
   )
 }

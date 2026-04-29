@@ -1,3 +1,5 @@
+import type { AnimationTrack } from '@/types/animation'
+
 // ── Base types (structurally compatible with @xzdarcy/timeline-engine) ──
 
 export interface TimelineActionBase {
@@ -50,6 +52,8 @@ export interface Slide {
   duration: number
   inPresetId: string | null
   outPresetId: string | null
+  inCustomTracks: AnimationTrack[] | null
+  outCustomTracks: AnimationTrack[] | null
 }
 
 // ── Row IDs ──────────────────────────────────────────────────────────

@@ -10,7 +10,7 @@ import { BackgroundConfig, BackgroundType } from "@/lib/constants/backgrounds";
 import { gradientColors } from "@/lib/constants/gradient-colors";
 import { solidColors } from "@/lib/constants/solid-colors";
 import type { Mockup } from "@/types/mockup";
-import type { TimelineState } from "@/types/animation";
+import type { TimelineState, AnimationTrack } from "@/types/animation";
 import {
   trackImageUpload,
   trackBackgroundChange,
@@ -46,6 +46,8 @@ interface Slide {
   duration: number;
   inPresetId: string | null;
   outPresetId: string | null;
+  inCustomTracks: AnimationTrack[] | null;
+  outCustomTracks: AnimationTrack[] | null;
 }
 export interface TextOverlay {
   id: string;
@@ -652,6 +654,12 @@ export interface ImageState {
   // Per-slide animation assignment
   setSlideInPreset: (slideId: string, presetId: string | null) => void;
   setSlideOutPreset: (slideId: string, presetId: string | null) => void;
+  setSlideCustomTracks: (
+    slideId: string,
+    slot: 'in' | 'out',
+    tracks: AnimationTrack[] | null,
+  ) => void;
+  clearSlideCustomTracks: (slideId: string, slot: 'in' | 'out') => void;
 
   // Annotations (custom SVG)
   annotations: AnnotationShape[];
@@ -1377,6 +1385,8 @@ export const useImageStore = create<ImageState>()(
         duration: slideshow.defaultDuration,
         inPresetId: null,
         outPresetId: null,
+        inCustomTracks: null,
+        outCustomTracks: null,
       }));
 
       const allSlides = [...slides, ...newSlides];
@@ -1522,6 +1532,8 @@ export const useImageStore = create<ImageState>()(
           ...s,
           inPresetId: null,
           outPresetId: null,
+          inCustomTracks: null,
+          outCustomTracks: null,
         })),
       }));
     },
@@ -1538,6 +1550,36 @@ export const useImageStore = create<ImageState>()(
       set((state) => ({
         slides: state.slides.map((s) =>
           s.id === slideId ? { ...s, outPresetId: presetId } : s
+        ),
+      }));
+    },
+
+    setSlideCustomTracks: (slideId, slot, tracks) => {
+      set((state) => ({
+        slides: state.slides.map((s) =>
+          s.id === slideId
+            ? {
+                ...s,
+                ...(slot === 'in'
+                  ? { inCustomTracks: tracks }
+                  : { outCustomTracks: tracks }),
+              }
+            : s
+        ),
+      }));
+    },
+
+    clearSlideCustomTracks: (slideId, slot) => {
+      set((state) => ({
+        slides: state.slides.map((s) =>
+          s.id === slideId
+            ? {
+                ...s,
+                ...(slot === 'in'
+                  ? { inCustomTracks: null }
+                  : { outCustomTracks: null }),
+              }
+            : s
         ),
       }));
     },

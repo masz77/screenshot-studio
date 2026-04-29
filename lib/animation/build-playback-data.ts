@@ -8,6 +8,23 @@ interface SlideInput {
   duration: number
   inPresetId: string | null
   outPresetId: string | null
+  inCustomTracks: AnimationTrack[] | null
+  outCustomTracks: AnimationTrack[] | null
+}
+
+function offsetTracks(
+  tracks: AnimationTrack[],
+  startMs: number,
+  clipId: string,
+): AnimationTrack[] {
+  return tracks.map((track) => ({
+    ...track,
+    clipId,
+    keyframes: track.keyframes.map((kf) => ({
+      ...kf,
+      time: kf.time + startMs,
+    })),
+  }))
 }
 
 /**
@@ -26,39 +43,62 @@ export function buildPlaybackData(
     const slideDurationMs = (slide.duration || defaultDuration) * 1000
     const timing = getSlideAnimationTiming(slideDurationMs)
 
-    if (slide.inPresetId) {
+    // ── In ──
+    if (slide.inCustomTracks && slide.inCustomTracks.length > 0) {
+      const clipId = `playback-in-${slide.id}`
+      clips.push({
+        id: clipId,
+        presetId: 'custom',
+        name: 'Custom (In)',
+        startTime: slideStartMs,
+        duration: timing.inMs,
+        color: '#10B981',
+      })
+      tracks.push(...offsetTracks(slide.inCustomTracks, slideStartMs, clipId))
+    } else if (slide.inPresetId) {
       const preset = getAnyPresetById(slide.inPresetId)
       if (preset) {
         const clipId = `playback-in-${slide.id}`
-        const clip: AnimationClip = {
+        clips.push({
           id: clipId,
           presetId: preset.id,
           name: preset.name,
           startTime: slideStartMs,
           duration: timing.inMs,
           color: '#10B981',
-        }
-        clips.push(clip)
+        })
         tracks.push(
           ...clonePresetTracks(preset, { startTime: slideStartMs, clipId }),
         )
       }
     }
 
-    if (slide.outPresetId) {
+    // ── Out ──
+    if (slide.outCustomTracks && slide.outCustomTracks.length > 0) {
+      const outStartMs = slideStartMs + slideDurationMs - timing.outMs
+      const clipId = `playback-out-${slide.id}`
+      clips.push({
+        id: clipId,
+        presetId: 'custom',
+        name: 'Custom (Out)',
+        startTime: outStartMs,
+        duration: timing.outMs,
+        color: '#10B981',
+      })
+      tracks.push(...offsetTracks(slide.outCustomTracks, outStartMs, clipId))
+    } else if (slide.outPresetId) {
       const preset = getAnyPresetById(slide.outPresetId)
       if (preset) {
         const outStartMs = slideStartMs + slideDurationMs - timing.outMs
         const clipId = `playback-out-${slide.id}`
-        const clip: AnimationClip = {
+        clips.push({
           id: clipId,
           presetId: preset.id,
           name: preset.name,
           startTime: outStartMs,
           duration: timing.outMs,
           color: '#10B981',
-        }
-        clips.push(clip)
+        })
         tracks.push(
           ...clonePresetTracks(preset, { startTime: outStartMs, clipId }),
         )
@@ -77,5 +117,11 @@ export function buildPlaybackData(
 export function hasAnySlideAnimations(
   slides: SlideInput[],
 ): boolean {
-  return slides.some((s) => s.inPresetId !== null || s.outPresetId !== null)
+  return slides.some(
+    (s) =>
+      s.inPresetId !== null ||
+      s.outPresetId !== null ||
+      (s.inCustomTracks?.length ?? 0) > 0 ||
+      (s.outCustomTracks?.length ?? 0) > 0,
+  )
 }
