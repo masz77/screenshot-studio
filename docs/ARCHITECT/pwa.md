@@ -85,3 +85,37 @@ Deploy / update
 - **No user content is persisted by the SW.** User-uploaded images and design state live in IndexedDB / in-memory Zustand stores managed by the app (see `docs/ARCHITECT/client-storage.md`). The SW only caches static build artifacts and explicit third-party libraries (FFmpeg, Google Fonts).
 - **Manifest stays under our control.** `manifest: false` in the plugin config prevents the build from overwriting `public/manifest.json`, so icon URLs, scope, and start_url cannot drift from intentional configuration.
 - **`/sw.js` is served with `Cache-Control: no-cache`** via `public/_headers`. Without this, Cloudflare or browser HTTP caches could serve a stale SW and prevent updates from ever activating.
+
+## Implementation Status (2026-04-29)
+
+Completed across commits `fee2211` through `1135aed`.
+
+### Build verification
+- `dist/sw.js` emitted (~27 KB, 27829 bytes) with Workbox precache manifest
+- `dist/client/_headers` includes `/sw.js` no-cache rule (copied from `public/_headers` at build time)
+- `dist/client/manifest.json` (1396 bytes) and `dist/client/icons/` (5 PNGs, 88 KB total) in place
+- Precache scope excludes large image folders (`mac/`, `mesh/`, `pattern/`, `paper/`, `radiant/`, `raycast/`, `overlay/`, `overlay-shadow/`, `demo/`) — runtime CacheFirst handles them
+- First precache URLs: `client/assets/worker-entry-*.{css,js}`, `client/assets/worker-*.js`, `client/assets/webp_enc*.js`, `client/assets/router-*.js`, `client/assets/rolldown-runtime-*.js`, `client/assets/preload-helper-*.js`, `client/assets/index-*.{js,css}`, `client/assets/framework-*.js`, `client/assets/ClientCanvas-*.js` (~20 entries observed)
+- Workbox runtime emitted at `dist/client/assets/workbox-window.prod.es5-*.js`
+- `dist/client/assets/` is 12 MB total — large but expected (worker bundles, codecs)
+
+### Concerns surfaced during verification (need follow-up tasks)
+1. **Service worker emitted at `dist/sw.js`, not `dist/client/sw.js`.** vinext serves static from `dist/client/`, so `/sw.js` may not resolve at the production origin unless the Cloudflare worker / static handler is configured to also serve files from `dist/`. Worth a smoke test: `curl https://screenshot-studio.com/sw.js` after deploy.
+2. **Precache manifest URLs are prefixed with `client/`** (e.g. `client/assets/worker-*.js`). At runtime these would resolve as `/client/assets/...` — but production URLs are `/assets/...`. The precache install step is likely to 404 every entry, leaving the SW registered but with an empty cache. Runtime caching routes (CacheFirst on `/assets/*`) should still populate on demand, so the user-facing impact is "no offline app shell" rather than a broken site, but installability + offline fallback may be degraded.
+3. The two issues above stem from `vite-plugin-pwa` running against the Vite outDir (`dist/`) rather than vinext's client output dir (`dist/client/`). May need a `buildBase` / `outDir` override in `vite.config.ts` or a post-build copy step.
+
+### Manual verification still required (user-driven)
+1. `pnpm build && pnpm start` — open `/editor` in incognito Chrome
+2. DevTools → Application → Service Workers — confirm `sw.js` activated (or 404 if concern #1 is real)
+3. DevTools → Network → reload → `/editor` response keeps `Cross-Origin-Opener-Policy: same-origin` and `Cross-Origin-Embedder-Policy: credentialless`
+4. Console: `crossOriginIsolated === true`
+5. Trigger video export — FFmpeg WASM still works (proves SAB intact)
+6. Lighthouse PWA audit — should show "Installable"
+7. Test offline: DevTools → Network → Offline → reload → see `/offline` page
+8. Test install prompt: Chrome may show install icon in URL bar; trigger install and verify standalone window opens
+9. After deploy: `curl -I https://screenshot-studio.com/sw.js` — should return 200 with `Cache-Control: public, max-age=0, must-revalidate`
+
+### Known caveats
+- `vite-plugin-pwa@1.2.0` declares peer `vite ^3-7`; project uses vite ^8. Build works but watch for plugin updates.
+- Cache TTLs: 30d for static assets, 1y for FFmpeg WASM and Google Fonts, 7d for HTML pages.
+- Update flow is silent (`skipWaiting` + `clientsClaim`) per user choice — no toast on new version.
