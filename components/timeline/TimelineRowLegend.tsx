@@ -64,7 +64,7 @@ export const TIMELINE_LEGEND_ROWS = (rowHeights: {
     label: 'Motion',
     hint: 'Entrance & exit per slide. Click + In / + Out.',
     icon: <VideoReplayIcon size={14} />,
-    accentClass: 'text-primary',
+    accentClass: 'text-foreground/70',
   },
   {
     id: 'media',

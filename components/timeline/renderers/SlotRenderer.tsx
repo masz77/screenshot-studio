@@ -99,8 +99,8 @@ export function SlotRenderer({
               className={cn(
                 'flex-1 flex items-center gap-1 px-2 rounded-r-lg overflow-hidden transition-all',
                 outPreset
-                  ? 'bg-primary/15 border border-primary/30'
-                  : 'bg-muted/30 border border-dashed border-border/50 hover:border-primary/40 hover:bg-primary/5',
+                  ? 'bg-accent/40 border border-accent-foreground/20'
+                  : 'bg-muted/30 border border-dashed border-border/50 hover:border-accent-foreground/40 hover:bg-accent/20',
                 isOutSelected && 'ring-2 ring-primary ring-offset-1 ring-offset-card'
               )}
               onClick={(e) => {
@@ -115,8 +115,8 @@ export function SlotRenderer({
             >
               {outPreset ? (
                 <>
-                  <VideoReplayIcon size={10} className="text-primary shrink-0" />
-                  <span className="text-[9px] text-primary font-medium truncate">
+                  <VideoReplayIcon size={10} className="text-accent-foreground shrink-0" />
+                  <span className="text-[9px] text-accent-foreground font-medium truncate">
                     {outPreset.name}
                   </span>
                   <button
