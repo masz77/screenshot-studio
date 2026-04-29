@@ -8,6 +8,7 @@ import '@xzdarcy/react-timeline-editor/dist/react-timeline-editor.css'
 import { useImageStore, useEditorStore } from '@/lib/store'
 import { TimelineControls } from '@/components/timeline/TimelineControls'
 import { useTimelinePlayback } from '@/components/timeline/hooks/useTimelinePlayback'
+import { useTimelineAutoFit } from '@/components/timeline/hooks/useTimelineAutoFit'
 import { SlotRenderer } from '@/components/timeline/renderers/SlotRenderer'
 import { MediaClipRenderer } from '@/components/timeline/renderers/MediaClipRenderer'
 import { KeyframeEditorSheet } from '@/components/timeline/KeyframeEditorSheet'
@@ -76,6 +77,7 @@ export function TimelineEditor() {
     React.useState<{ slideId: string; slot: 'in' | 'out' } | null>(null)
 
   useTimelinePlayback()
+  useTimelineAutoFit(scrollContainerRef)
 
   // Build editor data from store state
   const editorData = React.useMemo(
@@ -261,7 +263,7 @@ export function TimelineEditor() {
           Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, currentZoom + delta)) * 100,
         ) / 100
       if (newZoom !== currentZoom) {
-        setTimeline({ zoom: newZoom })
+        setTimeline({ zoom: newZoom, fitMode: 'manual' })
       }
     }
 

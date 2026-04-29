@@ -875,6 +875,7 @@ export const useImageStore = create<ImageState>()(
           isPlaying: false,
           isLooping: true,
           zoom: 1,
+          fitMode: 'fit',
         },
         showTimeline: false,
       });
@@ -979,6 +980,7 @@ export const useImageStore = create<ImageState>()(
           isPlaying: false,
           isLooping: true,
           zoom: 1,
+          fitMode: 'fit',
         },
         showTimeline: false,
       });
@@ -1467,6 +1469,7 @@ export const useImageStore = create<ImageState>()(
       isPlaying: false,
       isLooping: true,
       zoom: 1,
+      fitMode: 'fit',
     },
     showTimeline: false,
 

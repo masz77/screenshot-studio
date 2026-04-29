@@ -64,6 +64,7 @@ export interface TimelineState {
   isLooping: boolean;
   tracks: AnimationTrack[];
   zoom: number; // zoom level for timeline UI (1 = 100%)
+  fitMode: 'fit' | 'manual'; // 'fit' = auto-recompute zoom from container width; 'manual' = user owns zoom
   snapToKeyframes: boolean;
 }
 
@@ -75,6 +76,7 @@ export const DEFAULT_TIMELINE_STATE: TimelineState = {
   isLooping: true,
   tracks: [],
   zoom: 1,
+  fitMode: 'fit',
   snapToKeyframes: true,
 };
 

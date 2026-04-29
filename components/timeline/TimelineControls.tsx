@@ -118,6 +118,29 @@ export function TimelineControls({ onClose }: TimelineControlsProps) {
               <TooltipTrigger asChild>
                 <button
                   type="button"
+                  aria-label="Fit timeline to width"
+                  onClick={() => setTimeline({ fitMode: 'fit' })}
+                  className={cn(
+                    'h-7 px-2 rounded text-[10px] font-medium transition-colors',
+                    timeline.fitMode === 'fit'
+                      ? 'bg-primary/15 text-primary'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                  )}
+                >
+                  Fit
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                {timeline.fitMode === 'fit'
+                  ? 'Auto-fit on. Ctrl+wheel zooms manually.'
+                  : 'Click to auto-fit timeline to panel width.'}
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
                   aria-label={
                     timeline.zoom !== 1 ? 'Reset zoom to 100%' : 'Current zoom level'
                   }
