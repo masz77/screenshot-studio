@@ -6,6 +6,7 @@ import type { TimelineState } from '@xzdarcy/react-timeline-editor'
 import '@xzdarcy/react-timeline-editor/dist/react-timeline-editor.css'
 
 import { useImageStore, useEditorStore } from '@/lib/store'
+import { loadTimelinePrefs, saveTimelinePrefs } from '@/lib/store/timeline-persistence'
 import { TimelineControls } from '@/components/timeline/TimelineControls'
 import { useTimelinePlayback } from '@/components/timeline/hooks/useTimelinePlayback'
 import { useTimelineAutoFit } from '@/components/timeline/hooks/useTimelineAutoFit'
@@ -72,7 +73,13 @@ export function TimelineEditor() {
 
   const timelineRef = React.useRef<TimelineState>(null)
   const scrollContainerRef = React.useRef<HTMLDivElement>(null)
-  const [overrideHeight, setOverrideHeight] = React.useState<number | null>(null)
+  const [overrideHeight, setOverrideHeight] = React.useState<number | null>(
+    () => loadTimelinePrefs().panelHeight ?? null,
+  )
+
+  React.useEffect(() => {
+    saveTimelinePrefs({ panelHeight: overrideHeight })
+  }, [overrideHeight])
   const [editorTarget, setEditorTarget] =
     React.useState<{ slideId: string; slot: 'in' | 'out' } | null>(null)
 

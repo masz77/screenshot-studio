@@ -20,6 +20,9 @@ import {
   trackAspectRatioChange,
 } from "@/lib/analytics";
 import { pickFrame, pickBackground, pick3D, pickMotion } from "@/lib/randomize";
+import { loadTimelinePrefs, saveTimelinePrefs } from '@/lib/store/timeline-persistence';
+
+const persistedTimeline = loadTimelinePrefs();
 
 interface TextShadow {
   enabled: boolean;
@@ -1469,8 +1472,8 @@ export const useImageStore = create<ImageState>()(
       playhead: 0,
       isPlaying: false,
       isLooping: true,
-      zoom: 1,
-      fitMode: 'fit',
+      zoom: persistedTimeline.zoom ?? 1,
+      fitMode: persistedTimeline.fitMode ?? 'fit',
     },
     showTimeline: false,
 
@@ -1478,6 +1481,10 @@ export const useImageStore = create<ImageState>()(
       set((state) => ({
         timeline: { ...state.timeline, ...updates },
       }));
+      if ('zoom' in updates || 'fitMode' in updates) {
+        const next = get().timeline;
+        saveTimelinePrefs({ zoom: next.zoom, fitMode: next.fitMode });
+      }
     },
 
     setShowTimeline: (show) => {
