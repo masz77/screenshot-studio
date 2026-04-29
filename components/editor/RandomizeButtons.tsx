@@ -22,6 +22,7 @@ interface ButtonDef {
   ariaLabel: string;
   tooltip: string;
   onClick: () => void;
+  primary?: boolean;
 }
 
 export function RandomizeButtons({ variant, className }: RandomizeButtonsProps) {
@@ -36,28 +37,31 @@ export function RandomizeButtons({ variant, className }: RandomizeButtonsProps) 
           {
             label: 'Frame',
             ariaLabel: 'Randomize frame styling',
-            tooltip: 'Randomize style, border radius, scale, padding, opacity, and shadow.',
+            tooltip: 'Randomize style, border radius, opacity, and shadow.',
             onClick: randomizeFrame,
+            primary: true,
           },
           {
             label: 'Background',
             ariaLabel: 'Randomize background',
             tooltip: 'Pick a random background — image, gradient, mesh, or magic gradient.',
             onClick: randomizeBackground,
+            primary: true,
           },
         ]
       : [
+          {
+            label: 'Motion',
+            ariaLabel: 'Randomize motion preset',
+            tooltip: 'Pick a different random entrance animation for each slide.',
+            onClick: randomizeMotion,
+            primary: true,
+          },
           {
             label: '3D',
             ariaLabel: 'Randomize 3D perspective',
             tooltip: 'Apply a random 3D perspective preset (tilt, rotation, scale).',
             onClick: randomize3D,
-          },
-          {
-            label: 'Motion',
-            ariaLabel: 'Randomize motion preset',
-            tooltip: 'Apply a random entrance animation preset to all slides.',
-            onClick: randomizeMotion,
           },
         ];
 
@@ -73,14 +77,21 @@ export function RandomizeButtons({ variant, className }: RandomizeButtonsProps) 
                 aria-label={b.ariaLabel}
                 className={cn(
                   'flex items-center justify-between gap-2 h-9 px-3 rounded-lg',
-                  'bg-muted/80 dark:bg-muted/50 border border-border/20',
-                  'text-sm text-foreground',
-                  'hover:bg-accent transition-colors',
-                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+                  'text-sm transition-colors',
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                  b.primary
+                    ? 'bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 active:bg-primary/80 hover:shadow-md'
+                    : 'bg-muted/80 dark:bg-muted/50 border border-border/20 text-foreground hover:bg-accent'
                 )}
               >
                 <span className="font-medium truncate">{b.label}</span>
-                <ShuffleIcon size={14} className="text-muted-foreground shrink-0" />
+                <ShuffleIcon
+                  size={14}
+                  className={cn(
+                    'shrink-0',
+                    b.primary ? 'text-primary-foreground/80' : 'text-muted-foreground'
+                  )}
+                />
               </button>
             </TooltipTrigger>
             <TooltipContent side={variant === 'left' ? 'right' : 'left'} className="max-w-[220px]">

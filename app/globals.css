@@ -406,6 +406,21 @@
   background: var(--border) !important;
 }
 
+/* Hide internal horizontal scrollbar on the slide/edit area. The library
+   shows a 4px bar on hover by default; we keep it invisible so the panel
+   stays clean even when hovered. Vertical scrollbar is also hidden. */
+.timeline-editor-edit-area .ReactVirtualized__Grid,
+.timeline-editor:hover .timeline-editor-edit-area .ReactVirtualized__Grid {
+  scrollbar-width: none !important;
+}
+
+.timeline-editor-edit-area .ReactVirtualized__Grid::-webkit-scrollbar,
+.timeline-editor:hover .timeline-editor-edit-area .ReactVirtualized__Grid::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+}
+
 .timeline-editor-action .timeline-editor-action-left-stretch,
 .timeline-editor-action .timeline-editor-action-right-stretch {
   opacity: 0.4 !important;

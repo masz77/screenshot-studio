@@ -4,7 +4,7 @@ export const SLIDE_ANIMATION_CONFIG = {
   /** Fraction of slide duration used for exit animation */
   outRatio: 0.10,
   /** Minimum animation duration in ms (prevents too-short on short slides) */
-  minDurationMs: 200,
+  minDurationMs: 400,
   /** Maximum animation duration in ms (prevents too-long on long slides) */
   maxDurationMs: 2000,
 } as const

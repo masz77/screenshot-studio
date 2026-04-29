@@ -1547,14 +1547,12 @@ export const useImageStore = create<ImageState>()(
       const next = pickFrame({
         imageStylePreset: state.imageStylePreset,
         borderRadius: state.borderRadius,
-        imageScale: state.imageScale,
         imageBorder: state.imageBorder,
         shadowPreset: state.shadowPreset,
       });
       set({
         imageStylePreset: next.imageStylePreset,
         borderRadius: next.borderRadius,
-        imageScale: next.imageScale,
         imageBorder: next.imageBorder,
         shadowPreset: next.shadowPreset,
       });
@@ -1587,10 +1585,11 @@ export const useImageStore = create<ImageState>()(
     randomizeMotion: () => {
       const state = get();
       if (state.slides.length === 0) return;
-      const currentId = state.slides[0]?.inPresetId ?? null;
-      const preset = pickMotion(currentId);
       set({
-        slides: state.slides.map((s) => ({ ...s, inPresetId: preset.id })),
+        slides: state.slides.map((s) => ({
+          ...s,
+          inPresetId: pickMotion(s.inPresetId ?? null).id,
+        })),
       });
     },
 

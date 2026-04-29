@@ -150,8 +150,8 @@ export function toTimelineRows(
   uploadedImageUrl: string | null,
   imageName: string | null,
 ): TimelineRowBase[] {
-  // Only show animation slots for multi-slide
-  const slotActions = slides.length > 1 ? slidesToSlotActions(slides) : []
+  // Show animation slots whenever there's at least one slide
+  const slotActions = slides.length >= 1 ? slidesToSlotActions(slides) : []
 
   const mediaActions =
     slides.length > 0

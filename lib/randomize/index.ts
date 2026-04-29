@@ -47,7 +47,6 @@ function roundToStep(n: number, step: number): number {
 export interface FrameRandomResult {
   imageStylePreset: ImageStylePreset;
   borderRadius: number;
-  imageScale: number;
   imageBorder: ImageBorder;
   shadowPreset: ShadowPreset;
 }
@@ -55,7 +54,6 @@ export interface FrameRandomResult {
 export function pickFrame(current: {
   imageStylePreset: ImageStylePreset;
   borderRadius: number;
-  imageScale: number;
   imageBorder: ImageBorder;
   shadowPreset: ShadowPreset;
 }): FrameRandomResult {
@@ -65,15 +63,12 @@ export function pickFrame(current: {
   const stylePreset = pickDifferent(r.stylePresets, current.imageStylePreset, attempts, (a, b) => a === b);
   const shadowPreset = pickDifferent(r.shadowPresets, current.shadowPreset, attempts, (a, b) => a === b);
   const borderRadius = pickDifferent(r.borderRadiusChoices, current.borderRadius, attempts, (a, b) => a === b);
-  const imageScale = Math.round(pickRandomInRange(r.imageScale.min, r.imageScale.max, 1, current.imageScale));
-  const padding = pickRandomInRange(r.padding.min, r.padding.max, r.padding.step, current.imageBorder.padding ?? 2);
   const opacity = pickRandomInRange(r.opacity.min, r.opacity.max, r.opacity.step, current.imageBorder.opacity ?? 0.3);
 
   return {
     imageStylePreset: stylePreset,
     borderRadius,
-    imageScale,
-    imageBorder: { ...current.imageBorder, padding, opacity },
+    imageBorder: { ...current.imageBorder, opacity },
     shadowPreset,
   };
 }

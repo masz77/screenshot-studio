@@ -23,7 +23,6 @@ import type {
   TimelineActionBase,
 } from '@/lib/timeline/adapters'
 
-const TIMELINE_HEIGHT = 248
 const ZOOM_STEP = 0.1
 const MIN_ZOOM = 0.25
 const MAX_ZOOM = 4
@@ -31,6 +30,13 @@ const MAX_ZOOM = 4
 const SCALE_WIDTH = 160
 const SCALE_SPLIT_COUNT = 10
 const START_LEFT = 120
+
+// Auto-fit height constants
+const CONTROLS_HEIGHT = 48
+const BANNER_HEIGHT = 32
+const RULER_HEIGHT = 32
+const TIMELINE_CHROME = 16 // border + horizontal scrollbar slack
+const MIN_HEIGHT = 120
 
 export function TimelineEditor() {
   const {
@@ -60,6 +66,7 @@ export function TimelineEditor() {
 
   const timelineRef = React.useRef<TimelineState>(null)
   const scrollContainerRef = React.useRef<HTMLDivElement>(null)
+  const [overrideHeight, setOverrideHeight] = React.useState<number | null>(null)
 
   useTimelinePlayback()
 
@@ -73,6 +80,45 @@ export function TimelineEditor() {
         imageName,
       ),
     [slides, timeline.duration, uploadedImageUrl, imageName],
+  )
+
+  // Auto-fit height: sum of all rendered components, no vertical scrolling
+  const fitHeight = React.useMemo(() => {
+    const rowsHeight = editorData.reduce(
+      (sum, row) => sum + (row.rowHeight ?? 32),
+      0,
+    )
+    const banner = pendingPresetId ? BANNER_HEIGHT : 0
+    return banner + CONTROLS_HEIGHT + RULER_HEIGHT + rowsHeight + TIMELINE_CHROME
+  }, [editorData, pendingPresetId])
+
+  const height = overrideHeight ?? fitHeight
+
+  // Drag handle: top edge resize (drag up = grow)
+  const handleResizeStart = React.useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault()
+      const startY = e.clientY
+      const startHeight = height
+      const maxHeight = Math.floor(window.innerHeight * 0.8)
+
+      const onMove = (ev: MouseEvent) => {
+        const delta = startY - ev.clientY
+        const next = Math.max(MIN_HEIGHT, Math.min(maxHeight, startHeight + delta))
+        setOverrideHeight(next)
+      }
+      const onUp = () => {
+        document.removeEventListener('mousemove', onMove)
+        document.removeEventListener('mouseup', onUp)
+        document.body.style.cursor = ''
+        document.body.style.userSelect = ''
+      }
+      document.body.style.cursor = 'ns-resize'
+      document.body.style.userSelect = 'none'
+      document.addEventListener('mousemove', onMove)
+      document.addEventListener('mouseup', onUp)
+    },
+    [height],
   )
 
   // Sync store playhead → library cursor
@@ -240,9 +286,17 @@ export function TimelineEditor() {
 
   return (
     <div
-      className="timeline-editor-wrapper bg-card border-t border-border/40 flex flex-col"
-      style={{ height: TIMELINE_HEIGHT }}
+      className="timeline-editor-wrapper bg-card border-t border-border/40 flex flex-col relative"
+      style={{ height }}
     >
+      {/* Resize handle (drag top edge to adjust height; double-click to auto-fit) */}
+      <div
+        onMouseDown={handleResizeStart}
+        onDoubleClick={() => setOverrideHeight(null)}
+        title="Drag to resize, double-click to auto-fit"
+        className="absolute top-0 left-0 right-0 h-1.5 -translate-y-1/2 z-10 cursor-ns-resize hover:bg-primary/40 transition-colors"
+      />
+
       {/* Banner for preset-first flow */}
       {pendingPresetId && (
         <div className="flex items-center justify-between px-3 py-1.5 bg-primary/10 border-b border-primary/20 shrink-0">
