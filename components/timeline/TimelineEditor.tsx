@@ -278,12 +278,42 @@ export function TimelineEditor() {
     return () => container.removeEventListener('wheel', handleWheel)
   }, [setTimeline])
 
-  // Clear selection on Escape
+  // Keyboard shortcuts: Esc / Space / F / Arrow keys
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Skip when typing in inputs / contenteditable
+      const target = e.target as HTMLElement
+      if (
+        target?.tagName === 'INPUT' ||
+        target?.tagName === 'TEXTAREA' ||
+        target?.isContentEditable
+      ) {
+        return
+      }
+
       if (e.key === 'Escape') {
         setSelectedSlot(null)
         setPendingPresetId(null)
+        return
+      }
+      if (e.code === 'Space') {
+        e.preventDefault()
+        useImageStore.getState().togglePlayback()
+        return
+      }
+      if (e.key === 'f' || e.key === 'F') {
+        useImageStore.getState().setTimeline({ fitMode: 'fit' })
+        return
+      }
+      if (e.key === 'ArrowLeft') {
+        const { timeline, setPlayhead } = useImageStore.getState()
+        setPlayhead(Math.max(0, timeline.playhead - 100))
+        return
+      }
+      if (e.key === 'ArrowRight') {
+        const { timeline, setPlayhead } = useImageStore.getState()
+        setPlayhead(Math.min(timeline.duration, timeline.playhead + 100))
+        return
       }
     }
     window.addEventListener('keydown', handleKeyDown)
