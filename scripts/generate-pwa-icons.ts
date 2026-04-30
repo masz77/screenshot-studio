@@ -8,8 +8,20 @@ const OUT = resolve(ROOT, "public/icons")
 const BG = "#059669"
 
 async function writeAnyPurpose(svg: Buffer, size: number, file: string) {
-  const info = await sharp(svg, { density: 384 })
-    .resize(size, size, { fit: "contain", background: { r: 0, g: 0, b: 0, alpha: 0 } })
+  // Render onto solid brand background so the icon has fully opaque pixels.
+  // macOS .app bundle icons (used by Brave/Chrome PWA installs) render
+  // transparency as the dock background, which would make a mostly-transparent
+  // icon appear as a blank tile.
+  const padPct = 0.1
+  const inner = Math.round(size * (1 - padPct * 2))
+  const innerPng = await sharp(svg, { density: 384 })
+    .resize(inner, inner, { fit: "contain", background: { r: 0, g: 0, b: 0, alpha: 0 } })
+    .png()
+    .toBuffer()
+  const info = await sharp({
+    create: { width: size, height: size, channels: 4, background: BG },
+  })
+    .composite([{ input: innerPng, gravity: "center" }])
     .png()
     .toFile(resolve(OUT, file))
   console.log(`wrote ${file} (${size}x${size}) - ${info.size} bytes`)

@@ -35,6 +35,11 @@ import { GlobalDropZone } from "@/components/GlobalDropZone";
 import { ServiceWorkerRegister } from "@/components/pwa/ServiceWorkerRegister";
 import { getRootJsonLd } from "@/lib/seo/json-ld";
 
+// Eager SW registration runs before React hydrates so Brave/Chrome's
+// installability check sees an active SW during initial paint — required
+// for the address-bar install icon to appear on first visit.
+const SW_REGISTER_INLINE = `if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(()=>{})}`;
+
 // System UI fonts
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -371,6 +376,13 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(rootJsonLd) }}
         />
+        {process.env.NODE_ENV === "production" && (
+          <script
+            dangerouslySetInnerHTML={{
+              __html: SW_REGISTER_INLINE,
+            }}
+          />
+        )}
       </head>
       <body
         className={`${fontVariables} antialiased`}
